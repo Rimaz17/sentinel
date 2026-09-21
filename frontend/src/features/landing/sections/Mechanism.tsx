@@ -20,11 +20,10 @@ export function Mechanism() {
             An outbreak rarely announces itself at one clinic.
           </h2>
           <p className="mechanism__standfirst">
-            It appears as a handful of extra patients at each of a dozen different places, and
-            each of those numbers is small enough to explain away as the rainy season or a virus
-            going round. Nobody on the ground has enough information to sound an alarm. Sentinel
-            keeps the combined view continuously, so the rise is flagged on day three instead of
-            day ten.
+            It appears as a handful of extra patients at each of a dozen different places, and each
+            of those numbers is small enough to explain away as the rainy season or a virus going
+            round. Nobody on the ground has enough information to sound an alarm. Sentinel keeps the
+            combined view continuously, so the rise is flagged on day three instead of day ten.
           </p>
         </div>
 

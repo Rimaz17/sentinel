@@ -30,8 +30,8 @@ export function SiteFooter() {
         <div className="site-footer__credit">
           <p className="label label--sm">Rimaz Saththar · IIT Sri Lanka · 2026</p>
           <p className="site-footer__source">
-            Facility registry derived from the Ministry of Health Institutions dataset published
-            by Team Watchdog.
+            Facility registry derived from the Ministry of Health Institutions dataset published by
+            Team Watchdog.
           </p>
         </div>
       </div>

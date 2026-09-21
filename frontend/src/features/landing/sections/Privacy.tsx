@@ -31,9 +31,9 @@ export function Privacy() {
             Identity is stripped at the front door.
           </h2>
           <p className="privacy__standfirst">
-            Personal fields are removed in the ingestion API before anything is written to
-            storage. Nothing downstream — the database, the event stream, the backups or the logs —
-            ever holds personal data.
+            Personal fields are removed in the ingestion API before anything is written to storage.
+            Nothing downstream — the database, the event stream, the backups or the logs — ever
+            holds personal data.
           </p>
         </div>
 
@@ -68,9 +68,9 @@ export function Privacy() {
         </table>
 
         <p className="privacy__note">
-          The public view is coarser than the internal one on purpose. A dot plotted at a
-          pharmacy’s exact coordinates can let someone infer which household got sick, even with
-          no name attached — so the public map shows shaded districts, never individual reports.
+          The public view is coarser than the internal one on purpose. A dot plotted at a pharmacy’s
+          exact coordinates can let someone infer which household got sick, even with no name
+          attached — so the public map shows shaded districts, never individual reports.
         </p>
       </div>
     </section>

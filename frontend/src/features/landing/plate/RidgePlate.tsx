@@ -33,7 +33,14 @@ export function RidgePlate({ mode }: RidgePlateProps) {
       role="presentation"
     >
       <defs>
-        <linearGradient id="plate-band" x1="0" y1={BAND_TOP} x2="0" y2={BAND_BOTTOM} gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="plate-band"
+          x1="0"
+          y1={BAND_TOP}
+          x2="0"
+          y2={BAND_BOTTOM}
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="var(--paper)" stopOpacity="0" />
           <stop offset="46%" stopColor="var(--paper)" stopOpacity="0.72" />
           <stop offset="100%" stopColor="var(--paper)" stopOpacity="0.97" />
@@ -56,8 +63,21 @@ export function RidgePlate({ mode }: RidgePlateProps) {
       </g>
 
       {/* The normal range, laid over the field. */}
-      <rect x="0" y={BAND_TOP} width={FRAME.width} height={BAND_BOTTOM - BAND_TOP} fill="url(#plate-band)" />
-      <rect x="0" y={BAND_BOTTOM} width={FRAME.width} height={FRAME.height - BAND_BOTTOM} fill="var(--paper)" fillOpacity="0.97" />
+      <rect
+        x="0"
+        y={BAND_TOP}
+        width={FRAME.width}
+        height={BAND_BOTTOM - BAND_TOP}
+        fill="url(#plate-band)"
+      />
+      <rect
+        x="0"
+        y={BAND_BOTTOM}
+        width={FRAME.width}
+        height={FRAME.height - BAND_BOTTOM}
+        fill="var(--paper)"
+        fillOpacity="0.97"
+      />
 
       {/* The threshold itself. */}
       <line

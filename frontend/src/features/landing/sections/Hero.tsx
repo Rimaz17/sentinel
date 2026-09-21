@@ -22,8 +22,8 @@ export function Hero({ plate }: HeroProps) {
 
           <p className="hero__standfirst">
             Sentinel gathers anonymised symptom reports from hospitals, clinics and pharmacies
-            across Sri Lanka, learns what a normal week looks like for each district, and raises
-            an alert when an area moves well outside that range.
+            across Sri Lanka, learns what a normal week looks like for each district, and raises an
+            alert when an area moves well outside that range.
           </p>
 
           <div className="hero__actions">

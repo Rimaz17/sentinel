@@ -30,7 +30,13 @@ export function PointPlate({ mode }: PointPlateProps) {
         {/* A faint survey grid, so the field reads as a mapped area rather than
             as scattered ink. */}
         <pattern id="plate-grid" width="72" height="72" patternUnits="userSpaceOnUse">
-          <path d="M72 0 L0 0 0 72" fill="none" stroke="var(--ink)" strokeOpacity="0.06" strokeWidth="1" />
+          <path
+            d="M72 0 L0 0 0 72"
+            fill="none"
+            stroke="var(--ink)"
+            strokeOpacity="0.06"
+            strokeWidth="1"
+          />
         </pattern>
       </defs>
 

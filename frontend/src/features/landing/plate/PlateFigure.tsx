@@ -29,7 +29,7 @@ export function PlateFigure({ activeId, onSelect }: PlateFigureProps) {
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([])
 
   const onKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
       const current = PLATES.findIndex((p) => p.id === activeId)
       if (current < 0) return
 
@@ -79,12 +79,7 @@ export function PlateFigure({ activeId, onSelect }: PlateFigureProps) {
           {active?.alt}
         </p>
 
-        <div
-          className="plate__switcher"
-          role="tablist"
-          aria-label="Plate"
-          onKeyDown={onKeyDown}
-        >
+        <div className="plate__switcher" role="tablist" aria-label="Plate">
           <span className="plate__switcher-label label label--sm" aria-hidden="true">
             Plate
           </span>
@@ -104,6 +99,7 @@ export function PlateFigure({ activeId, onSelect }: PlateFigureProps) {
                 tabIndex={isActive ? 0 : -1}
                 className={`plate__tab${isActive ? ' is-active' : ''}`}
                 onClick={() => onSelect(plate.id)}
+                onKeyDown={onKeyDown}
               >
                 <span className="plate__tab-ordinal tnum">{plate.ordinal}</span>
                 <span className="plate__tab-name">{plate.name}</span>

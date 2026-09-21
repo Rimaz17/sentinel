@@ -21,8 +21,8 @@ export function Entries() {
             See what is happening in your district.
           </h2>
           <p className="entries__standfirst">
-            District-level status, disease trends, historical data and published alerts. No
-            account, no sign-up, no interstitial.
+            District-level status, disease trends, historical data and published alerts. No account,
+            no sign-up, no interstitial.
           </p>
           <div className="entries__action">
             <Action to="/dashboard" trailing="→">

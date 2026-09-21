@@ -35,8 +35,8 @@ export function Disclosure() {
             What this demonstration does not do.
           </h2>
           <p className="disclosure__standfirst">
-            Sentinel is a working system running on simulated data. These limitations are
-            documented on purpose rather than left for a reader to discover.
+            Sentinel is a working system running on simulated data. These limitations are documented
+            on purpose rather than left for a reader to discover.
           </p>
         </div>
 
