@@ -57,22 +57,31 @@
   border-bottom: var(--rule-hair);
 }
 
+/* The term stays uppercase; ink-55 clears 3:1 and the term is never the
+   information — the value beside it is. */
 .hero__readout-row dt {
-  color: var(--ink-40);
-  /* This is a label at label size; ink-40 fails text contrast, so the term is
-     carried at ink-55 and the value carries the meaning. */
   color: var(--ink-55);
 }
 
+/* Values are NOT uppercased. They carry units and proper nouns — sigma, km,
+   district names — and `text-transform: uppercase` silently turns "3.2σ" into
+   "3.2Σ", which is a different symbol. Mono and tabular figures already give
+   the technical register without touching the glyphs. */
 .hero__readout-value {
   margin: 0;
   color: var(--ink-85);
+  text-transform: none;
+  letter-spacing: 0.05em;
+}
+
+/* Safe to uppercase: plate names carry no units and no proper nouns. */
+.hero__readout-caps {
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
 }
 
 .hero__readout-note {
   color: var(--ink-70);
-  text-transform: none;
-  letter-spacing: 0.04em;
 }
 
 .hero__simulated {

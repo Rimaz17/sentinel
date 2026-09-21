@@ -41,7 +41,8 @@ export function Hero({ plate }: HeroProps) {
             <div className="hero__readout-row">
               <dt className="label label--sm">Plate</dt>
               <dd className="label label--sm hero__readout-value">
-                <span className="tnum">{plate.ordinal}</span> — {plate.name}
+                <span className="tnum">{plate.ordinal}</span> —{' '}
+                <span className="hero__readout-caps">{plate.name}</span>
               </dd>
             </div>
             <div className="hero__readout-row">
