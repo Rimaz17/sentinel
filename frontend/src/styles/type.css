@@ -22,7 +22,7 @@
      Fluid from 360px to 1440px. The display ceiling is 5.25rem, under the
      6rem cap; tracking tightens as size grows, because a grotesque set large
      at default tracking reads loose. */
-  --step-display: clamp(2.5rem, 1.42rem + 4.8vw, 5.25rem);
+  --step-display: clamp(2.375rem, 1.6rem + 3.4vw, 4.5rem);
   --step-title: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
   --step-section: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
   --step-body-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);

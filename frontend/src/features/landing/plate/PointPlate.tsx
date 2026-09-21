@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { pointField, type PointFieldMode } from './series'
 
 const W = 1440
-const H = 560
+const H = 430
 const REPORTS = 96
 const SEED = 20260921
 

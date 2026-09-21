@@ -7,7 +7,7 @@
   width: 100%;
   /* Tall enough that the ridges have somewhere to rise, short enough that the
      caption stays in the first scroll on a laptop. */
-  height: clamp(20rem, 46vh, 33rem);
+  height: clamp(17rem, 42vh, 27rem);
   overflow: hidden;
   background-color: var(--paper);
   border-top: var(--rule-hair);

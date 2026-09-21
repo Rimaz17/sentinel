@@ -59,7 +59,9 @@ export function ridgeField(
   mode: RidgeFieldMode,
 ): RidgeSeries[] {
   const rand = mulberry32(seed)
-  const exceedingIndex = Math.floor(count * 0.62)
+  // Mid-ground, so the district that leaves its range emerges from the band
+  // rather than standing in front of it.
+  const exceedingIndex = Math.round((count - 1) * 0.45)
 
   return Array.from({ length: count }, (_, i) => {
     const depth = count === 1 ? 1 : i / (count - 1)
@@ -84,7 +86,7 @@ export function ridgeField(
         const d = Math.abs(s - peak) / width
         if (d < 1) {
           const lift = Math.cos((d * Math.PI) / 2) ** 2
-          values[s] = (values[s] ?? 0) + lift * 0.64
+          values[s] = (values[s] ?? 0) + lift * 0.95
         }
       }
     }
