@@ -1,0 +1,85 @@
+/*
+ * Typography.
+ *
+ * Two faces, both self-hosted as variable fonts so the page has no third-party
+ * font request and no layout shift waiting on one.
+ *
+ * Schibsted Grotesk carries display and body. It is a neo-grotesque with a wide,
+ * open lower case that holds together when set tight at display sizes, which is
+ * what the pinned reference does.
+ *
+ * Geist Mono carries measurement: coordinates, ISO dates, counts, sigma values,
+ * district codes. It is never used as decoration. If a mono string on this page
+ * is not a measured value, it is in the wrong face.
+ */
+
+:root {
+  --font-sans:
+    'Schibsted Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+
+  /* ---- Display ---------------------------------------------------------
+     Fluid from 360px to 1440px. The display ceiling is 5.25rem, under the
+     6rem cap; tracking tightens as size grows, because a grotesque set large
+     at default tracking reads loose. */
+  --step-display: clamp(2.5rem, 1.42rem + 4.8vw, 5.25rem);
+  --step-title: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
+  --step-section: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-body-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  --step-body: 1rem;
+  --step-small: 0.875rem;
+  --step-label: 0.75rem;
+  --step-label-sm: 0.6875rem;
+
+  --leading-display: 0.98;
+  --leading-title: 1.08;
+  --leading-snug: 1.3;
+  --leading-body: 1.6;
+
+  --track-display: -0.03em;
+  --track-title: -0.02em;
+  --track-tight: -0.01em;
+  --track-label: 0.13em;
+  --track-label-wide: 0.18em;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* Body measure. 68ch sits inside the 65-75ch band. */
+  --measure: 68ch;
+  --measure-narrow: 46ch;
+}
+
+/*
+ * The mono label. Used often enough that it is a single class rather than a
+ * repeated block. It always carries a real measured value.
+ */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--step-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  line-height: 1.45;
+  color: var(--ink-70);
+}
+
+.label--sm {
+  font-size: var(--step-label-sm);
+  letter-spacing: var(--track-label-wide);
+}
+
+/* The one accent. At most one of these is visible per view. */
+.label__value {
+  color: var(--ochre);
+}
+
+/* Any figure a reader might compare against another figure is tabular. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
