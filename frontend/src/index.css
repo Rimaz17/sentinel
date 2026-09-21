@@ -1,0 +1,8 @@
+/* Self-hosted variable fonts. No third-party font request, no layout shift. */
+@import '@fontsource-variable/schibsted-grotesk';
+@import '@fontsource-variable/geist-mono';
+
+@import './styles/tokens.css';
+@import './styles/type.css';
+@import './styles/layout.css';
+@import './styles/base.css';
