@@ -1,0 +1,19 @@
+# Normalise text files to LF in the repository.
+* text=auto eol=lf
+
+# Shell scripts and git hooks must stay LF or bash fails on checkout.
+*.sh            text eol=lf
+scripts/git-hooks/* text eol=lf
+mvnw            text eol=lf
+
+# Windows-only scripts keep CRLF.
+*.cmd           text eol=crlf
+*.bat           text eol=crlf
+
+# Binary assets are never diffed or converted.
+*.png           binary
+*.jpg           binary
+*.webp          binary
+*.ico           binary
+*.woff          binary
+*.woff2         binary
