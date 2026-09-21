@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Strip any AI attribution trailers before the commit is written.
+sed -i.bak \
+  -e '/Generated with \[Claude Code\]/d' \
+  -e '/^Co-Authored-By: Claude/d' \
+  -e '/^Claude-Session:/d' \
+  -e '/noreply@anthropic\.com/d' \
+  "$1"
+rm -f "$1.bak"
