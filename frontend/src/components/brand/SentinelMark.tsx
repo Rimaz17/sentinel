@@ -6,8 +6,10 @@
  * the baseline is filled, because that area is the entire point — the signal is
  * the part that leaves the normal range.
  *
- * Drawn rather than borrowed, in one stroke weight, so it holds at 16px in a
- * browser tab and at 40px in the header.
+ * Drawn rather than borrowed, in one stroke weight. The flanking readings are
+ * deliberately shallow and the exceedance deliberately narrow: at 16px in a
+ * browser tab, a busy trace collapses into a smudge, while one tall spike
+ * crossing one horizontal rule still reads.
  */
 
 type SentinelMarkProps = {
@@ -16,13 +18,13 @@ type SentinelMarkProps = {
   className?: string
 }
 
-/* The weekly trace. Baseline sits at y = 14; smaller y is a higher count. */
-const TRACE = 'M1 17 L4 16 L7 17.4 L10 15.5 L12.5 4.5 L15 15.5 L18 16.8 L21 16 L23 17'
+/** The week's readings. Baseline sits at y = 14; smaller y is a higher count. */
+const TRACE = 'M1 16.6 L4.2 16 L7.4 16.9 L10.2 15.8 L12 5.2 L13.8 15.8 L16.6 16.9 L19.8 16 L23 16.6'
 
 /* The part of the trace above the baseline, closed against it. The two x values
    are where the trace crosses y = 14, solved from the segments either side of
    the peak. */
-const EXCEEDANCE = 'M10.34 14 L12.5 4.5 L14.66 14 Z'
+const EXCEEDANCE = 'M10.506 14 L12 5.2 L13.494 14 Z'
 
 export function SentinelMark({ size = 24, className }: SentinelMarkProps) {
   return (
@@ -33,14 +35,17 @@ export function SentinelMark({ size = 24, className }: SentinelMarkProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.5}
+      strokeWidth={1.4}
       strokeLinecap="square"
       strokeLinejoin="miter"
+      /* The apex is a ~19 degree angle. The default miter limit of 4 bevels
+         anything under ~29 degrees, which flattens the spike into a stub. */
+      strokeMiterlimit={10}
       aria-hidden="true"
       focusable="false"
     >
       {/* The baseline: what a normal week looks like for this area. */}
-      <line x1="1" y1="14" x2="23" y2="14" strokeWidth={1} opacity={0.45} />
+      <line x1="1" y1="14" x2="23" y2="14" strokeWidth={1} opacity={0.42} />
       {/* The exceedance, filled. */}
       <path d={EXCEEDANCE} fill="currentColor" stroke="none" />
       {/* The week's readings. */}
