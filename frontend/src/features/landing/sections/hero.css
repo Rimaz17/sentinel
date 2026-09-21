@@ -1,0 +1,114 @@
+.hero {
+  padding-block: clamp(2.5rem, 1.6rem + 4vw, 5rem) 0;
+}
+
+.hero__inner {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+/* The headline column is held off the left edge and stops short of the right,
+   which is what keeps it reading as a set column rather than as a full-width
+   banner. */
+.hero__lede {
+  max-width: 21ch;
+}
+
+.hero__title {
+  font-size: var(--step-display);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-display);
+  letter-spacing: var(--track-display);
+  text-wrap: balance;
+  /* Pull the cap height flush with the rail's first rule. */
+  margin-top: -0.12em;
+}
+
+.hero__standfirst {
+  max-width: 54ch;
+  margin-top: var(--space-md);
+  font-size: var(--step-body-lg);
+  line-height: var(--leading-snug);
+  color: var(--ink-70);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md) var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+/* ---- The readout rail --------------------------------------------------- */
+
+.hero__readout {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: var(--rule-hair);
+}
+
+.hero__readout-row {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: var(--space-sm);
+  padding-block: 0.6rem;
+  border-bottom: var(--rule-hair);
+}
+
+.hero__readout-row dt {
+  color: var(--ink-40);
+  /* This is a label at label size; ink-40 fails text contrast, so the term is
+     carried at ink-55 and the value carries the meaning. */
+  color: var(--ink-55);
+}
+
+.hero__readout-value {
+  margin: 0;
+  color: var(--ink-85);
+}
+
+.hero__readout-note {
+  color: var(--ink-70);
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.hero__simulated {
+  margin-top: var(--space-md);
+  padding: 0.55rem 0.7rem;
+  color: var(--ink-85);
+  background-color: var(--ochre-wash);
+  border-left: 1px solid var(--ochre);
+  width: fit-content;
+}
+
+/* ---- Two columns once there is room ------------------------------------ */
+
+@media (min-width: 60rem) {
+  .hero__inner {
+    grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.85fr);
+    align-items: end;
+    gap: var(--space-2xl);
+  }
+
+  .hero__lede {
+    max-width: none;
+  }
+
+  .hero__title {
+    max-width: 15ch;
+  }
+
+  /* The rail sits on the headline's lower baseline, never above it. */
+  .hero__rail {
+    padding-bottom: 0.35rem;
+  }
+}
+
+@media (min-width: 60rem) and (max-width: 74rem) {
+  .hero__title {
+    max-width: 13ch;
+  }
+}
