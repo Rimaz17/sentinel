@@ -120,21 +120,34 @@ export type PointField = {
  * evenly across the district with no hotspot at all. The detector treats these
  * differently, and the two plates exist to show why.
  */
-export function pointField(seed: number, mode: PointFieldMode, count: number): PointField {
+export function pointField(
+  seed: number,
+  mode: PointFieldMode,
+  count: number,
+  /**
+   * Frame aspect (width / height). Positions are normalised to 0..1 on both
+   * axes, so without this a round cluster is drawn as an ellipse as wide as the
+   * frame is wide — and the reports then sit outside the very ring that is
+   * supposed to contain them.
+   */
+  aspect = 1,
+): PointField {
   const rand = mulberry32(seed)
   const points: FieldPoint[] = []
 
   const centre = { x: 0.38, y: 0.52 }
   const clustered = mode === 'cluster' ? Math.round(count * 0.34) : 0
+  /** Radius in normalised height units — the ~2 km the geographic check uses. */
+  const clusterRadius = 0.135
 
   for (let i = 0; i < count; i += 1) {
     if (i < clustered) {
       // Polar sampling with a square root on the radius keeps the knot evenly
       // dense rather than piling everything on the centre point.
       const angle = rand() * Math.PI * 2
-      const radius = Math.sqrt(rand()) * 0.052
+      const radius = Math.sqrt(rand()) * clusterRadius * 0.92
       points.push({
-        x: centre.x + Math.cos(angle) * radius * 0.52,
+        x: centre.x + (Math.cos(angle) * radius) / aspect,
         y: centre.y + Math.sin(angle) * radius,
         facility: Math.floor(rand() * 7),
       })
@@ -149,6 +162,6 @@ export function pointField(seed: number, mode: PointFieldMode, count: number): P
 
   return {
     points,
-    ring: mode === 'cluster' ? { x: centre.x, y: centre.y, r: 0.066 } : null,
+    ring: mode === 'cluster' ? { x: centre.x, y: centre.y, r: clusterRadius } : null,
   }
 }

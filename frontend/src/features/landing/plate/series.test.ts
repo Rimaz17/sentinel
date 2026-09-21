@@ -63,18 +63,20 @@ describe('ridgeField', () => {
 })
 
 describe('pointField', () => {
+  const ASPECT = 1440 / 430
+
   it('is deterministic', () => {
-    expect(pointField(3, 'cluster', 60)).toEqual(pointField(3, 'cluster', 60))
+    expect(pointField(3, 'cluster', 60, ASPECT)).toEqual(pointField(3, 'cluster', 60, ASPECT))
   })
 
   it('draws a ring only when there is a cluster to draw it around', () => {
-    expect(pointField(3, 'cluster', 60).ring).not.toBeNull()
-    expect(pointField(3, 'spread', 60).ring).toBeNull()
+    expect(pointField(3, 'cluster', 60, ASPECT).ring).not.toBeNull()
+    expect(pointField(3, 'spread', 60, ASPECT).ring).toBeNull()
   })
 
   it('keeps every report inside the frame', () => {
     for (const mode of ['cluster', 'spread'] as const) {
-      for (const p of pointField(3, mode, 200).points) {
+      for (const p of pointField(3, mode, 200, ASPECT).points) {
         expect(p.x).toBeGreaterThanOrEqual(0)
         expect(p.x).toBeLessThanOrEqual(1)
         expect(p.y).toBeGreaterThanOrEqual(0)
@@ -85,10 +87,25 @@ describe('pointField', () => {
 
   it('concentrates reports near the centre on the cluster plate only', () => {
     const near = (mode: 'cluster' | 'spread') =>
-      pointField(3, mode, 200).points.filter(
-        (p) => Math.hypot((p.x - 0.38) * 0.52, p.y - 0.52) < 0.055,
+      pointField(3, mode, 200, ASPECT).points.filter(
+        (p) => Math.hypot((p.x - 0.38) * ASPECT, p.y - 0.52) < 0.135,
       ).length
 
     expect(near('cluster')).toBeGreaterThan(near('spread') * 3)
+  })
+
+  it('keeps every clustered report inside the ring it is drawn in', () => {
+    const field = pointField(3, 'cluster', 200, ASPECT)
+    const ring = field.ring
+    expect(ring).not.toBeNull()
+    if (!ring) return
+
+    // A third of the reports are the cluster; all of those must sit inside the
+    // ring once the frame's aspect is accounted for.
+    const inside = field.points.filter(
+      (p) => Math.hypot((p.x - ring.x) * ASPECT, p.y - ring.y) <= ring.r,
+    ).length
+
+    expect(inside).toBeGreaterThanOrEqual(Math.round(200 * 0.34))
   })
 })

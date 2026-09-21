@@ -3,7 +3,7 @@ import { pointField, type PointFieldMode } from './series'
 
 const W = 1440
 const H = 430
-const REPORTS = 96
+const REPORTS = 128
 const SEED = 20260921
 
 type PointPlateProps = { mode: PointFieldMode }
@@ -17,7 +17,7 @@ type PointPlateProps = { mode: PointFieldMode }
  * shows is the shape of the distribution, which is the part that matters here.
  */
 export function PointPlate({ mode }: PointPlateProps) {
-  const field = useMemo(() => pointField(SEED, mode, REPORTS), [mode])
+  const field = useMemo(() => pointField(SEED, mode, REPORTS, W / H), [mode])
 
   return (
     <svg
@@ -50,7 +50,7 @@ export function PointPlate({ mode }: PointPlateProps) {
             cy={field.ring.y * H}
             r={field.ring.r * H}
             fill="var(--ochre)"
-            fillOpacity="0.07"
+            fillOpacity="0.1"
           />
           <circle
             cx={field.ring.x * W}
@@ -58,8 +58,8 @@ export function PointPlate({ mode }: PointPlateProps) {
             r={field.ring.r * H}
             fill="none"
             stroke="var(--ochre)"
-            strokeWidth="1.5"
-            strokeDasharray="6 5"
+            strokeWidth="2"
+            strokeDasharray="7 6"
           />
           {/* A leader and scale mark, so the ring states its own size. */}
           <line
@@ -79,7 +79,7 @@ export function PointPlate({ mode }: PointPlateProps) {
             key={i}
             cx={p.x * W}
             cy={p.y * H}
-            r={2.6 + (p.facility % 3) * 0.5}
+            r={2.9 + (p.facility % 3) * 0.55}
             fill="var(--ink)"
             fillOpacity={0.5 + (p.facility % 4) * 0.1}
           />
