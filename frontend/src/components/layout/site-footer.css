@@ -46,11 +46,12 @@
   gap: var(--space-2xs);
 }
 
+/* 11px body text, so it needs the full 4.5:1 — ink-55 measures 3.62:1 here. */
 .site-footer__source {
   max-width: 42ch;
   font-size: var(--step-label-sm);
   line-height: var(--leading-snug);
-  color: var(--ink-55);
+  color: var(--ink-70);
 }
 
 @media (min-width: 60rem) {

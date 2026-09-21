@@ -61,10 +61,10 @@
   border-bottom: var(--rule-hair);
 }
 
-/* The term stays uppercase; ink-55 clears 3:1 and the term is never the
-   information — the value beside it is. */
+/* The term stays uppercase and sits at 11px, which is body size for contrast
+   purposes — it needs 4.5:1, not 3:1. */
 .hero__readout-row dt {
-  color: var(--ink-55);
+  color: var(--ink-70);
 }
 
 /* Values are NOT uppercased. They carry units and proper nouns — sigma, km,

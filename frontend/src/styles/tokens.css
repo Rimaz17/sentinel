@@ -23,7 +23,9 @@
      ink          14.78:1  any text
      ink-85        9.46:1  any text
      ink-70        5.76:1  any text — the secondary body colour
-     ink-55        3.62:1  LARGE text only (>=24px, or >=18.7px bold); never body
+     ink-55        3.62:1  LARGE text only (>=24px, or >=18.7px bold); never body.
+                           Nothing on the landing page is large enough to use
+                           it for type, so it is currently non-text only.
      ink-40        2.40:1  non-text only — rules, inactive marks
      ink-24        1.64:1  non-text only
      ink-14/08/04          hairline rules and washes only */

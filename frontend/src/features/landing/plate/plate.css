@@ -60,11 +60,10 @@
   display: flex;
   align-items: center;
   padding-inline: var(--space-sm);
-  color: var(--ink-55);
+  color: var(--ink-70);
   border-inline-end: var(--rule-hair);
-  /* Large enough for ink-55 to clear 3:1 is not a claim this size can make, so
-     the word is decorative and hidden from assistive technology; the tab list
-     carries its own accessible name. */
+  /* Hidden from assistive technology — the tab list carries its own accessible
+     name — but still visible text, so it still has to clear 4.5:1. */
   font-size: var(--step-label-sm);
 }
 
