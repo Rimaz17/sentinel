@@ -1,0 +1,118 @@
+.privacy {
+  padding-block: var(--space-3xl);
+  border-top: var(--rule-hair);
+  background-color: var(--paper-sunk);
+}
+
+.privacy__inner {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.privacy__title {
+  max-width: 16ch;
+  font-size: var(--step-title);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-title);
+  letter-spacing: var(--track-title);
+}
+
+.privacy__standfirst {
+  max-width: var(--measure);
+  margin-top: var(--space-md);
+  font-size: var(--step-body-lg);
+  line-height: var(--leading-body);
+  color: var(--ink-70);
+}
+
+.privacy__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: start;
+}
+
+.privacy__head {
+  padding: 0 var(--space-md) var(--space-2xs) 0;
+  text-align: start;
+  vertical-align: bottom;
+  color: var(--ink-70);
+  border-bottom: var(--rule-ink);
+}
+
+.privacy__cell {
+  padding: var(--space-md) var(--space-md) 0 0;
+  vertical-align: top;
+  border-bottom: 0;
+}
+
+.privacy__list {
+  display: grid;
+  gap: 0;
+}
+
+.privacy__item {
+  padding-block: 0.5rem;
+  border-bottom: var(--rule-hair);
+  color: var(--ink-85);
+  font-size: var(--step-small);
+  line-height: var(--leading-snug);
+}
+
+.privacy__note {
+  max-width: var(--measure);
+  color: var(--ink-70);
+  font-size: var(--step-small);
+}
+
+/* On a phone the three columns stack. The header cells become the group titles
+   so the reading order stays "question, then answers". */
+@media (max-width: 48rem) {
+  .privacy__table,
+  .privacy__table thead,
+  .privacy__table tbody,
+  .privacy__table tr,
+  .privacy__table th,
+  .privacy__table td {
+    display: block;
+    width: 100%;
+  }
+
+  .privacy__table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .privacy__cell {
+    padding-inline-end: 0;
+    padding-block-start: var(--space-lg);
+  }
+
+  .privacy__cell::before {
+    content: attr(data-head);
+    display: block;
+    padding-bottom: var(--space-2xs);
+    border-bottom: var(--rule-ink);
+    font-family: var(--font-mono);
+    font-size: var(--step-label-sm);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--track-label-wide);
+    text-transform: uppercase;
+    color: var(--ink-70);
+  }
+}
+
+@media (min-width: 60rem) {
+  .privacy__inner {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
+    column-gap: var(--space-2xl);
+    align-items: start;
+  }
+
+  .privacy__note {
+    grid-column: 2;
+    margin-top: calc(var(--space-md) * -1);
+  }
+}
