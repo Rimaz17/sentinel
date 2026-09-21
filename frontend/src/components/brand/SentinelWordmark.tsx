@@ -13,9 +13,7 @@ type SentinelWordmarkProps = {
  * produces a nested anchor.
  */
 export function SentinelWordmark({ size = 'md', className }: SentinelWordmarkProps) {
-  const classes = ['brand', size === 'lg' ? 'brand--lg' : '', className]
-    .filter(Boolean)
-    .join(' ')
+  const classes = ['brand', size === 'lg' ? 'brand--lg' : '', className].filter(Boolean).join(' ')
 
   return (
     <span className={classes}>

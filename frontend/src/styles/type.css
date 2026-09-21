@@ -15,8 +15,7 @@
 
 :root {
   --font-sans:
-    'Schibsted Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
-    sans-serif;
+    'Schibsted Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, 'Cascadia Code', 'Courier New', monospace;
 
   /* ---- Display ---------------------------------------------------------
