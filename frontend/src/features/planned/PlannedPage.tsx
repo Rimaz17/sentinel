@@ -29,8 +29,11 @@ export function PlannedPage({ title, phase, children }: PlannedPageProps) {
 
       <main id="main" className="planned__main">
         <div className="shell planned__inner">
-          <p className="planned__phase label label--sm">Not built yet · {phase}</p>
+          {/* The status line sits under the heading, not above it. A label
+              stacked over a title is a kicker, and the heading carries its own
+              weight without one. */}
           <h1 className="planned__title">{title}</h1>
+          <p className="planned__phase label label--sm">Not built yet · {phase}</p>
           <div className="planned__body">{children}</div>
           <p className="planned__back">
             <Link to="/">Back to the front page</Link>

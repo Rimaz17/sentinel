@@ -16,15 +16,15 @@
 }
 
 .planned__phase {
-  padding-bottom: var(--space-2xs);
-  color: var(--ink-70);
-  border-bottom: var(--rule-firm);
   width: fit-content;
+  margin-top: var(--space-sm);
+  padding-top: var(--space-2xs);
+  color: var(--ink-70);
+  border-top: var(--rule-firm);
 }
 
 .planned__title {
   max-width: 18ch;
-  margin-top: var(--space-md);
   font-size: var(--step-title);
   font-weight: var(--weight-medium);
   line-height: var(--leading-title);
