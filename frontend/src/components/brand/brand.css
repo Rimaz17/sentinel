@@ -1,0 +1,44 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brand__mark {
+  flex: none;
+  /* Optical correction: the mark's baseline rule sits slightly above its own
+     centre, so it needs nudging down to align with the wordmark's cap height. */
+  transform: translateY(1px);
+}
+
+.brand__word {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.22em;
+  /* Letter-spacing adds a trailing gap after the last letter; removing it keeps
+     the lockup optically centred. */
+  margin-inline-end: -0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.brand--lg .brand__word {
+  font-size: 1.0625rem;
+}
+
+/* The mark's trace thickens on hover — the lockup reacts without moving. */
+.brand__mark path {
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+a.brand:hover .brand__mark {
+  color: var(--ochre);
+}
+
+a.brand:hover {
+  text-decoration: none;
+}
