@@ -1,0 +1,10 @@
+# Only the landing page is meant to be indexed. District status and alert
+# counts live on the public dashboard behind a deliberate click, and the staff
+# routes are not public surface at all.
+User-agent: *
+Allow: /$
+Disallow: /dashboard
+Disallow: /signin
+Disallow: /register
+Disallow: /submit
+Disallow: /app
