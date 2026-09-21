@@ -1,0 +1,77 @@
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: var(--step-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ---- Primary: the ruled box ------------------------------------------- */
+
+.action--primary {
+  position: relative;
+  padding: 1.05rem 1.6rem;
+  color: var(--ink);
+  border: var(--rule-ink);
+  background-color: transparent;
+  /* The fill arrives from the foot of the box rather than fading in, so the
+     control reads as being inked rather than lit. */
+  background-image: linear-gradient(var(--ink), var(--ink));
+  background-repeat: no-repeat;
+  background-position: 50% 100%;
+  background-size: 100% 0%;
+  transition:
+    background-size var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+}
+
+.action--primary:hover,
+.action--primary:focus-visible {
+  color: var(--paper);
+  background-size: 100% 100%;
+}
+
+.action--primary .action__trailing {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.action--primary:hover .action__trailing {
+  transform: translateX(0.22rem);
+}
+
+/* ---- Quiet: the underlined link ---------------------------------------- */
+
+.action--quiet {
+  padding-block: 0.3rem;
+  color: var(--ink-70);
+  border-bottom: var(--rule-firm);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.action--quiet:hover,
+.action--quiet:focus-visible {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.action--quiet .action__trailing {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.action--quiet:hover .action__trailing {
+  transform: translateY(0.15rem);
+}
+
+@media (max-width: 30rem) {
+  .action--primary {
+    justify-content: center;
+    width: 100%;
+  }
+}

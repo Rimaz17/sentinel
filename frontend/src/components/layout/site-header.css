@@ -1,0 +1,73 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: rgb(242 245 245 / 0.86);
+  backdrop-filter: blur(10px);
+  border-bottom: var(--rule-faint);
+}
+
+/* The blur is an effect, not decoration: it exists so the ridges can pass under
+   the header without the wordmark losing contrast. Where it is unsupported, the
+   ground goes solid instead of going translucent. */
+@supports not (backdrop-filter: blur(10px)) {
+  .site-header {
+    background-color: var(--paper);
+  }
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: var(--header-h);
+}
+
+.site-header__brand:hover {
+  text-decoration: none;
+}
+
+.site-header__staff {
+  font-family: var(--font-mono);
+  font-size: var(--step-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-70);
+  text-decoration: none;
+  padding-block: 0.35rem;
+  border-bottom: var(--rule-firm);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.site-header__staff:hover,
+.site-header__staff:focus-visible {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+/* The skip link sits above everything and only appears when tabbed to. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: var(--gutter);
+  z-index: 50;
+  padding: 0.75rem 1.1rem;
+  transform: translateY(-120%);
+  background-color: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: var(--step-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline-offset: 3px;
+}
