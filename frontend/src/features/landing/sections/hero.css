@@ -7,11 +7,12 @@
   gap: var(--space-xl);
 }
 
-/* The headline column is held off the left edge and stops short of the right,
-   which is what keeps it reading as a set column rather than as a full-width
-   banner. */
+/* No max-width here. `ch` on this container resolves against its own 16px font,
+   which on a phone clamps the whole column to about 235px and forces the
+   headline into five lines and the action button outside its own box. The
+   measure belongs on the title, where `ch` scales with the display size. */
 .hero__lede {
-  max-width: 24ch;
+  min-width: 0;
 }
 
 .hero__title {
@@ -20,6 +21,9 @@
   line-height: var(--leading-display);
   letter-spacing: var(--track-display);
   text-wrap: balance;
+  /* `ch` here is relative to the display size, so this measure holds its
+     proportions at every breakpoint instead of collapsing on small screens. */
+  max-width: 22ch;
   /* Pull the cap height flush with the rail's first rule. */
   margin-top: -0.12em;
 }
@@ -102,22 +106,16 @@
     gap: var(--space-2xl);
   }
 
-  .hero__lede {
-    max-width: none;
-  }
-
-  .hero__title {
-    max-width: 24ch;
-  }
-
   /* The rail sits on the headline's lower baseline, never above it. */
   .hero__rail {
     padding-bottom: 0.35rem;
   }
 }
 
-@media (min-width: 60rem) and (max-width: 74rem) {
-  .hero__title {
-    max-width: 19ch;
+/* Narrow the readout terms before they start stealing the values' room. */
+@media (max-width: 26rem) {
+  .hero__readout-row {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: var(--space-2xs);
   }
 }
