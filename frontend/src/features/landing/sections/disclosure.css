@@ -1,0 +1,83 @@
+.disclosure {
+  padding-block: var(--space-3xl);
+  border-top: var(--rule-hair);
+  background-color: var(--ink);
+  color: var(--paper);
+}
+
+/* On ink, every rule and secondary tone is re-derived from paper rather than
+   left as the ink-alpha tokens, which would vanish. */
+.disclosure__inner {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.disclosure__title {
+  max-width: 17ch;
+  font-size: var(--step-title);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-title);
+  letter-spacing: var(--track-title);
+}
+
+.disclosure__standfirst {
+  max-width: 48ch;
+  margin-top: var(--space-md);
+  font-size: var(--step-body-lg);
+  line-height: var(--leading-body);
+  /* paper at 78% over ink measures 9.4:1 — comfortably readable. */
+  color: rgb(242 245 245 / 0.78);
+}
+
+.disclosure__list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid rgb(242 245 245 / 0.22);
+}
+
+.disclosure__item {
+  display: grid;
+  gap: var(--space-2xs);
+  padding-block: var(--space-md);
+  border-bottom: 1px solid rgb(242 245 245 / 0.14);
+}
+
+.disclosure__term {
+  color: var(--ochre-bright);
+}
+
+.disclosure__body {
+  max-width: 62ch;
+  margin: 0;
+  font-size: var(--step-small);
+  line-height: var(--leading-body);
+  color: rgb(242 245 245 / 0.78);
+}
+
+.disclosure ::selection {
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+@media (min-width: 60rem) {
+  .disclosure__inner {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
+    column-gap: var(--space-2xl);
+    align-items: start;
+  }
+
+  .disclosure__list {
+    border-top: 0;
+  }
+
+  .disclosure__item {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: var(--space-md);
+    align-items: baseline;
+  }
+
+  .disclosure__item:first-child {
+    padding-top: 0;
+  }
+}
