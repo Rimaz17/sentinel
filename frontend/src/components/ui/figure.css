@@ -1,0 +1,28 @@
+.figure {
+  margin: 0;
+}
+
+.figure__frame {
+  /* Always ratio'd, so the space is reserved before the bytes arrive and
+     nothing on the page shifts as the image loads. */
+  aspect-ratio: var(--figure-ratio);
+  overflow: hidden;
+  /* The drawings sit on a warm paper; the page ground is cooler. Sinking the
+     frame very slightly means the join reads as a change of stock rather than
+     as a mismatch. */
+  background-color: var(--paper-sunk);
+}
+
+.figure__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.figure__caption {
+  padding-top: var(--space-2xs);
+  margin-top: var(--space-xs);
+  color: var(--ink-70);
+  border-top: var(--rule-hair);
+}
