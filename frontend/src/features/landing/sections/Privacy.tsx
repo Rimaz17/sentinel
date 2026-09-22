@@ -1,3 +1,5 @@
+import { privacyFields } from '@/assets/images'
+import { Figure } from '@/components/ui/Figure'
 import './privacy.css'
 
 /**
@@ -28,24 +30,35 @@ const FATES = [
 
 export function Privacy() {
   return (
-    <section className="privacy" aria-labelledby="privacy-title">
+    <section className="privacy" id="privacy" aria-labelledby="privacy-title">
       <div className="shell privacy__inner">
-        <div className="privacy__lede split">
-          <h2 id="privacy-title" className="privacy__title">
-            Identity is stripped at the front door.
-          </h2>
-          <div className="privacy__prose">
-            <p>
-              Personal fields are removed in the ingestion API before anything is written to
-              storage. Nothing downstream, not the database, the event stream, the backups or the
-              logs, ever holds personal data.
-            </p>
-            <p>
-              Sentinel does not diagnose anyone. It counts symptom patterns, not confirmed cases,
-              and it does not decide what happens next. Every alert is investigated by a public
-              health inspector, who can mark it a false alarm.
-            </p>
+        <div className="privacy__lede split split--paired">
+          <div className="privacy__words">
+            <h2 id="privacy-title" className="privacy__title">
+              Identity is stripped at the front door.
+            </h2>
+            <div className="privacy__prose">
+              <p>
+                Personal fields are removed in the ingestion API before anything is written to
+                storage. Nothing downstream, not the database, the event stream, the backups or the
+                logs, ever holds personal data.
+              </p>
+              <p>
+                Sentinel does not diagnose anyone. It counts symptom patterns, not confirmed cases,
+                and it does not decide what happens next. Every alert is investigated by a public
+                health inspector, who can mark it a false alarm.
+              </p>
+            </div>
           </div>
+
+          {/* The same division the register below spells out: the identifiers
+              struck through, the operational fields kept. */}
+          <Figure
+            className="privacy__figure"
+            image={privacyFields}
+            sizes="(min-width: 84rem) 636px, (min-width: 68rem) 45vw, calc(100vw - 2rem)"
+            alt="An illustration. Above, five identity fields struck through: a person, an identity card, a fingerprint, a telephone and a house. Below, four fields kept: a hospital, a staff badge, a location pin and a clock."
+          />
         </div>
 
         <dl className="privacy__register">

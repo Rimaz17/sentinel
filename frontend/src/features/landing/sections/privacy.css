@@ -9,6 +9,12 @@
   gap: var(--space-xl);
 }
 
+.privacy__words {
+  display: grid;
+  gap: var(--space-md);
+  align-content: start;
+}
+
 .privacy__title {
   max-width: 26ch;
   font-size: var(--step-title);
