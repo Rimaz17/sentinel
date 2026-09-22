@@ -56,7 +56,7 @@ export function Privacy() {
           <Figure
             className="privacy__figure"
             image={privacyFields}
-            sizes="(min-width: 84rem) 636px, (min-width: 68rem) 45vw, calc(100vw - 2rem)"
+            sizes="(min-width: 68rem) 432px, calc(100vw - 2rem)"
             alt="An illustration. Above, five identity fields struck through: a person, an identity card, a fingerprint, a telephone and a house. Below, four fields kept: a hospital, a staff badge, a location pin and a clock."
           />
         </div>

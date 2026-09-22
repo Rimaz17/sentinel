@@ -32,6 +32,15 @@
   color: var(--ink-70);
 }
 
+/* The sheet is a legend, not the section's subject, so it reads at less than
+   its column's full width. Centred in the column, so shrinking it does not
+   leave the section lopsided. */
+.privacy__figure {
+  width: 100%;
+  max-width: 27rem;
+  margin-inline: auto;
+}
+
 /* ---- The register ------------------------------------------------------ */
 
 .privacy__register {
