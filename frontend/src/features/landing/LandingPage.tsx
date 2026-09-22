@@ -1,6 +1,5 @@
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
-import { Disclosure } from './sections/Disclosure'
 import { Entries } from './sections/Entries'
 import { Hero } from './sections/Hero'
 import { Mechanism } from './sections/Mechanism'
@@ -22,7 +21,6 @@ export function LandingPage() {
         <Mechanism />
         <Privacy />
         <Entries />
-        <Disclosure />
       </main>
 
       <SiteFooter />
