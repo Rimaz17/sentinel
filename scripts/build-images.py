@@ -36,17 +36,17 @@ QUALITY = 80
 # survives into the page.
 SPEC = {
     "dengue-vector": dict(
-        widths=[640, 960, 1280],
+        widths=[640, 768, 960, 1280],
         key=dict(dark=171.0, ink=38.0, cut=0.10),
         trim=0.02,
     ),
     "network-map": dict(
-        widths=[640, 960, 1280],
+        widths=[640, 768, 960, 1280],
         key=dict(dark=186.0, ink=40.0, cut=0.10),
         trim=0.02,
     ),
     # Already a finished opaque artwork; nothing to key or trim.
-    "two-views": dict(widths=[640, 960, 1280, 1600], key=None, trim=None),
+    "two-views": dict(widths=[640, 768, 960, 1280, 1600], key=None, trim=None),
 }
 
 

@@ -13,10 +13,13 @@
  */
 
 import dengue640 from './dengue-vector-640.webp'
+import dengue768 from './dengue-vector-768.webp'
 import dengue960 from './dengue-vector-960.webp'
 import network640 from './network-map-640.webp'
+import network768 from './network-map-768.webp'
 import network960 from './network-map-960.webp'
 import twoViews640 from './two-views-640.webp'
+import twoViews768 from './two-views-768.webp'
 import twoViews960 from './two-views-960.webp'
 import twoViews1280 from './two-views-1280.webp'
 import twoViews1600 from './two-views-1600.webp'
@@ -31,7 +34,7 @@ export type ImageAsset = {
 
 export const dengueVector: ImageAsset = {
   src: dengue960,
-  srcSet: [`${dengue640} 640w`, `${dengue960} 960w`].join(', '),
+  srcSet: [`${dengue640} 640w`, `${dengue768} 768w`, `${dengue960} 960w`].join(', '),
   width: 1032,
   height: 751,
 }
@@ -40,6 +43,7 @@ export const twoViews: ImageAsset = {
   src: twoViews960,
   srcSet: [
     `${twoViews640} 640w`,
+    `${twoViews768} 768w`,
     `${twoViews960} 960w`,
     `${twoViews1280} 1280w`,
     `${twoViews1600} 1600w`,
@@ -50,7 +54,7 @@ export const twoViews: ImageAsset = {
 
 export const networkMap: ImageAsset = {
   src: network960,
-  srcSet: [`${network640} 640w`, `${network960} 960w`].join(', '),
+  srcSet: [`${network640} 640w`, `${network768} 768w`, `${network960} 960w`].join(', '),
   width: 1024,
   height: 982,
 }
