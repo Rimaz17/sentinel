@@ -24,15 +24,15 @@
   --header-h: 4.25rem;
 
   /* ---- Motion ----------------------------------------------------------
-     One authored moment on this page: the plate change. Everything else
-     settles quickly and gets out of the way. Exponential ease-out, from an
-     already-visible default — nothing on this page animates in from nothing. */
+     One authored moment on this page: the primary action takes its ink from
+     the foot of the box upward. Everything else settles quickly and gets out
+     of the way. Exponential ease-out, from an already-visible default —
+     nothing on this page animates in from nothing. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-fast: 120ms;
   --dur-base: 200ms;
   --dur-slow: 420ms;
-  --dur-plate: 620ms;
 }
 
 /*
@@ -44,7 +44,6 @@
     --dur-fast: 1ms;
     --dur-base: 1ms;
     --dur-slow: 1ms;
-    --dur-plate: 1ms;
   }
 }
 

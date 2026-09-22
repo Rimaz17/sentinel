@@ -40,10 +40,10 @@
 
   /* ---- The one accent -------------------------------------------------- */
   /* Two ochres on one hue (41deg), because the bright one cannot carry text.
-     --ochre        #8f6203 — 4.89:1 on paper. This is the text-carrying accent.
-     --ochre-bright #c88a05 — 2.70:1 on paper, FAILS as text there, but 5.48:1
-                    on --ink. It is a graphic fill for the plate's dark tonal
-                    ground only, and never sets type on paper. */
+     --ochre        #8f6203 — 4.89:1 on paper. This is the accent in use.
+     --ochre-bright #c88a05 — 2.70:1 on paper, so it FAILS as text there, but
+                    5.48:1 on --ink. Reserved for marks on dark surfaces, which
+                    the internal dashboard will have; never sets type on paper. */
   --ochre: #8f6203;
   --ochre-bright: #c88a05;
   --ochre-wash: rgb(200 138 5 / 0.12);
