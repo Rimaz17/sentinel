@@ -23,11 +23,11 @@
   min-height: var(--header-h);
 }
 
-/* The section links take the middle, so the header reads as a way around the
-   page rather than as a wordmark with one sign-in stranded opposite it. */
+/* The section links sit to the right, beside the staff route, so the whole
+   navigation reads as one group opposite the wordmark. */
 .site-header__nav {
   display: none;
-  margin-inline: auto;
+  margin-inline-start: auto;
 }
 
 .site-header__links {
@@ -67,7 +67,9 @@
   }
 
   .site-header__staff-nav {
-    margin-inline-start: 0;
+    /* The links group is already pushed right, so this only needs to hold the
+       staff route a little apart from the section links. */
+    margin-inline-start: var(--space-sm);
   }
 }
 
