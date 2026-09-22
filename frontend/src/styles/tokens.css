@@ -5,7 +5,7 @@
  * document so the landing page and the dashboards stay one system. It is
  * deliberately near-monochrome: ink on paper, with a single ochre reserved for
  * exactly one live measurement per view. Ochre is never used for furniture,
- * borders or hover states — the moment it decorates something it stops meaning
+ * borders or hover states. The moment it decorates something it stops meaning
  * "this is the number that matters".
  *
  * Every contrast ratio quoted below was computed against the ground named, not
@@ -14,19 +14,19 @@
 
 :root {
   /* ---- Ground and ink ------------------------------------------------- */
-  --paper: #f2f5f5;
-  --paper-raised: #f7f9f9;
-  --paper-sunk: #e7ebec;
+  --paper: #eaeeee;
+  --paper-raised: #f1f4f4;
+  --paper-sunk: #dfe4e4;
   --ink: #15222b;
 
   /* Ink at fixed alphas, measured on --paper:
-     ink          14.78:1  any text
-     ink-85        9.46:1  any text
-     ink-70        5.76:1  any text — the secondary body colour
-     ink-55        3.62:1  LARGE text only (>=24px, or >=18.7px bold); never body.
+     ink          13.86:1  any text
+     ink-85        9.02:1  any text
+     ink-70        5.58:1  any text, the secondary body colour
+     ink-55        3.55:1  LARGE text only (>=24px, or >=18.7px bold); never body.
                            Nothing on the landing page is large enough to use
                            it for type, so it is currently non-text only.
-     ink-40        2.40:1  non-text only — rules, inactive marks
+     ink-40        2.40:1  non-text only: rules, inactive marks
      ink-24        1.64:1  non-text only
      ink-14/08/04          hairline rules and washes only */
   --ink-85: rgb(21 34 43 / 0.85);
@@ -40,8 +40,8 @@
 
   /* ---- The one accent -------------------------------------------------- */
   /* Two ochres on one hue (41deg), because the bright one cannot carry text.
-     --ochre        #8f6203 — 4.89:1 on paper. This is the accent in use.
-     --ochre-bright #c88a05 — 2.70:1 on paper, so it FAILS as text there, but
+     --ochre        #8f6203, 4.59:1 on paper. This is the accent in use.
+     --ochre-bright #c88a05, 2.70:1 on paper, so it FAILS as text there, but
                     5.48:1 on --ink. Reserved for marks on dark surfaces, which
                     the internal dashboard will have; never sets type on paper. */
   --ochre: #8f6203;
