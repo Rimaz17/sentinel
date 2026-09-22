@@ -1,5 +1,7 @@
+/* Generous on both sides: with no figure beneath it, the hero has the first
+   viewport to itself and the space is what gives it weight. */
 .hero {
-  padding-block: clamp(2rem, 1.4rem + 2.6vw, 3.5rem) 0;
+  padding-block: clamp(2.5rem, 1.6rem + 3.2vw, 4.5rem) clamp(3rem, 2rem + 4vw, 6rem);
 }
 
 .hero__inner {
@@ -10,13 +12,20 @@
 /* No max-width here. `ch` on this container resolves against its own 16px font,
    which on a phone clamps the whole column to about 235px and forces the
    headline into five lines and the action button outside its own box. The
-   measure belongs on the title, where `ch` scales with the display size. */
+   measure belongs on the title, where `ch` scales with the display size.
+
+   This is also the container the headline sizes itself against. */
 .hero__lede {
   min-width: 0;
+  container-type: inline-size;
+  container-name: lede;
 }
 
 .hero__title {
-  font-size: var(--step-display);
+  /* Single column: here the column IS the viewport, so vw is the honest unit.
+     The 5.8vw slope is chosen to meet the two-column value at the 60rem
+     breakpoint, so the headline does not jump size as the layout reflows. */
+  font-size: clamp(2.5rem, 5.8vw, 4rem);
   font-weight: var(--weight-medium);
   line-height: var(--leading-display);
   letter-spacing: var(--track-display);
@@ -94,6 +103,15 @@
 /* ---- Two columns once there is room ------------------------------------ */
 
 @media (min-width: 60rem) {
+  /* Two columns: the headline no longer spans the viewport, so it is sized
+     against its own column instead. 10.4cqw holds a constant ratio of column
+     width to type size, which is what keeps the headline at three even lines
+     all the way up. A viewport-fluid size drifts as the window narrows: at
+     1100px it produced a fourth line carrying only "no single". */
+  .hero__title {
+    font-size: clamp(2.5rem, 10.4cqw, 5rem);
+  }
+
   .hero__inner {
     grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.85fr);
     align-items: end;
