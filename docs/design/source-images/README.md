@@ -4,11 +4,15 @@ Full-resolution originals for the landing page figures. These are **not shipped*
 they are archived here so the web assets can be regenerated if sizes or formats
 change.
 
-| File | Used as | Appears |
+| File | Source | Appears |
 |---|---|---|
-| `dengue-vector.jpg` | 2816×1536 | Full-bleed figure below the hero |
-| `two-views.jpg` | 1024×1054 | Inside "An outbreak rarely announces itself" |
-| `network-map.jpg` | 764×768 | Inside "See what is happening in your district" |
+| `dengue-vector.jpg` | 1110×944, cut-out | Hero, right column |
+| `two-views.jpg` | 2048×2048, opaque | Detection section, left column |
+| `network-map.jpg` | 1024×1029, cut-out | Entry paths, left column |
+
+Two of these are cut-outs that were exported as JPEG, so their transparency
+arrived baked in as a checkerboard. The build script keys it back out and trims
+each one to its own artwork — see `## Imagery` in `../DESIGN.md`.
 
 The shipped derivatives live in `frontend/src/assets/` as WebP at several widths.
 Regenerate them with:
