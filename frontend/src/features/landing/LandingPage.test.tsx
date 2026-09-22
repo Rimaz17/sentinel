@@ -36,11 +36,18 @@ describe('LandingPage', () => {
     expect(screen.getByRole('link', { name: /skip to content/i })).toHaveAttribute('href', '#main')
   })
 
-  it('states the detection window and threshold in the hero rail', () => {
+  it('states the coverage, window and threshold in the hero strip', () => {
     renderLanding()
     expect(screen.getByText('25 districts · 1,505 facilities')).toBeInTheDocument()
     expect(screen.getByText('last 7 days against 8 weeks')).toBeInTheDocument()
     expect(screen.getByText('3σ')).toBeInTheDocument()
+  })
+
+  it('puts every two-column section on the one shared grid', () => {
+    const { container } = renderLanding()
+    // Sections inventing their own column ratios is what made the page read as
+    // unaligned, so there must be no stray grid definitions left behind.
+    expect(container.querySelectorAll('.split').length).toBe(4)
   })
 
   it('carries no plate switcher', () => {
