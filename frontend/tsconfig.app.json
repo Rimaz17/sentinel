@@ -16,7 +16,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Strictness — CLAUDE.md section 6 requires strict mode. */
+    /* Strictness: CLAUDE.md section 6 requires strict mode. */
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
