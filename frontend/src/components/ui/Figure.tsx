@@ -21,6 +21,12 @@ type FigureProps = {
    * source image, so nothing important falls outside the frame.
    */
   ratio?: string
+  /**
+   * `contain` (the default) fits the whole drawing in the frame, which is what
+   * a trimmed cut-out needs — cropping one just clips the artwork. `cover`
+   * fills the frame and is for opaque artwork that can take a crop.
+   */
+  fit?: 'contain' | 'cover'
   /** Only the figure at the fold should load eagerly. */
   priority?: boolean
   className?: string
@@ -32,11 +38,13 @@ export function Figure({
   caption,
   sizes,
   ratio,
+  fit = 'contain',
   priority = false,
   className,
 }: FigureProps) {
   const frameStyle = {
     '--figure-ratio': ratio ?? `${image.width} / ${image.height}`,
+    '--figure-fit': fit,
   } as CSSProperties
 
   return (

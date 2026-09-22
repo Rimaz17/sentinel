@@ -12,16 +12,15 @@
      So a breakpoint that needs a different crop sets the override instead. */
   aspect-ratio: var(--figure-ratio-override, var(--figure-ratio));
   overflow: hidden;
-  /* The drawings sit on a warm paper; the page ground is cooler. Sinking the
-     frame very slightly means the join reads as a change of stock rather than
-     as a mismatch. */
-  background-color: var(--paper-sunk);
 }
 
 .figure__img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* Defaults to `contain`: two of these are cut-outs trimmed to their own
+     artwork, and cropping a cut-out just clips the drawing. Opaque artwork
+     opts into `cover` so a section can crop it to the band it wants. */
+  object-fit: var(--figure-fit, contain);
   object-position: center;
 }
 
