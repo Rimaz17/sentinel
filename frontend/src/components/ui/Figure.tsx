@@ -6,11 +6,12 @@ type FigureProps = {
   image: ImageAsset
   /**
    * What the picture says, for someone who cannot see it. Not a description of
-   * the artwork — a description of the information it carries.
+   * the artwork — a description of the information it carries. Each of these
+   * ends by naming itself an illustration: the figures carry no visible
+   * caption, so the alt text is where that disclosure lives for anyone who
+   * cannot see the drawing.
    */
   alt: string
-  /** The mono line beneath. Every figure here is an illustration and says so. */
-  caption: string
   /** `sizes` for the browser's srcSet choice. Must match the real CSS width. */
   sizes: string
   /**
@@ -35,7 +36,6 @@ type FigureProps = {
 export function Figure({
   image,
   alt,
-  caption,
   sizes,
   ratio,
   fit = 'contain',
@@ -63,7 +63,6 @@ export function Figure({
           {...(priority ? { fetchPriority: 'high' as const } : {})}
         />
       </div>
-      <figcaption className="figure__caption label label--sm">{caption}</figcaption>
     </figure>
   )
 }

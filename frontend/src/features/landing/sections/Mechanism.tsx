@@ -16,7 +16,7 @@ const CHECKS = [
 export function Mechanism() {
   return (
     <section className="mechanism" id="mechanism" aria-labelledby="mechanism-title">
-      <div className="shell split split--paired split--flip">
+      <div className="shell split split--fill split--flip">
         <div className="mechanism__body">
           <h2 id="mechanism-title" className="mechanism__title">
             An outbreak rarely announces itself at one clinic.
@@ -42,10 +42,8 @@ export function Mechanism() {
           className="mechanism__figure"
           image={twoViews}
           fit="cover"
-          ratio="6 / 7"
           sizes="(min-width: 84rem) 636px, (min-width: 60rem) 45vw, calc(100vw - 2rem)"
-          alt="One week drawn twice. Above: patients and hospitals scattered across a grey hillside, annotated “isolated cases” and “rainy season?”. Below: the same ground as a single connected network, with a red cluster picked out and annotated “Sentinel alert”, “DBSCAN cluster” and “hidden outbreak”."
-          caption="The same week, seen twice · illustration"
+          alt="An illustration. One week drawn twice. Above: patients and hospitals scattered across a grey hillside, annotated “isolated cases” and “rainy season?”. Below: the same ground as a single connected network, with a red cluster picked out and annotated “Sentinel alert”, “DBSCAN cluster” and “hidden outbreak”."
         />
       </div>
 

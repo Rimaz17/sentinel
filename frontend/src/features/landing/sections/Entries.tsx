@@ -15,7 +15,7 @@ import './entries.css'
 export function Entries() {
   return (
     <section className="entries" aria-labelledby="entries-title">
-      <div className="shell split split--paired split--flip">
+      <div className="shell split split--fill">
         <div className="entries__body">
           <div>
             <h2 id="entries-title" className="entries__title">
@@ -59,8 +59,7 @@ export function Entries() {
           className="entries__figure"
           image={networkMap}
           sizes="(min-width: 84rem) 636px, (min-width: 60rem) 45vw, calc(100vw - 2rem)"
-          alt="An outline of Sri Lanka stippled with small red marks, densest around the cities and along the coast."
-          caption="The reporting network, all 25 districts · illustration, not live data"
+          alt="An illustration, not live data: an outline of Sri Lanka stippled with small red marks, densest around the cities and along the coast."
         />
       </div>
     </section>

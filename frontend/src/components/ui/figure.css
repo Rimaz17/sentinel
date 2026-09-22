@@ -23,10 +23,3 @@
   object-fit: var(--figure-fit, contain);
   object-position: center;
 }
-
-.figure__caption {
-  padding-top: var(--space-2xs);
-  margin-top: var(--space-xs);
-  color: var(--ink-70);
-  border-top: var(--rule-hair);
-}

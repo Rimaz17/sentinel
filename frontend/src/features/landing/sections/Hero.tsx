@@ -45,8 +45,7 @@ export function Hero() {
             image={dengueVector}
             priority
             sizes="(min-width: 84rem) 636px, (min-width: 60rem) 45vw, calc(100vw - 2rem)"
-            alt="A single-line ink drawing of a mosquito — the dengue vector."
-            caption="Aedes aegypti, the dengue vector · illustration"
+            alt="An illustration: a single-line ink drawing of a mosquito, the dengue vector."
           />
         </div>
 
