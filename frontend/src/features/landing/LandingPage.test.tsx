@@ -43,11 +43,57 @@ describe('LandingPage', () => {
     expect(screen.getByText('3σ')).toBeInTheDocument()
   })
 
-  it('carries no plate figure or plate switcher', () => {
+  it('carries no plate switcher', () => {
     renderLanding()
+    // Figures are fine — the switcher is the thing that must not come back.
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument()
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
-    expect(screen.queryByRole('figure')).not.toBeInTheDocument()
+  })
+
+  it('carries three figures', () => {
+    renderLanding()
+    expect(screen.getAllByRole('img')).toHaveLength(3)
+  })
+
+  it('gives every image alt text that carries its information', () => {
+    renderLanding()
+    for (const img of screen.getAllByRole('img')) {
+      const alt = img.getAttribute('alt') ?? ''
+      // Not empty, and not a filename or a shrug.
+      expect(alt.length).toBeGreaterThan(30)
+      expect(alt).not.toMatch(/\.(webp|jpe?g|png)$/i)
+      expect(alt).not.toMatch(/^(image|figure|photo|illustration)$/i)
+    }
+  })
+
+  it('labels every figure as an illustration rather than as system output', () => {
+    renderLanding()
+    // None of these pictures is a rendering of real or simulated output, and
+    // the page must not let a visitor think otherwise.
+    const captions = screen
+      .getAllByRole('figure')
+      .map((f) => f.querySelector('figcaption')?.textContent ?? '')
+    expect(captions).toHaveLength(3)
+    for (const caption of captions) {
+      expect(caption.toLowerCase()).toContain('illustration')
+    }
+  })
+
+  it('loads only the figure at the fold eagerly', () => {
+    renderLanding()
+    const loading = screen.getAllByRole('img').map((i) => i.getAttribute('loading'))
+    expect(loading.filter((l) => l === 'eager')).toHaveLength(1)
+    expect(loading.filter((l) => l === 'lazy')).toHaveLength(2)
+  })
+
+  it('reserves space for every image so nothing shifts as they load', () => {
+    renderLanding()
+    for (const img of screen.getAllByRole('img')) {
+      expect(img).toHaveAttribute('width')
+      expect(img).toHaveAttribute('height')
+      expect(img).toHaveAttribute('srcset')
+      expect(img).toHaveAttribute('sizes')
+    }
   })
 
   it('carries no author byline', () => {
