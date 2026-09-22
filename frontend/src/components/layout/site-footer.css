@@ -1,6 +1,9 @@
+/* A shade below the page ground, so the page closes on a tone change rather
+   than on a rule alone. Same family as the paper, one step down. */
 .site-footer {
   padding-block: var(--space-2xl) var(--space-xl);
-  border-top: var(--rule-hair);
+  background-color: var(--paper-sunk);
+  border-top: var(--rule-firm);
 }
 
 .site-footer__inner {
@@ -46,7 +49,7 @@
   gap: var(--space-2xs);
 }
 
-/* 11px body text, so it needs the full 4.5:1 — ink-55 measures 3.62:1 here. */
+/* 11px body text, so it needs the full 4.5:1, and ink-55 measures 3.55:1 here. */
 .site-footer__source {
   max-width: 42ch;
   font-size: var(--step-label-sm);
