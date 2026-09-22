@@ -26,11 +26,11 @@ does not exist on the page the reference was taken from.
 
 | Token | Value | Use |
 |---|---|---|
-| `--paper` | `#f2f5f5` | Page ground |
-| `--paper-raised` | `#f7f9f9` | Raised ground |
-| `--paper-sunk` | `#e7ebec` | The privacy band |
+| `--paper` | `#eaeeee` | Page ground |
+| `--paper-raised` | `#f1f4f4` | Raised ground |
+| `--paper-sunk` | `#dfe4e4` | The footer |
 | `--ink` | `#15222b` | Body text, rules at full strength |
-| `--ochre` | `#8f6203` | The accent. Text-safe at 4.89:1 on paper |
+| `--ochre` | `#8f6203` | The accent. Text-safe at 4.59:1 on paper |
 | `--ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces, 2.70:1 on paper, so never type there |
 | `--alert` | `#e0443e` | Reserved for the alert vocabulary; unused so far |
 
@@ -38,10 +38,10 @@ Ink alphas and their measured ratios on `--paper`:
 
 | Token | Ratio | Permitted use |
 |---|---|---|
-| `--ink` | 14.78:1 | Any text |
-| `--ink-85` | 9.46:1 | Any text |
-| `--ink-70` | 5.76:1 | Any text, the secondary body colour |
-| `--ink-55` | 3.62:1 | Large text only (≥24px, or ≥18.7px bold). Nothing on the landing page qualifies, so it is currently non-text only |
+| `--ink` | 13.86:1 | Any text |
+| `--ink-85` | 9.02:1 | Any text |
+| `--ink-70` | 5.58:1 | Any text, the secondary body colour |
+| `--ink-55` | 3.55:1 | Large text only (≥24px, or ≥18.7px bold). Nothing on the landing page qualifies, so it is currently non-text only |
 | `--ink-40` / `--ink-24` | 2.40:1 / 1.64:1 | Non-text: rules, inactive marks |
 | `--ink-14` / `--ink-08` / `--ink-04` | n/a | Hairline rules and washes |
 
@@ -125,7 +125,14 @@ reflows (980px → 55.9px, 940px → 54.5px).
 .split--paired        centres a text block against a figure
 .split--fill          stretches both columns to one shared height
 .split--flip          moves the first child to column two
+--split-a/--split-b   shifts the divider for one section
 ```
+
+The divider can move, the outer edges cannot. A section that genuinely needs an
+uneven split sets `--split-a` / `--split-b`; the detection section does, at
+`0.88fr / 1.12fr`, because its text column carries two sub-columns of its own.
+Everything still starts and ends on the shell's gutters, so the page reads as
+one grid.
 
 **Why 68rem and not 60rem.** Below about 1088px the columns are too narrow to
 carry a figure: the text column keeps growing as it narrows while the figure only
@@ -145,14 +152,11 @@ between figure and text are 0px in both.
 right, left, while the DOM keeps heading-then-figure order, so a screen reader
 and the stacked phone layout both get the heading first.
 
-**A section read in one screen.** The detection and entry sections are meant to be
-taken in without scrolling, so their padding and internal rhythm are budgeted
-against the viewport (`vh` clamps) rather than the page width, and the detection
-section's closing caveat sits full width under both columns rather than inside the
-text column it made too tall. Measured section heights against the available
-height (viewport minus header): at 1080 and at 900 every section fits. At 780 and
-below the detection section overflows by roughly 40–70px, because the copy has a
-floor past which shrinking it would cost more than the scroll does.
+**Sections are not forced to fit one screen.** An earlier build budgeted the
+detection and entry sections in `vh` so each fitted the viewport without
+scrolling. It worked, and it made both sections feel compacted: the type went
+small, the rhythm went tight, and the gain was one avoided scroll. Sections are
+sized by their content again. Room to breathe beats a fitted screen.
 
 ## Imagery
 
@@ -240,6 +244,13 @@ Themed from the palette rather than left to the platform: selection (`--ink` gro
 `--paper` text), caret (`--ochre`), `accent-color`, thin scrollbars in `--ink-24`,
 one 2px `--ink` focus ring at 2px offset for the whole page, and a `0.28em`
 underline offset on links.
+
+## House style
+
+**No em dashes.** Not in copy, comments, commits or documentation. A comma, a
+colon, a semicolon, a full stop or brackets, whichever the sentence actually
+needs; a middot (`·`) where a label wants a separator. A test fails the build
+if one reaches the rendered page. Recorded in CLAUDE.md section 11.
 
 ## Accessibility floor
 
