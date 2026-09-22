@@ -63,8 +63,8 @@
   margin: 0;
 }
 
-/* Visually hidden, still announced. Used for the plate's text alternative and
-   for headings that structure the page for a screen reader without appearing. */
+/* Visually hidden, still announced. Used for table captions and for headings
+   that structure the page for a screen reader without appearing. */
 .sr-only {
   position: absolute;
   width: 1px;

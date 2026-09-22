@@ -115,8 +115,8 @@ ol {
   background-color: var(--ink-40);
 }
 
-/* One focus ring for the whole page. Two offset rings so it stays visible on
-   both the paper ground and the plate's dark tone. */
+/* One focus ring for the whole page, offset so it stays clear of the element it
+   marks on both the paper and the sunk grounds. */
 :focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
