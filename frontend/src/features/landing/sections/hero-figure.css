@@ -1,0 +1,25 @@
+/* Full-bleed: the only element on the page that ignores the shell. */
+.hero-figure__figure .figure__frame {
+  width: 100%;
+  border-block: var(--rule-hair);
+}
+
+/* The caption returns to the text column so it lines up with everything else. */
+.hero-figure__figure .figure__caption {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  padding-top: 0;
+  margin-top: var(--space-xs);
+  border-top: 0;
+}
+
+/* On a phone a 2.4:1 band leaves the mosquito too small to read, so the crop
+   opens up. Both ratios were checked against the subject's bounding box in the
+   source: it stays fully inside each one. */
+@media (max-width: 48rem) {
+  .hero-figure__figure .figure__frame {
+    --figure-ratio: 16 / 10;
+  }
+}

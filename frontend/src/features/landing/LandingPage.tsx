@@ -2,6 +2,7 @@ import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { Entries } from './sections/Entries'
 import { Hero } from './sections/Hero'
+import { HeroFigure } from './sections/HeroFigure'
 import { Mechanism } from './sections/Mechanism'
 import { Privacy } from './sections/Privacy'
 import './landing.css'
@@ -18,6 +19,7 @@ export function LandingPage() {
 
       <main id="main" className="landing__main">
         <Hero />
+        <HeroFigure />
         <Mechanism />
         <Privacy />
         <Entries />
