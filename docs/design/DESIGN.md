@@ -123,6 +123,7 @@ reflows (980px → 55.9px, 940px → 54.5px).
 ```
 .split                two equal columns, gap --space-2xl, from 68rem up
 .split--paired        centres a text block against a figure
+.split--fill          stretches both columns to one shared height
 .split--flip          moves the first child to column two
 ```
 
@@ -132,31 +133,46 @@ shrinks, so the two drift apart and leave exactly the dead space the split exist
 to avoid. At 1000px wide the detection section reached a 500px imbalance. Stacked
 is balanced by definition, so below the breakpoint the page stacks.
 
-**Why `--paired` centres.** With a figure beside a text block, the shorter of the
-two otherwise leaves a tall void at one end. Centring halves it and puts what is
-left on both sides, where it reads as margin rather than as a gap.
+**`--paired` versus `--fill`.** `--paired` centres the shorter column against the
+taller, which halves a small imbalance and puts what is left on both sides, where
+it reads as margin. `--fill` goes further: both columns stretch to one shared
+height, the figure frame drops its own aspect ratio and fills the row, and the
+figure's top and bottom edges land on exactly the same lines as the text beside
+it. The detection and entry sections use `--fill`; measured top and bottom deltas
+between figure and text are 0px in both.
 
 **Why `--flip` exists.** The figure side alternates down the page — right, left,
 right, left — while the DOM keeps heading-then-figure order, so a screen reader
 and the stacked phone layout both get the heading first.
 
-**Measured balance** at 1400px, as the difference between the two column heights:
-hero 83px, detection 94px, privacy 84px, entries 68px. Anything approaching 300px
-means something belongs outside the split — which is why the detection section's
-closing caveat is a full-width line under both columns rather than the last
-paragraph of the text column.
+**A section read in one screen.** The detection and entry sections are meant to be
+taken in without scrolling, so their padding and internal rhythm are budgeted
+against the viewport (`vh` clamps) rather than the page width, and the detection
+section's closing caveat sits full width under both columns rather than inside the
+text column it made too tall. Measured section heights against the available
+height (viewport minus header): at 1080 and at 900 every section fits. At 780 and
+below the detection section overflows by roughly 40–70px, because the copy has a
+floor past which shrinking it would cost more than the scroll does.
 
 ## Imagery
 
 Three figures, one per section, each filling its own column so all three share a
-width and a pair of edges. All three are drawings; none is a rendering of real or
-simulated system output, and every caption says `illustration`.
+width and a pair of edges. The figure side alternates: hero right, detection left,
+entry paths right.
 
 | Figure | Where | Why there |
 |---|---|---|
 | `dengue-vector` | Hero, right | Dengue is the symptom group the specification's worked example follows |
 | `two-views` | Detection, left | Its own annotations — "isolated cases", "rainy season?" — are the argument that section makes |
-| `network-map` | Entry paths, left | The country, at the moment the page asks the visitor to pick their district |
+| `network-map` | Entry paths, right | The country, at the moment the page asks the visitor to pick their district |
+
+**No visible captions.** The figures carry none. The disclosure they used to hold
+now lives in two places: every alt text names its image an illustration, so a
+reader who cannot see the drawing still learns it is not system output; and the
+page's visible statement is the ochre-washed **"All case data simulated ·
+demonstration system"** notice in the hero, which is where CLAUDE.md section 6a
+wants it anyway. That notice is now the only visible disclosure on the page, so it
+does not move and does not get quieter.
 
 **Cut-outs, keyed.** Two of the three originals were exported as JPEG with their
 transparency baked in as a checkerboard. `scripts/build-images.py` keys that back
