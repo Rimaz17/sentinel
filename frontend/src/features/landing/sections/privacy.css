@@ -1,104 +1,102 @@
+/* No band of its own: this section sits on the page ground like every other. */
 .privacy {
-  padding-block: clamp(1.25rem, 4.2vh, 3.25rem);
+  padding-block: var(--space-2xl);
   border-top: var(--rule-hair);
-  background-color: var(--paper-sunk);
 }
 
-.privacy__body {
+.privacy__inner {
   display: grid;
-  gap: var(--space-md);
-  align-content: start;
+  gap: var(--space-xl);
 }
 
 .privacy__title {
-  max-width: 16ch;
+  max-width: 26ch;
   font-size: var(--step-title);
   font-weight: var(--weight-medium);
   line-height: var(--leading-title);
   letter-spacing: var(--track-title);
 }
 
-.privacy__standfirst {
+.privacy__prose {
+  display: grid;
+  gap: var(--space-sm);
   max-width: var(--measure);
-  font-size: var(--step-body-lg);
+  font-size: var(--step-body);
   line-height: var(--leading-body);
   color: var(--ink-70);
 }
 
-.privacy__note {
-  max-width: var(--measure);
-  color: var(--ink-70);
-  font-size: var(--step-small);
-}
+/* ---- The register ------------------------------------------------------ */
 
-.privacy__table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: start;
-}
-
-.privacy__head {
-  padding: 0 var(--space-md) var(--space-2xs) 0;
-  text-align: start;
-  vertical-align: bottom;
-  color: var(--ink-70);
-  border-bottom: var(--rule-ink);
-}
-
-.privacy__cell {
-  padding: var(--space-sm) var(--space-md) 0 0;
-  vertical-align: top;
-}
-
-.privacy__list {
+.privacy__register {
   display: grid;
   gap: 0;
+  margin: 0;
+  border-top: var(--rule-ink);
 }
 
-.privacy__item {
-  padding-block: 0.5rem;
+.privacy__band {
+  display: grid;
+  gap: var(--space-xs);
+  padding-block: var(--space-md);
   border-bottom: var(--rule-hair);
-  color: var(--ink-85);
-  font-size: var(--step-small);
-  line-height: var(--leading-snug);
 }
 
-/* On a phone the three columns stack, and the column headers become the group
-   titles so the reading order stays "question, then answers". */
-@media (max-width: 48rem) {
-  .privacy__table,
-  .privacy__table thead,
-  .privacy__table tbody,
-  .privacy__table tr,
-  .privacy__table th,
-  .privacy__table td {
-    display: block;
-    width: 100%;
+.privacy__fate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2xs) var(--space-sm);
+}
+
+.privacy__verb {
+  font-size: var(--step-section);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-tight);
+}
+
+.privacy__note {
+  color: var(--ink-70);
+}
+
+/* The fields run along the band rather than stacking into a narrow column. */
+.privacy__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) 0;
+  margin: 0;
+}
+
+.privacy__field {
+  padding-inline: var(--space-sm);
+  border-left: var(--rule-firm);
+  font-size: var(--step-body);
+  line-height: var(--leading-snug);
+  color: var(--ink-85);
+}
+
+.privacy__field:first-child {
+  padding-inline-start: 0;
+  border-left: 0;
+}
+
+.privacy__foot {
+  max-width: var(--measure);
+  font-size: var(--step-body);
+  line-height: var(--leading-body);
+  color: var(--ink-70);
+}
+
+@media (min-width: 68rem) {
+  .privacy__band {
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    align-items: baseline;
+    gap: var(--space-2xl);
+    padding-block: var(--space-lg);
   }
 
-  .privacy__table thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-
-  .privacy__cell {
-    padding-inline-end: 0;
-    padding-block-start: var(--space-lg);
-  }
-
-  .privacy__cell::before {
-    content: attr(data-head);
-    display: block;
-    padding-bottom: var(--space-2xs);
-    border-bottom: var(--rule-ink);
-    font-family: var(--font-mono);
-    font-size: var(--step-label-sm);
-    font-weight: var(--weight-medium);
-    letter-spacing: var(--track-label-wide);
-    text-transform: uppercase;
-    color: var(--ink-70);
+  .privacy__fate {
+    display: grid;
+    gap: 0.15rem;
   }
 }
