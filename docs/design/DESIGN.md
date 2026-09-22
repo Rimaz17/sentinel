@@ -28,8 +28,8 @@ does not exist on the page the reference was taken from.
 |---|---|---|
 | `--paper` | `#eaeeee` | Page ground |
 | `--paper-raised` | `#f1f4f4` | Raised ground |
-| `--paper-sunk` | `#dfe4e4` | The footer |
-| `--ink` | `#15222b` | Body text, rules at full strength |
+| `--paper-sunk` | `#dfe4e4` | Reserved; unused on the landing page |
+| `--ink` | `#15222b` | Body text, rules at full strength, the footer ground |
 | `--ochre` | `#8f6203` | The accent. Text-safe at 4.59:1 on paper |
 | `--ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces, 2.70:1 on paper, so never type there |
 | `--alert` | `#e0443e` | Reserved for the alert vocabulary; unused so far |
@@ -167,6 +167,7 @@ entry paths right.
 | Figure | Where | Why there |
 |---|---|---|
 | `dengue-vector` | Hero, right | Dengue is the symptom group the specification's worked example follows |
+| `privacy-fields` | Privacy, right | The identifiers struck through and the operational fields kept: the same division the register below it spells out |
 | `two-views` | Detection, left | Its own annotations, "isolated cases", "rainy season?", are the argument that section makes |
 | `network-map` | Entry paths, right | The country, at the moment the page asks the visitor to pick their district |
 
@@ -178,12 +179,26 @@ demonstration system"** notice in the hero, which is where CLAUDE.md section 6a
 wants it anyway. That notice is now the only visible disclosure on the page, so it
 does not move and does not get quieter.
 
-**Cut-outs, keyed.** Two of the three originals were exported as JPEG with their
-transparency baked in as a checkerboard. `scripts/build-images.py` keys that back
-out: the artwork is dark on a light checker, so anything at or above the darker
-square is background and how far below it a pixel sits gives its opacity. The last
-few percent of opacity is discarded, that is JPEG ringing around the checker
-edges, and without the cut a faint checker ghost survives into the page.
+**A dark footer.** The footer takes the ink ground rather than another shade of
+paper. A near-white footer under a near-white page reads as more page; ink gives
+the page a definite end, and it is the colour the type has been all the way down.
+Every rule and secondary tone inside it is re-derived from paper, because the
+ink-alpha tokens are built for a light ground and vanish on this one. Selection
+and the focus ring are re-themed there too.
+
+**Two keying methods, because the cut-outs differ.** Three of the four originals
+were exported as JPEG with their transparency baked in as a checkerboard. `scripts/build-images.py` keys that back
+out two ways. For the drawings, the artwork is dark on a light checker, so
+anything at or above the darker square is background and how far below it a pixel
+sits gives its opacity; the last few percent is discarded as JPEG ringing.
+
+That fails for the icon sheet, whose grey fills sit *just below* the darker checker
+square and would be erased. Its artwork is opaque rather than a dark wash, so it is
+keyed by value instead: the background takes exactly two levels, and anything
+outside those two bands is artwork keeping its own colour. A morphological opening
+then clears the speckle that survives between the bands, and the sheet's two rows
+are found and restacked against a fixed gap, because the tall empty band between
+them would otherwise ship as dead space inside a column.
 
 **Trimmed to the artwork.** Each cut-out is then cropped to its own alpha bounding
 box. The exports carry a wide empty margin, and left in, that margin ships as

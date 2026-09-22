@@ -8,11 +8,14 @@ change.
 |---|---|---|
 | `dengue-vector.jpg` | 1110×944, cut-out | Hero, right column |
 | `two-views.jpg` | 2048×2048, opaque | Detection section, left column |
-| `network-map.jpg` | 1024×1029, cut-out | Entry paths, left column |
+| `network-map.jpg` | 1024×1029, cut-out | Entry paths, right column |
+| `privacy-fields.jpg` | 2644×1600, cut-out icon sheet | Privacy section, right column |
 
-Two of these are cut-outs that were exported as JPEG, so their transparency
+Three of these are cut-outs that were exported as JPEG, so their transparency
 arrived baked in as a checkerboard. The build script keys it back out and trims
-each one to its own artwork, see `## Imagery` in `../DESIGN.md`.
+each one to its own artwork. The icon sheet needs a different key from the
+drawings, and its two rows are restacked to close the gap between them, see
+`## Imagery` in `../DESIGN.md`.
 
 The shipped derivatives live in `frontend/src/assets/` as WebP at several widths.
 Regenerate them with:
