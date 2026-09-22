@@ -55,6 +55,12 @@
   margin-top: var(--space-lg);
 }
 
+.mechanism__detail {
+  display: grid;
+  gap: var(--space-lg);
+  align-content: start;
+}
+
 .mechanism__limit {
   max-width: var(--measure);
   color: var(--ink-70);
@@ -77,10 +83,6 @@
 
   .mechanism__check:first-child {
     padding-top: 0;
-  }
-
-  .mechanism__limit {
-    grid-column: 2;
   }
 }
 

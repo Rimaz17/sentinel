@@ -37,20 +37,25 @@ export function Mechanism() {
           />
         </div>
 
-        <dl className="mechanism__checks">
-          {CHECKS.map((check) => (
-            <div className="mechanism__check" key={check.term}>
-              <dt className="mechanism__check-term">{check.term}</dt>
-              <dd className="mechanism__check-body">{check.body}</dd>
-            </div>
-          ))}
-        </dl>
+        {/* The checks and the caveat are one grid item. Left as siblings they
+            land in separate grid rows, and the caveat gets pushed to the foot
+            of the tall figure column instead of following the checks. */}
+        <div className="mechanism__detail">
+          <dl className="mechanism__checks">
+            {CHECKS.map((check) => (
+              <div className="mechanism__check" key={check.term}>
+                <dt className="mechanism__check-term">{check.term}</dt>
+                <dd className="mechanism__check-body">{check.body}</dd>
+              </div>
+            ))}
+          </dl>
 
-        <p className="mechanism__limit">
-          Sentinel does not diagnose anyone — it counts symptom patterns, not confirmed cases — and
-          it does not decide what happens next. Every alert is investigated by a public health
-          inspector, who can mark it a false alarm.
-        </p>
+          <p className="mechanism__limit">
+            Sentinel does not diagnose anyone — it counts symptom patterns, not confirmed cases —
+            and it does not decide what happens next. Every alert is investigated by a public health
+            inspector, who can mark it a false alarm.
+          </p>
+        </div>
       </div>
     </section>
   )
