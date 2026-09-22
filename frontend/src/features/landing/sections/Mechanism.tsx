@@ -36,12 +36,6 @@ export function Mechanism() {
               </div>
             ))}
           </dl>
-
-          <p className="mechanism__limit">
-            Sentinel does not diagnose anyone — it counts symptom patterns, not confirmed cases —
-            and it does not decide what happens next. Every alert is investigated by a public health
-            inspector, who can mark it a false alarm.
-          </p>
         </div>
 
         <Figure
@@ -53,6 +47,17 @@ export function Mechanism() {
           alt="One week drawn twice. Above: patients and hospitals scattered across a grey hillside, annotated “isolated cases” and “rainy season?”. Below: the same ground as a single connected network, with a red cluster picked out and annotated “Sentinel alert”, “DBSCAN cluster” and “hidden outbreak”."
           caption="The same week, seen twice · illustration"
         />
+      </div>
+
+      {/* Full width, under both columns. Kept out of the split because it is the
+          section's closing line, and inside the text column it just made that
+          column taller than the figure beside it. */}
+      <div className="shell">
+        <p className="mechanism__limit">
+          Sentinel does not diagnose anyone — it counts symptom patterns, not confirmed cases — and
+          it does not decide what happens next. Every alert is investigated by a public health
+          inspector, who can mark it a false alarm.
+        </p>
       </div>
     </section>
   )

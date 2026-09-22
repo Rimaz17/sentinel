@@ -53,6 +53,9 @@
 
 .mechanism__limit {
   max-width: var(--measure);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: var(--rule-hair);
   color: var(--ink-70);
   font-size: var(--step-small);
 }
