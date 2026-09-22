@@ -51,6 +51,10 @@
   color: var(--ink-70);
 }
 
+.mechanism__figure {
+  margin-top: var(--space-lg);
+}
+
 .mechanism__limit {
   max-width: var(--measure);
   color: var(--ink-70);
@@ -63,10 +67,8 @@
     align-items: start;
   }
 
-  .mechanism__lede {
-    position: sticky;
-    top: calc(var(--header-h) + var(--space-xl));
-  }
+  /* The lede is no longer sticky: with the figure under it the column is full,
+     so there is nothing to hold in place. */
 
   .mechanism__checks {
     border-top: 0;

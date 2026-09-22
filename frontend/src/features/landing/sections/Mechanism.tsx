@@ -1,3 +1,5 @@
+import { twoViews } from '@/assets/images'
+import { Figure } from '@/components/ui/Figure'
 import './mechanism.css'
 
 const CHECKS = [
@@ -25,6 +27,14 @@ export function Mechanism() {
             round. Nobody on the ground has enough information to sound an alarm. Sentinel keeps the
             combined view continuously, so the rise is flagged on day three instead of day ten.
           </p>
+
+          <Figure
+            className="mechanism__figure"
+            image={twoViews}
+            sizes="(min-width: 90rem) 542px, (min-width: 60rem) 38vw, calc(100vw - 2rem)"
+            alt="One week drawn twice. Above: patients and hospitals scattered across a grey hillside, annotated “isolated cases” and “rainy season?”. Below: the same island as a single connected network, with three red clusters picked out and annotated “Sentinel alert”, “DBSCAN cluster” and “hidden outbreak”."
+            caption="The same week, seen twice · illustration"
+          />
         </div>
 
         <dl className="mechanism__checks">
