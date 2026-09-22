@@ -2,23 +2,24 @@
  * Image manifest.
  *
  * Each figure ships as WebP at several widths so a browser can pick the one it
- * actually needs — a phone on mobile data takes the 960px hero at 34 KB rather
- * than the 2816px one at 182 KB. The originals live in
+ * actually needs rather than always taking the largest. Two of the three carry
+ * real transparency, keyed back out of exports that had it baked in as a
+ * checkerboard, and all three are trimmed to their own artwork so no empty
+ * margin is shipped as page whitespace. The originals live in
  * `docs/design/source-images/`; regenerate these with `scripts/build-images.py`.
  *
  * Intrinsic width and height are recorded so every figure can reserve its space
  * before the bytes arrive, and nothing on the page shifts as they load.
  */
 
+import dengue640 from './dengue-vector-640.webp'
 import dengue960 from './dengue-vector-960.webp'
-import dengue1440 from './dengue-vector-1440.webp'
-import dengue2048 from './dengue-vector-2048.webp'
-import dengue2816 from './dengue-vector-2816.webp'
-import network512 from './network-map-512.webp'
-import network764 from './network-map-764.webp'
+import network640 from './network-map-640.webp'
+import network960 from './network-map-960.webp'
 import twoViews640 from './two-views-640.webp'
-import twoViews768 from './two-views-768.webp'
-import twoViews1024 from './two-views-1024.webp'
+import twoViews960 from './two-views-960.webp'
+import twoViews1280 from './two-views-1280.webp'
+import twoViews1600 from './two-views-1600.webp'
 
 export type ImageAsset = {
   /** Fallback for browsers that ignore srcSet. The middle width, not the largest. */
@@ -29,27 +30,27 @@ export type ImageAsset = {
 }
 
 export const dengueVector: ImageAsset = {
-  src: dengue1440,
-  srcSet: [
-    `${dengue960} 960w`,
-    `${dengue1440} 1440w`,
-    `${dengue2048} 2048w`,
-    `${dengue2816} 2816w`,
-  ].join(', '),
-  width: 2816,
-  height: 1536,
+  src: dengue960,
+  srcSet: [`${dengue640} 640w`, `${dengue960} 960w`].join(', '),
+  width: 1032,
+  height: 751,
 }
 
 export const twoViews: ImageAsset = {
-  src: twoViews1024,
-  srcSet: [`${twoViews640} 640w`, `${twoViews768} 768w`, `${twoViews1024} 1024w`].join(', '),
-  width: 1024,
-  height: 1054,
+  src: twoViews960,
+  srcSet: [
+    `${twoViews640} 640w`,
+    `${twoViews960} 960w`,
+    `${twoViews1280} 1280w`,
+    `${twoViews1600} 1600w`,
+  ].join(', '),
+  width: 2048,
+  height: 2048,
 }
 
 export const networkMap: ImageAsset = {
-  src: network764,
-  srcSet: [`${network512} 512w`, `${network764} 764w`].join(', '),
-  width: 764,
-  height: 768,
+  src: network960,
+  srcSet: [`${network640} 640w`, `${network960} 960w`].join(', '),
+  width: 1024,
+  height: 982,
 }
