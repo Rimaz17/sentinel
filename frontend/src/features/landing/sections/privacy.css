@@ -1,5 +1,5 @@
 .privacy {
-  padding-block: var(--space-2xl);
+  padding-block: clamp(1.25rem, 4.2vh, 3.25rem);
   border-top: var(--rule-hair);
   background-color: var(--paper-sunk);
 }

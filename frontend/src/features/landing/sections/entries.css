@@ -1,11 +1,13 @@
+/* Budgeted against the viewport for the same reason as the detection section:
+   the figure and the text beside it are meant to be read in one screen. */
 .entries {
-  padding-block: var(--space-2xl);
+  padding-block: clamp(1.25rem, 4.2vh, 3.25rem);
   border-top: var(--rule-hair);
 }
 
 .entries__body {
   display: grid;
-  gap: var(--space-xl);
+  gap: clamp(1.25rem, 3vh, 2rem);
   align-content: start;
 }
 
@@ -46,7 +48,7 @@
 }
 
 .entries__staff-item {
-  padding-block: var(--space-md);
+  padding-block: clamp(0.7rem, 1.8vh, 1.1rem);
   border-bottom: var(--rule-hair);
 }
 

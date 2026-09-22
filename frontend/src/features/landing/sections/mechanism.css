@@ -1,17 +1,20 @@
+/* This section is meant to be taken in without scrolling, so its padding and
+   its internal rhythm are budgeted against the viewport rather than the page
+   width. */
 .mechanism {
-  padding-block: var(--space-2xl);
+  padding-block: clamp(1.25rem, 4.2vh, 3.25rem);
   border-top: var(--rule-hair);
 }
 
 .mechanism__body {
   display: grid;
-  gap: var(--space-lg);
+  gap: clamp(0.7rem, 2.2vh, 1.5rem);
   align-content: start;
 }
 
 .mechanism__title {
   max-width: 18ch;
-  font-size: var(--step-title);
+  font-size: clamp(1.625rem, 1.2rem + 1.5vw, 2.25rem);
   font-weight: var(--weight-medium);
   line-height: var(--leading-title);
   letter-spacing: var(--track-title);
@@ -19,8 +22,8 @@
 
 .mechanism__standfirst {
   max-width: var(--measure);
-  font-size: var(--step-body-lg);
-  line-height: var(--leading-body);
+  font-size: var(--step-body);
+  line-height: 1.55;
   color: var(--ink-70);
 }
 
@@ -34,12 +37,12 @@
 .mechanism__check {
   display: grid;
   gap: var(--space-2xs);
-  padding-block: var(--space-md);
+  padding-block: clamp(0.55rem, 1.8vh, 1.15rem);
   border-bottom: var(--rule-hair);
 }
 
 .mechanism__check-term {
-  font-size: var(--step-section);
+  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
   font-weight: var(--weight-medium);
   letter-spacing: var(--track-tight);
   line-height: var(--leading-snug);
@@ -48,13 +51,15 @@
 .mechanism__check-body {
   max-width: var(--measure);
   margin: 0;
+  font-size: var(--step-small);
+  line-height: 1.55;
   color: var(--ink-70);
 }
 
 .mechanism__limit {
   max-width: var(--measure);
-  margin-top: var(--space-xl);
-  padding-top: var(--space-md);
+  margin-top: clamp(1rem, 2.4vh, 1.75rem);
+  padding-top: var(--space-sm);
   border-top: var(--rule-hair);
   color: var(--ink-70);
   font-size: var(--step-small);
