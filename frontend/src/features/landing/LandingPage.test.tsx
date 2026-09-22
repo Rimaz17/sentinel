@@ -73,17 +73,27 @@ describe('LandingPage', () => {
     }
   })
 
-  it('labels every figure as an illustration rather than as system output', () => {
+  it('names every figure an illustration in its alt text', () => {
     renderLanding()
-    // None of these pictures is a rendering of real or simulated output, and
-    // the page must not let a visitor think otherwise.
-    const captions = screen
-      .getAllByRole('figure')
-      .map((f) => f.querySelector('figcaption')?.textContent ?? '')
-    expect(captions).toHaveLength(3)
-    for (const caption of captions) {
-      expect(caption.toLowerCase()).toContain('illustration')
+    // The figures carry no visible caption, so the alt text is where a reader
+    // who cannot see the drawing learns it is not system output.
+    const alts = screen.getAllByRole('img').map((i) => i.getAttribute('alt') ?? '')
+    expect(alts).toHaveLength(3)
+    for (const alt of alts) {
+      expect(alt.toLowerCase()).toContain('illustration')
     }
+  })
+
+  it('carries no visible figure captions', () => {
+    const { container } = renderLanding()
+    expect(container.querySelectorAll('figcaption')).toHaveLength(0)
+  })
+
+  it('still states plainly that the data is simulated', () => {
+    renderLanding()
+    // With the captions gone this notice is the page's visible disclosure, so
+    // it must not quietly disappear too.
+    expect(screen.getByText(/all case data simulated/i)).toBeInTheDocument()
   })
 
   it('loads only the figure at the fold eagerly', () => {
