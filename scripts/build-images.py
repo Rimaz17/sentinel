@@ -56,7 +56,7 @@ SPEC = {
         widths=[640, 768, 960, 1280],
         key=None,
         trim=0.01,
-        bands=dict(bands=[(177, 199), (214, 242)], opening=2),
+        bands=dict(bands=[(177, 199), (214, 242)], opening=2, min_area=4000),
         # The sheet carries a tall empty gap between its two rows. Left in, it
         # ships as dead space inside the page's column, so the rows are found
         # and recomposed against a fixed gap.
@@ -94,12 +94,83 @@ def key_checkerboard(im: Image.Image, dark: float, ink: float, cut: float) -> Im
     return out
 
 
-def key_by_bands(im: Image.Image, bands, opening: int) -> Image.Image:
+def drop_specks(mask: Image.Image, min_area: int) -> Image.Image:
+    """Erase every blob in the mask smaller than `min_area` pixels.
+
+    The opening thins the JPEG speckle but cannot remove a speck that survives
+    it whole, and those reach the page as grey flecks scattered around the icon
+    sheet. Measured on this sheet the two populations do not overlap at all:
+    the largest speck is under 1,600 pixels and the smallest real icon stroke is
+    over 23,000, so a single area threshold separates them cleanly.
+    """
+    w, h = mask.size
+    px = list(mask.get_flattened_data())
+    on = [v > 8 for v in px]
+    label = [0] * (w * h)
+    parent: list[int] = [0]
+
+    def find(x: int) -> int:
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(a: int, b: int) -> None:
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[rb] = ra
+
+    for y in range(h):
+        base = y * w
+        for x in range(w):
+            i = base + x
+            if not on[i]:
+                continue
+            # Eight-connected, so a diagonal hairline counts as one blob.
+            near = []
+            if x > 0 and on[i - 1]:
+                near.append(label[i - 1])
+            if y > 0:
+                if on[i - w]:
+                    near.append(label[i - w])
+                if x > 0 and on[i - w - 1]:
+                    near.append(label[i - w - 1])
+                if x < w - 1 and on[i - w + 1]:
+                    near.append(label[i - w + 1])
+            if near:
+                low = min(near)
+                label[i] = low
+                for other in near:
+                    union(low, other)
+            else:
+                label[i] = len(parent)
+                parent.append(len(parent))
+
+    area = [0] * len(parent)
+    for i in range(w * h):
+        if on[i]:
+            area[find(label[i])] += 1
+
+    dropped = 0
+    for i in range(w * h):
+        if on[i] and area[find(label[i])] < min_area:
+            px[i] = 0
+            dropped += 1
+
+    out = Image.new("L", (w, h))
+    out.putdata(px)
+    if dropped:
+        print(f"           {dropped} speck pixels cleared")
+    return out
+
+
+def key_by_bands(im: Image.Image, bands, opening: int, min_area: int) -> Image.Image:
     """Opaque artwork over a checkerboard, keyed by value.
 
     The background takes exactly two levels, so a pixel outside both bands is
     artwork and keeps its own colour. A morphological opening then clears the
-    JPEG speckle that survives between the bands.
+    JPEG speckle that survives between the bands, and an area filter removes the
+    specks that survive the opening whole.
     """
     im = im.convert("RGB")
     w, h = im.size
@@ -118,6 +189,8 @@ def key_by_bands(im: Image.Image, bands, opening: int) -> Image.Image:
         mask = mask.filter(ImageFilter.MinFilter(3))
     for _ in range(opening):
         mask = mask.filter(ImageFilter.MaxFilter(3))
+
+    mask = drop_specks(mask, min_area)
 
     out = im.convert("RGBA")
     out.putalpha(mask)
