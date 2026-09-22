@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 try:
-    from PIL import Image
+    from PIL import Image, ImageFilter
 except ImportError:
     sys.exit("Pillow is required: pip install Pillow")
 
@@ -47,6 +47,21 @@ SPEC = {
     ),
     # Already a finished opaque artwork; nothing to key or trim.
     "two-views": dict(widths=[640, 768, 960, 1280, 1600], key=None, trim=None),
+    # An icon sheet, also exported as a cut-out. Its artwork is opaque rather
+    # than a dark wash, so it is keyed by value instead: the checkerboard takes
+    # exactly two levels, and anything outside those two bands is artwork. A
+    # darkness key would erase the grey fills, which sit just below the darker
+    # checker square.
+    "privacy-fields": dict(
+        widths=[640, 768, 960, 1280],
+        key=None,
+        trim=0.01,
+        bands=dict(bands=[(177, 199), (214, 242)], opening=2),
+        # The sheet carries a tall empty gap between its two rows. Left in, it
+        # ships as dead space inside the page's column, so the rows are found
+        # and recomposed against a fixed gap.
+        rows=dict(gap=110),
+    ),
 }
 
 
@@ -76,6 +91,75 @@ def key_checkerboard(im: Image.Image, dark: float, ink: float, cut: float) -> Im
                 int(max(0, min(255, (b - base) / a))),
                 int(round(a * 255)),
             )
+    return out
+
+
+def key_by_bands(im: Image.Image, bands, opening: int) -> Image.Image:
+    """Opaque artwork over a checkerboard, keyed by value.
+
+    The background takes exactly two levels, so a pixel outside both bands is
+    artwork and keeps its own colour. A morphological opening then clears the
+    JPEG speckle that survives between the bands.
+    """
+    im = im.convert("RGB")
+    w, h = im.size
+    src = im.load()
+    mask = Image.new("L", (w, h), 0)
+    mk = mask.load()
+
+    for y in range(h):
+        for x in range(w):
+            r, g, b = src[x, y]
+            lum = (r * 299 + g * 587 + b * 114) / 1000.0
+            if not any(lo <= lum <= hi for lo, hi in bands):
+                mk[x, y] = 255
+
+    for _ in range(opening):
+        mask = mask.filter(ImageFilter.MinFilter(3))
+    for _ in range(opening):
+        mask = mask.filter(ImageFilter.MaxFilter(3))
+
+    out = im.convert("RGBA")
+    out.putalpha(mask)
+    return out
+
+
+def recompose_rows(im: Image.Image, gap: int) -> Image.Image:
+    """Find the sheet's rows of artwork and restack them against a fixed gap."""
+    alpha = im.getchannel("A")
+    w, h = im.size
+    px = alpha.load()
+
+    filled = []
+    for y in range(h):
+        row = False
+        for x in range(0, w, 3):
+            if px[x, y] > 0:
+                row = True
+                break
+        filled.append(row)
+
+    bands, start = [], None
+    for y, on in enumerate(filled):
+        if on and start is None:
+            start = y
+        elif not on and start is not None:
+            if y - start > 20:
+                bands.append((start, y))
+            start = None
+    if start is not None and h - start > 20:
+        bands.append((start, h))
+
+    if len(bands) < 2:
+        return im
+
+    strips = [im.crop((0, top, w, bottom)) for top, bottom in bands]
+    total = sum(s.height for s in strips) + gap * (len(strips) - 1)
+    out = Image.new("RGBA", (w, total), (0, 0, 0, 0))
+    y = 0
+    for s in strips:
+        out.paste(s, (0, y))
+        y += s.height + gap
     return out
 
 
@@ -109,7 +193,16 @@ def main() -> int:
             sys.exit(f"Missing source image: {src}")
 
         im = Image.open(src)
-        if spec["key"]:
+        if spec.get("bands"):
+            print(f"  {base}: keying by value bands ...")
+            im = key_by_bands(im, **spec["bands"])
+            if spec.get("rows"):
+                before = im.size
+                im = recompose_rows(im, **spec["rows"])
+                print(f"           rows restacked {before[0]}x{before[1]} -> {im.size[0]}x{im.size[1]}")
+            im = trim_to_artwork(im, spec["trim"])
+            print(f"           trimmed to {im.size[0]}x{im.size[1]}")
+        elif spec["key"]:
             print(f"  {base}: keying checkerboard ...")
             im = key_checkerboard(im, **spec["key"])
             before = im.size
