@@ -15,6 +15,10 @@
 import dengue640 from './dengue-vector-640.webp'
 import dengue768 from './dengue-vector-768.webp'
 import dengue960 from './dengue-vector-960.webp'
+import fields640 from './privacy-fields-640.webp'
+import fields768 from './privacy-fields-768.webp'
+import fields960 from './privacy-fields-960.webp'
+import fields1280 from './privacy-fields-1280.webp'
 import network640 from './network-map-640.webp'
 import network768 from './network-map-768.webp'
 import network960 from './network-map-960.webp'
@@ -50,6 +54,18 @@ export const twoViews: ImageAsset = {
   ].join(', '),
   width: 2048,
   height: 2048,
+}
+
+export const privacyFields: ImageAsset = {
+  src: fields960,
+  srcSet: [
+    `${fields640} 640w`,
+    `${fields768} 768w`,
+    `${fields960} 960w`,
+    `${fields1280} 1280w`,
+  ].join(', '),
+  width: 2238,
+  height: 1262,
 }
 
 export const networkMap: ImageAsset = {
