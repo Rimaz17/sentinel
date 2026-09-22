@@ -4,29 +4,32 @@
      one that ships in `sentinel/frontend/src/styles/`. -->
 
 Sentinel's surfaces are **ink on paper, ruled**. Structure is carried by hairlines
-and weight, never by cards, shadows or rounded containers. A single ochre marks the
-one measurement a view exists to show, and marks nothing else.
+and weight, never by cards, shadows or rounded containers. A single ochre carries
+the page's attention, and is spent in exactly two places.
 
 ## The world in one paragraph
 
-A survey plate. The page reads as a sheet from a ledger: a set headline, a column
-of measured annotations in letter-spaced monospace, a large tonal drawing, and a
-caption bar under it. What separates it from an editorial pastiche is that the
-annotations are real — every mono string on the page is a coordinate, a count, an
-ISO date, a sigma value or a district code. If a mono string is not a measured
-value, it is in the wrong face.
+A survey sheet. A set headline, a column of measured annotations in letter-spaced
+monospace, and content separated by rules rather than boxed into panels. What keeps
+it from being editorial pastiche is that the annotations are real — every mono
+string on the page is a count, a window, a threshold or a district figure. If a
+mono string is not a measured value, it is in the wrong face.
+
+The landing page carries **no hero figure**. An earlier build had a full-bleed
+plate with a segmented switcher; it came from a mis-cropped reference image and was
+removed. Nothing should reintroduce it.
 
 ## Colour
 
 | Token | Value | Use |
 |---|---|---|
 | `--paper` | `#f2f5f5` | Page ground |
-| `--paper-raised` | `#f7f9f9` | The plate switcher's ground |
+| `--paper-raised` | `#f7f9f9` | Raised ground |
 | `--paper-sunk` | `#e7ebec` | The privacy band |
-| `--ink` | `#15222b` | Body text, rules at full strength, the disclosure band's ground |
-| `--ochre` | `#8f6203` | The one accent. Text-safe at 4.89:1 on paper |
-| `--ochre-bright` | `#c88a05` | Graphic fill on `--ink` only — 2.70:1 on paper, so never type there |
-| `--alert` | `#e0443e` | Reserved for the alert vocabulary; unused on the landing page |
+| `--ink` | `#15222b` | Body text, rules at full strength |
+| `--ochre` | `#8f6203` | The accent. Text-safe at 4.89:1 on paper |
+| `--ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces — 2.70:1 on paper, so never type there |
+| `--alert` | `#e0443e` | Reserved for the alert vocabulary; unused so far |
 
 Ink alphas and their measured ratios on `--paper`:
 
@@ -41,10 +44,21 @@ Ink alphas and their measured ratios on `--paper`:
 
 **Colour strategy: restrained.** Neutrals plus one accent. The visitor came to
 understand something and then leave for the dashboard, and a system about outbreaks
-has no business being loud. Severity and state are never carried by colour alone —
-the exceeding district on the plate is also the tallest thing in the frame and the
-only trace with a heavy crest, and the active plate tab inverts its ground rather
-than merely tinting.
+has no business being loud.
+
+**Where the ochre is spent.** Twice per view, and never on furniture:
+
+1. the one measurement the whole system turns on — the `3σ` threshold in the hero
+   rail;
+2. the one thing every visitor must know — the simulated-data notice, which takes
+   an ochre wash and a 1px ochre rule.
+
+Nothing else gets it. Hover states, borders, headings and links are all ink. The
+moment ochre decorates something it stops meaning "read this".
+
+State is never carried by colour alone: the simulated notice is also set apart by
+its ground and its rule, and severity vocabulary on later surfaces must follow the
+same rule.
 
 Symptom-group hues are fixed and never reassigned: dengue `#8b3a8f`, ILI `#2f67b1`,
 GI `#6e7f1f`, leptospirosis `#12806e`.
@@ -61,7 +75,6 @@ waiting on one.
 
 | Token | Value |
 |---|---|
-| `--step-display` | `clamp(2.375rem, 1.6rem + 3.4vw, 4.5rem)` |
 | `--step-title` | `clamp(1.75rem, 1.3rem + 2vw, 2.75rem)` |
 | `--step-section` | `clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem)` |
 | `--step-body-lg` | `clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem)` |
@@ -74,15 +87,33 @@ Tracking: `-0.03em` display, `-0.02em` title, `-0.01em` body, `0.13em` on mono
 labels and `0.18em` on the small ones. Measure is `68ch` for body, `22ch` for the
 display headline.
 
-**A measure set in `ch` belongs on the element that carries the type**, not on its
-container. `ch` resolves against the element's own font size, so `max-width: 24ch`
-on a 16px wrapper clamps a whole column to ~235px on a phone. That bug shipped once
-here and is the reason the rule is written down.
+### The display step is not in the scale
 
-**Never apply `text-transform: uppercase` to a value.** Values carry units and
-proper nouns, and uppercasing silently turns `3.2σ` into `3.2Σ` — a different
-symbol. Terms may be uppercased; values may not. Mono plus tabular figures already
-supplies the technical register.
+It is the one size that does not belong to the viewport, so it is set on
+`.hero__title` rather than as a token:
+
+- **Single column** (`< 60rem`): `clamp(2.5rem, 5.8vw, 4rem)`. Here the column *is*
+  the viewport, so `vw` is the honest unit.
+- **Two columns** (`≥ 60rem`): `clamp(2.5rem, 10.4cqw, 5rem)`, against a
+  `container-type: inline-size` on `.hero__lede`.
+
+Above `60rem` the headline sits in a grid column roughly half the viewport's width.
+A viewport-fluid size makes the ratio of column width to type size drift as the
+window narrows, which moves where the real headline breaks — at 1100px it produced
+a fourth line carrying only the words "no single". Container units hold that ratio
+constant, so the headline stays at three even lines from 960px up. The two slopes
+are chosen to meet at the breakpoint, so the type does not jump as the layout
+reflows (980px → 55.9px, 940px → 54.5px).
+
+**Two rules learned the hard way, both from shipped bugs:**
+
+- **A measure set in `ch` belongs on the element that carries the type**, not on its
+  container. `ch` resolves against the element's own font size, so `max-width: 24ch`
+  on a 16px wrapper clamps a whole column to ~235px on a phone.
+- **Never apply `text-transform: uppercase` to a value.** Values carry units and
+  proper nouns, and uppercasing silently turns `3.2σ` into `3.2Σ` — a different
+  symbol. Terms may be uppercased; values may not. Mono plus tabular figures already
+  supplies the technical register.
 
 ## Space and motion
 
@@ -94,26 +125,25 @@ A 4px-rooted scale, fluid at the larger steps: `--space-3xs` `0.25rem` through
 Easing is `cubic-bezier(0.16, 1, 0.3, 1)` — exponential ease-out, always from an
 already-visible default. Nothing on the page animates in from nothing.
 
-**One authored moment: the plate change** (`--dur-plate`, 620ms). The outgoing
-plate leaves while the incoming one settles up and back to rest, so the change
-reads as a page turn rather than a dissolve. Everything else is 120–200ms and gets
-out of the way. `prefers-reduced-motion: reduce` collapses all four duration tokens
-to `1ms` at the token level, so a component that forgets its own media query still
-respects the preference.
+**One authored moment: the primary action takes its ink from the foot of the box
+upward** on hover, rather than fading in — the control reads as being inked, not
+lit. Everything else is 120–200ms and gets out of the way.
+`prefers-reduced-motion: reduce` collapses the duration tokens to `1ms` at the token
+level, so a component that forgets its own media query still respects the
+preference.
 
 ## Components
 
 - **Two action shapes, and no third.** A ruled box (`.action--primary`) for the
-  thing most visitors came to do, whose ink fill rises from the foot of the box on
-  hover rather than fading in; and a quiet underlined link (`.action--quiet`) for
+  thing most visitors came to do; a quiet underlined link (`.action--quiet`) for
   everything else. A filled button would be a third voice.
 - **The mono label** (`.label`) is the only place mono appears, and it always
   carries a measured value.
 - **Rules, not cards.** `--rule-hair` / `--rule-faint` / `--rule-firm` /
   `--rule-ink`. There are no elevation tokens because nothing is elevated.
-- **The plate** is a tab set: the switcher is the tab list, each plate a panel,
-  with roving tabindex and Arrow/Home/End keys. Every plate carries a text
-  alternative that states the same information the drawing does.
+- **Tables are tables.** The privacy model is a real `<table>` because it is
+  genuinely tabular, and it restacks on a phone with its column headers preserved
+  as group labels via `data-head`.
 
 ## Browser surfaces
 
@@ -125,6 +155,6 @@ underline offset on links.
 ## Accessibility floor
 
 Verified on the built page, not asserted: every visible text node clears its WCAG
-threshold (4.5:1 body, 3:1 large), all 16 focusable elements show a visible focus
-ring, the page has no horizontal overflow at 375px, and the privacy table restacks
-on a phone with its column headers preserved as group labels.
+threshold (4.5:1 body, 3:1 large), every focusable element shows a visible focus
+ring, there is no horizontal overflow from 375px up, one `<h1>` with no skipped
+heading levels, and the privacy table restacks on a phone with its headers intact.

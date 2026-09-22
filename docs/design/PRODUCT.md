@@ -101,15 +101,22 @@ district suggests a wider seasonal wave. The distinction changes the response.
   marketing-flavoured. The project documents its own limitations on purpose.
 - **Binding visual reference (user-supplied):** a monochrome editorial layout — restrained
   near-white ground, a large geometric sans headline set tight, uppercase letter-spaced
-  monospace metadata labels, a thin-ruled outlined button, one muted ochre accent used only
-  on a single data value, and a large full-bleed plate with a segmented plate switcher
-  beneath it. This is a pinned aesthetic and is to be honoured, not reinterpreted.
+  monospace metadata labels, a thin-ruled outlined button, and one muted ochre accent used
+  only on a single data value. This is a pinned aesthetic and is to be honoured, not
+  reinterpreted.
+  **Correction (2026-09-22):** the reference image as first supplied included a segmented
+  plate switcher over a full-bleed photograph. The user has since confirmed that control
+  was a capture artefact and is not part of the reference. It is not a design element of
+  this project, and no surface should reintroduce it. The landing page carries no hero
+  figure at all.
 - **Existing project palette** (from the author's own walkthrough document, to stay
   coherent with): ink `#15222B`, paper `#F2F5F5`, amber `#C88A05`, alert red `#E0443E`, and
   per-symptom-group hues dengue `#8B3A8F`, ILI `#2F67B1`, GI `#6E7F1F`, lepto `#12806E`.
 - **Framing (confirmed by the user):** the landing page reads as a working system with a
-  prominent notice that all case data is simulated. Author credit sits quietly in the
-  footer, not in the headline.
+  prominent notice that all case data is simulated. It carries **no author byline** — that
+  was removed at the user's request on 2026-09-22. The dataset attribution to Team Watchdog
+  stays, because it is owed to the publisher of the facility registry rather than being a
+  credit line. Authorship is recorded in the repository README, not on the page.
 
 ## Evidence on Hand
 
