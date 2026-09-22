@@ -1,44 +1,29 @@
-/* Generous on both sides: with no figure beneath it, the hero has the first
-   viewport to itself and the space is what gives it weight. */
 .hero {
-  padding-block: clamp(2.5rem, 1.6rem + 3.2vw, 4.5rem) clamp(3rem, 2rem + 4vw, 6rem);
+  padding-block: clamp(2rem, 1.4rem + 2.6vw, 3.5rem) var(--space-2xl);
 }
 
-.hero__inner {
-  display: grid;
-  gap: var(--space-xl);
-}
-
-/* No max-width here. `ch` on this container resolves against its own 16px font,
-   which on a phone clamps the whole column to about 235px and forces the
-   headline into five lines and the action button outside its own box. The
-   measure belongs on the title, where `ch` scales with the display size.
-
-   This is also the container the headline sizes itself against. */
 .hero__lede {
   min-width: 0;
+  /* The headline sizes itself against this column, not the viewport. */
   container-type: inline-size;
   container-name: lede;
 }
 
 .hero__title {
-  /* Single column: here the column IS the viewport, so vw is the honest unit.
-     The 5.8vw slope is chosen to meet the two-column value at the 60rem
-     breakpoint, so the headline does not jump size as the layout reflows. */
+  /* Single column: the column is the viewport, so vw is the honest unit. The
+     slope meets the two-column value at the 60rem breakpoint, so the headline
+     does not jump size as the layout reflows. */
   font-size: clamp(2.5rem, 5.8vw, 4rem);
   font-weight: var(--weight-medium);
   line-height: var(--leading-display);
   letter-spacing: var(--track-display);
   text-wrap: balance;
-  /* `ch` here is relative to the display size, so this measure holds its
-     proportions at every breakpoint instead of collapsing on small screens. */
   max-width: 22ch;
-  /* Pull the cap height flush with the rail's first rule. */
   margin-top: -0.12em;
 }
 
 .hero__standfirst {
-  max-width: 54ch;
+  max-width: 46ch;
   margin-top: var(--space-md);
   font-size: var(--step-body-lg);
   line-height: var(--leading-snug);
@@ -53,81 +38,71 @@
   margin-top: var(--space-lg);
 }
 
-/* ---- The readout rail --------------------------------------------------- */
+/* ---- The measurement strip --------------------------------------------- */
 
-.hero__readout {
+.hero__strip {
   display: grid;
   gap: 0;
-  margin: 0;
-  border-top: var(--rule-hair);
+  margin: var(--space-xl) 0 0;
+  border-top: var(--rule-ink);
 }
 
-.hero__readout-row {
+.hero__fact {
   display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr);
-  gap: var(--space-sm);
-  padding-block: 0.6rem;
+  gap: 0.2rem;
+  padding-block: var(--space-sm);
   border-bottom: var(--rule-hair);
 }
 
-/* The term stays uppercase and sits at 11px, which is body size for contrast
-   purposes — it needs 4.5:1, not 3:1. */
-.hero__readout-row dt {
+.hero__fact dt {
   color: var(--ink-70);
 }
 
-/* Values are NOT uppercased. They carry units and proper nouns — sigma, km,
-   district names — and `text-transform: uppercase` silently turns "3.2σ" into
-   "3.2Σ", which is a different symbol. Mono and tabular figures already give
-   the technical register without touching the glyphs. */
-.hero__readout-value {
+.hero__fact-value {
   margin: 0;
   color: var(--ink-85);
+  /* Values carry units and proper nouns. Uppercasing them turns 3σ into 3Σ. */
   text-transform: none;
   letter-spacing: 0.05em;
 }
 
-.hero__readout-note {
+.hero__fact-note {
   color: var(--ink-70);
 }
 
 .hero__simulated {
+  width: fit-content;
   margin-top: var(--space-md);
   padding: 0.55rem 0.7rem;
   color: var(--ink-85);
   background-color: var(--ochre-wash);
   border-left: 1px solid var(--ochre);
-  width: fit-content;
 }
 
-/* ---- Two columns once there is room ------------------------------------ */
+/* ---- Wide ---------------------------------------------------------------- */
+
+@media (min-width: 48rem) {
+  .hero__strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-bottom: var(--rule-hair);
+  }
+
+  .hero__fact {
+    padding-inline: var(--space-md);
+    border-bottom: 0;
+    border-inline-start: var(--rule-hair);
+  }
+
+  .hero__fact:first-child {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+}
 
 @media (min-width: 60rem) {
-  /* Two columns: the headline no longer spans the viewport, so it is sized
-     against its own column instead. 10.4cqw holds a constant ratio of column
-     width to type size, which is what keeps the headline at three even lines
-     all the way up. A viewport-fluid size drifts as the window narrows: at
-     1100px it produced a fourth line carrying only "no single". */
   .hero__title {
+    /* Two columns: sized against its own column so the ratio of column width
+       to type size stays fixed and the headline keeps its line breaks. */
     font-size: clamp(2.5rem, 10.4cqw, 5rem);
-  }
-
-  .hero__inner {
-    grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.85fr);
-    align-items: end;
-    gap: var(--space-2xl);
-  }
-
-  /* The rail sits on the headline's lower baseline, never above it. */
-  .hero__rail {
-    padding-bottom: 0.35rem;
-  }
-}
-
-/* Narrow the readout terms before they start stealing the values' room. */
-@media (max-width: 26rem) {
-  .hero__readout-row {
-    grid-template-columns: 5.5rem minmax(0, 1fr);
-    gap: var(--space-2xs);
   }
 }
