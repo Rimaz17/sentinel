@@ -65,7 +65,7 @@ export const privacyFields: ImageAsset = {
     `${fields1280} 1280w`,
   ].join(', '),
   width: 2238,
-  height: 1262,
+  height: 867,
 }
 
 export const networkMap: ImageAsset = {
