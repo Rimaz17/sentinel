@@ -57,9 +57,9 @@ describe('LandingPage', () => {
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
   })
 
-  it('carries three figures', () => {
+  it('carries a figure in each of the four content sections', () => {
     renderLanding()
-    expect(screen.getAllByRole('img')).toHaveLength(3)
+    expect(screen.getAllByRole('img')).toHaveLength(4)
   })
 
   it('gives every image alt text that carries its information', () => {
@@ -78,7 +78,7 @@ describe('LandingPage', () => {
     // The figures carry no visible caption, so the alt text is where a reader
     // who cannot see the drawing learns it is not system output.
     const alts = screen.getAllByRole('img').map((i) => i.getAttribute('alt') ?? '')
-    expect(alts).toHaveLength(3)
+    expect(alts).toHaveLength(4)
     for (const alt of alts) {
       expect(alt.toLowerCase()).toContain('illustration')
     }
@@ -100,7 +100,7 @@ describe('LandingPage', () => {
     renderLanding()
     const loading = screen.getAllByRole('img').map((i) => i.getAttribute('loading'))
     expect(loading.filter((l) => l === 'eager')).toHaveLength(1)
-    expect(loading.filter((l) => l === 'lazy')).toHaveLength(2)
+    expect(loading.filter((l) => l === 'lazy')).toHaveLength(3)
   })
 
   it('reserves space for every image so nothing shifts as they load', () => {
@@ -180,5 +180,24 @@ describe('LandingPage: house style', () => {
     }
     expect(screen.getByText('Name')).toBeInTheDocument()
     expect(screen.getByText('Approximate location')).toBeInTheDocument()
+  })
+})
+
+describe('SiteHeader', () => {
+  it('offers a way into the page as well as a way out of it', () => {
+    renderLanding()
+    const sections = within(screen.getByRole('navigation', { name: /sections/i })).getAllByRole(
+      'link',
+    )
+    expect(sections.map((l) => l.getAttribute('href'))).toEqual(['#mechanism', '#privacy'])
+  })
+
+  it('points every header section link at a section that exists', () => {
+    const { container } = renderLanding()
+    const nav = screen.getByRole('navigation', { name: /sections/i })
+    for (const link of within(nav).getAllByRole('link')) {
+      const id = (link.getAttribute('href') ?? '').slice(1)
+      expect(container.querySelector(`#${id}`)).not.toBeNull()
+    }
   })
 })
