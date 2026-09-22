@@ -1,18 +1,19 @@
-/* Budgeted against the viewport for the same reason as the detection section:
-   the figure and the text beside it are meant to be read in one screen. */
 .entries {
-  padding-block: clamp(1.25rem, 4.2vh, 3.25rem);
+  padding-block: var(--space-2xl);
   border-top: var(--rule-hair);
 }
 
-.entries__body {
+.entries__inner {
   display: grid;
-  gap: clamp(1.25rem, 3vh, 2rem);
-  align-content: start;
+  gap: var(--space-xl);
+}
+
+.entries__public {
+  align-self: center;
 }
 
 .entries__title {
-  max-width: 15ch;
+  max-width: 26ch;
   font-size: var(--step-title);
   font-weight: var(--weight-medium);
   line-height: var(--leading-title);
@@ -22,7 +23,7 @@
 .entries__standfirst {
   max-width: 46ch;
   margin-top: var(--space-md);
-  font-size: var(--step-body-lg);
+  font-size: var(--step-body);
   line-height: var(--leading-body);
   color: var(--ink-70);
 }
@@ -31,10 +32,11 @@
   margin-top: var(--space-lg);
 }
 
-/* Quieter, and clearly a separate area. */
+/* ---- Staff: its own row, clearly separated and given room --------------- */
+
 .entries__staff {
   padding-top: var(--space-md);
-  border-top: var(--rule-firm);
+  border-top: var(--rule-ink);
 }
 
 .entries__staff-title {
@@ -43,29 +45,20 @@
 
 .entries__staff-list {
   display: grid;
-  gap: 0;
-  margin-top: var(--space-sm);
-}
-
-.entries__staff-item {
-  padding-block: clamp(0.7rem, 1.8vh, 1.1rem);
-  border-bottom: var(--rule-hair);
-}
-
-.entries__staff-item:first-child {
-  border-top: var(--rule-hair);
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
 }
 
 .entries__staff-role {
-  font-size: var(--step-body);
+  font-size: var(--step-section);
   font-weight: var(--weight-medium);
   letter-spacing: var(--track-tight);
 }
 
 .entries__staff-body {
   max-width: 52ch;
-  margin-top: 0.3rem;
-  font-size: var(--step-small);
+  margin-top: var(--space-2xs);
+  font-size: var(--step-body);
   line-height: var(--leading-body);
   color: var(--ink-70);
 }
@@ -74,4 +67,11 @@
   color: var(--ink);
   text-decoration: underline;
   text-decoration-color: var(--ink-40);
+}
+
+@media (min-width: 68rem) {
+  .entries__staff-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2xl);
+  }
 }
