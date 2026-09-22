@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
+import { networkMap } from '@/assets/images'
 import { Action } from '@/components/ui/Action'
+import { Figure } from '@/components/ui/Figure'
 import './entries.css'
 
 /**
@@ -29,6 +31,14 @@ export function Entries() {
               Open the public dashboard
             </Action>
           </div>
+
+          <Figure
+            className="entries__figure"
+            image={networkMap}
+            sizes="(min-width: 64rem) 352px, calc(100vw - 2rem)"
+            alt="An outline of Sri Lanka stippled with small red marks, densest around the cities and along the coast, with a soft red bloom inland."
+            caption="The reporting network, all 25 districts · illustration, not live data"
+          />
         </div>
 
         <div className="entries__staff">

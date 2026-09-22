@@ -28,6 +28,13 @@
   margin-top: var(--space-lg);
 }
 
+/* Held well short of the column so the island keeps its own margin, and so the
+   quiet staff block opposite is not dwarfed by it. */
+.entries__figure {
+  max-width: 22rem;
+  margin-top: var(--space-xl);
+}
+
 /* ---- Staff: quieter, and clearly a separate area ----------------------- */
 
 .entries__staff {
