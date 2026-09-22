@@ -6,7 +6,7 @@ type FigureProps = {
   image: ImageAsset
   /**
    * What the picture says, for someone who cannot see it. Not a description of
-   * the artwork — a description of the information it carries. Each of these
+   * the artwork, but of the information it carries. Each of these
    * ends by naming itself an illustration: the figures carry no visible
    * caption, so the alt text is where that disclosure lives for anyone who
    * cannot see the drawing.
@@ -24,7 +24,7 @@ type FigureProps = {
   ratio?: string
   /**
    * `contain` (the default) fits the whole drawing in the frame, which is what
-   * a trimmed cut-out needs — cropping one just clips the artwork. `cover`
+   * a trimmed cut-out needs, because cropping one just clips the artwork. `cover`
    * fills the frame and is for opaque artwork that can take a crop.
    */
   fit?: 'contain' | 'cover'

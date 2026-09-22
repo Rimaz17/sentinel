@@ -5,7 +5,7 @@ import './planned.css'
 
 type PlannedPageProps = {
   title: string
-  /** Build phase from the project plan, e.g. "Phase 4 — Accounts and roles". */
+  /** Build phase from the project plan, e.g. "Phase 4, Accounts and roles". */
   phase: string
   /** What will actually live at this route. Written plainly, not as a promise. */
   children: React.ReactNode

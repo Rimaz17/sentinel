@@ -10,7 +10,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="site-header__inner shell">
-        <Link to="/" className="brand site-header__brand" aria-label="Sentinel — home">
+        <Link to="/" className="brand site-header__brand" aria-label="Sentinel, home">
           <SentinelWordmark />
         </Link>
 

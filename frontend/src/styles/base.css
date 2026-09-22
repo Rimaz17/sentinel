@@ -1,8 +1,8 @@
 /*
  * Base layer: reset, document defaults, and the browser's own surfaces.
  *
- * The parts nobody draws — selection, caret, focus ring, scrollbar, underline
- * offset — ship with defaults that belong to no design system. They are themed
+ * The parts nobody draws (selection, caret, focus ring, scrollbar, underline
+ * offset) ship with defaults that belong to no design system. They are themed
  * here from the palette.
  */
 

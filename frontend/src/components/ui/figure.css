@@ -3,12 +3,13 @@
 }
 
 .figure__frame {
+  position: relative;
   /* Always ratio'd, so the space is reserved before the bytes arrive and
      nothing on the page shifts as the image loads.
 
      Two variables, not one. The component sets `--figure-ratio` inline, and an
      inline custom property cannot be overridden by a stylesheet rule on the
-     same element — a media query setting `--figure-ratio` would simply lose.
+     same element, so a media query setting `--figure-ratio` would simply lose.
      So a breakpoint that needs a different crop sets the override instead. */
   aspect-ratio: var(--figure-ratio-override, var(--figure-ratio));
   overflow: hidden;

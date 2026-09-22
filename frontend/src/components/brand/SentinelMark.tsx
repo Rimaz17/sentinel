@@ -3,7 +3,7 @@
  *
  * It is the product's own mechanism drawn at 24px: a week of counts running
  * along a baseline, with one reading breaking through it. Only the area above
- * the baseline is filled, because that area is the entire point — the signal is
+ * the baseline is filled, because that area is the entire point: the signal is
  * the part that leaves the normal range.
  *
  * Drawn rather than borrowed, in one stroke weight. The flanking readings are

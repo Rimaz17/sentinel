@@ -52,7 +52,7 @@ describe('LandingPage', () => {
 
   it('carries no plate switcher', () => {
     renderLanding()
-    // Figures are fine — the switcher is the thing that must not come back.
+    // Figures are fine; the switcher is the thing that must not come back.
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument()
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
   })
@@ -119,7 +119,7 @@ describe('LandingPage', () => {
   })
 })
 
-describe('LandingPage — access routes', () => {
+describe('LandingPage: access routes', () => {
   it('offers registration only to data providers, never to inspectors', () => {
     renderLanding()
 
@@ -153,5 +153,32 @@ describe('LandingPage — access routes', () => {
     // page search engines index.
     expect(screen.queryByText(/active alerts?/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/districts? (?:at|on) (?:watch|alert)/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('LandingPage: house style', () => {
+  it('uses no em dashes anywhere in the rendered page', () => {
+    const { container } = renderLanding()
+    // CLAUDE.md section 11: never an em dash, in copy or anywhere else.
+    expect(container.textContent ?? '').not.toContain('\u2014')
+  })
+
+  it('keeps the restraint statement with the privacy section', () => {
+    renderLanding()
+    const privacy = screen
+      .getByRole('heading', { name: /identity is stripped/i })
+      .closest('section')
+    expect(privacy).not.toBeNull()
+    expect(privacy?.textContent).toMatch(/does not diagnose anyone/i)
+    expect(privacy?.textContent).toMatch(/can mark it a false alarm/i)
+  })
+
+  it('groups every report field under what happens to it', () => {
+    renderLanding()
+    for (const verb of ['Removed entirely', 'Generalised', 'Kept']) {
+      expect(screen.getByText(verb)).toBeInTheDocument()
+    }
+    expect(screen.getByText('Name')).toBeInTheDocument()
+    expect(screen.getByText('Approximate location')).toBeInTheDocument()
   })
 })

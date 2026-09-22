@@ -22,13 +22,17 @@
      The display size is NOT set here, because it is the one step in the scale
      that does not belong to the viewport. The headline sits in a grid column
      roughly half the viewport's width, and a viewport-fluid size makes the
-     ratio of column width to type size drift as the window narrows — which
+     ratio of column width to type size drift as the window narrows, which
      changes where the real headline breaks. It is set in container units on
      `.hero__title` instead, where that ratio stays fixed by construction.
      Tracking still tightens as size grows, because a grotesque set large at
      default tracking reads loose. */
-  --step-title: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
-  --step-section: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  /* One size for every section heading, one for every sub-heading, and one for
+     every piece of body copy beneath them. Sections setting their own sizes is
+     what made the page's headings read as inconsistent with each other: the
+     detection title was 36px while the privacy and entry titles were 44px. */
+  --step-title: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  --step-section: clamp(1.0625rem, 1rem + 0.35vw, 1.1875rem);
   --step-body-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
   --step-body: 1rem;
   --step-small: 0.875rem;

@@ -28,7 +28,7 @@ export function SiteFooter() {
         </nav>
 
         <div className="site-footer__credit">
-          {/* Dataset attribution, not a byline — this one is owed to the
+          {/* Dataset attribution, not a byline. This one is owed to the
               publisher of the facility registry. */}
           <p className="site-footer__source">
             Facility registry derived from the Ministry of Health Institutions dataset published by

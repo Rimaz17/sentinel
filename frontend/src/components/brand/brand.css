@@ -30,7 +30,7 @@
   font-size: 1.0625rem;
 }
 
-/* The mark's trace thickens on hover — the lockup reacts without moving. */
+/* The mark's trace thickens on hover; the lockup reacts without moving. */
 .brand__mark path {
   transition: opacity var(--dur-base) var(--ease-out);
 }
