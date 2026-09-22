@@ -4,8 +4,13 @@
 
 .figure__frame {
   /* Always ratio'd, so the space is reserved before the bytes arrive and
-     nothing on the page shifts as the image loads. */
-  aspect-ratio: var(--figure-ratio);
+     nothing on the page shifts as the image loads.
+
+     Two variables, not one. The component sets `--figure-ratio` inline, and an
+     inline custom property cannot be overridden by a stylesheet rule on the
+     same element — a media query setting `--figure-ratio` would simply lose.
+     So a breakpoint that needs a different crop sets the override instead. */
+  aspect-ratio: var(--figure-ratio-override, var(--figure-ratio));
   overflow: hidden;
   /* The drawings sit on a warm paper; the page ground is cooler. Sinking the
      frame very slightly means the join reads as a change of stock rather than

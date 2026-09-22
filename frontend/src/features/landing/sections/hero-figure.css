@@ -20,6 +20,6 @@
    source: it stays fully inside each one. */
 @media (max-width: 48rem) {
   .hero-figure__figure .figure__frame {
-    --figure-ratio: 16 / 10;
+    --figure-ratio-override: 16 / 10;
   }
 }
