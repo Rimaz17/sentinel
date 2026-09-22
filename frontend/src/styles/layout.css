@@ -26,7 +26,7 @@
   /* ---- Motion ----------------------------------------------------------
      One authored moment on this page: the primary action takes its ink from
      the foot of the box upward. Everything else settles quickly and gets out
-     of the way. Exponential ease-out, from an already-visible default —
+     of the way. Exponential ease-out, from an already-visible default;
      nothing on this page animates in from nothing. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
@@ -74,13 +74,16 @@
    avoid. Stacked is balanced by definition. */
 @media (min-width: 68rem) {
   .split {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* Equal by default. A section can shift the divider with --split-a /
+       --split-b when its content genuinely needs it; the outer edges stay on
+       the shell's gutters either way, so the page still reads as one grid. */
+    grid-template-columns: minmax(0, var(--split-a, 1fr)) minmax(0, var(--split-b, 1fr));
     gap: var(--space-2xl);
     align-items: start;
   }
 
   /* A block of text paired with a figure. Centred against each other, because
-     the shorter of the two otherwise leaves a tall void beside the taller —
+     the shorter of the two otherwise leaves a tall void beside the taller,
      which is the single biggest source of dead space on a page like this. */
   .split--paired {
     align-items: center;
@@ -108,10 +111,21 @@
   }
 
   .split--fill > .figure .figure__frame {
-    flex: 1 1 auto;
-    /* The row height governs here, not the image's own proportions. */
+    /* Basis 0, not auto: with `auto` the frame's flex basis is the image's own
+       height, the figure reports that as its intrinsic height, and the grid row
+       sizes to the IMAGE rather than to the text, so trimming the text moves
+       nothing. Basis 0 lets the frame grow into whatever the text column asks
+       for and contribute nothing of its own. */
+    flex: 1 1 0;
     aspect-ratio: auto;
     min-height: 0;
+  }
+
+  /* Taken out of flow for the same reason: an in-flow image would put its own
+     height back into the figure's intrinsic size. */
+  .split--fill > .figure .figure__img {
+    position: absolute;
+    inset: 0;
   }
 }
 
