@@ -92,6 +92,27 @@
   .split--flip > :first-child {
     order: 2;
   }
+
+  /* Both columns share one height, so a figure's top and bottom edges land on
+     exactly the same lines as the text beside it. The taller column sets the
+     height and the figure fills it, rather than the two floating at their own
+     natural sizes. */
+  .split--fill {
+    align-items: stretch;
+  }
+
+  .split--fill > .figure {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .split--fill > .figure .figure__frame {
+    flex: 1 1 auto;
+    /* The row height governs here, not the image's own proportions. */
+    aspect-ratio: auto;
+    min-height: 0;
+  }
 }
 
 /* A hairline rule used as a structural divider rather than a border on a box. */
