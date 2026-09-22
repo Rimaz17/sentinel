@@ -56,6 +56,40 @@
   padding-inline: var(--gutter);
 }
 
+/*
+ * The page's one two-column grid.
+ *
+ * Every section that splits in two uses this, at the same ratio and the same
+ * gap, so the column edges line up from the header to the footer. Sections
+ * inventing their own ratios is what made the page read as unaligned.
+ */
+.split {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 60rem) {
+  .split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+
+  /* A block of text paired with a figure. Centred against each other, because
+     the shorter of the two otherwise leaves a tall void beside the taller —
+     which is the single biggest source of dead space on a page like this. */
+  .split--paired {
+    align-items: center;
+  }
+
+  /* Moves the first child into the second column, so the figure side can
+     alternate down the page while the DOM keeps heading-then-figure order for
+     screen readers and for the stacked layout on a phone. */
+  .split--flip > :first-child {
+    order: 2;
+  }
+}
+
 /* A hairline rule used as a structural divider rather than a border on a box. */
 .rule {
   border: 0;
