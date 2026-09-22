@@ -109,13 +109,31 @@ IntelliJ.
 
 ```
 sentinel/
-├── frontend/          React + TypeScript + Vite — the landing page today
+├── frontend/
+│   └── src/assets/        Shipped WebP figures, several widths each
 ├── docs/
-│   ├── adr/           Architecture decision records
-│   └── design/        PRODUCT.md and DESIGN.md
-├── scripts/git-hooks/ commit-msg hook
+│   ├── adr/               Architecture decision records
+│   └── design/
+│       ├── PRODUCT.md     Product record
+│       ├── DESIGN.md      Design system, written from the built page
+│       └── source-images/ Full-resolution originals (archived, not shipped)
+├── scripts/
+│   ├── build-images.py    Regenerates frontend/src/assets from the originals
+│   └── git-hooks/         commit-msg hook
 └── README.md
 ```
+
+### Regenerating the images
+
+The landing page figures ship as WebP at several widths. To rebuild them after
+changing a source image:
+
+```bash
+python scripts/build-images.py
+```
+
+Needs Pillow (`pip install Pillow`). It reads `docs/design/source-images/` and
+writes `frontend/src/assets/`.
 
 `backend/` and `infra/` are not scaffolded yet; they arrive with the phase that
 needs them.
