@@ -7,7 +7,3 @@
 .landing__main {
   flex: 1;
 }
-
-.landing__plate {
-  margin-top: var(--space-lg);
-}

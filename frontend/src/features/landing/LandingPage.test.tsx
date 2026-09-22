@@ -1,5 +1,4 @@
 import { render, screen, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { LandingPage } from './LandingPage'
@@ -37,82 +36,23 @@ describe('LandingPage', () => {
     expect(screen.getByRole('link', { name: /skip to content/i })).toHaveAttribute('href', '#main')
   })
 
-  it('exposes the plate switcher as a tab list', () => {
+  it('states the detection window and threshold in the hero rail', () => {
     renderLanding()
-    const tabs = within(screen.getByRole('tablist', { name: /plate/i })).getAllByRole('tab')
-    expect(tabs).toHaveLength(4)
-    expect(tabs.filter((t) => t.getAttribute('aria-selected') === 'true')).toHaveLength(1)
+    expect(screen.getByText('25 districts · 1,505 facilities')).toBeInTheDocument()
+    expect(screen.getByText('last 7 days against 8 weeks')).toBeInTheDocument()
+    expect(screen.getByText('3σ')).toBeInTheDocument()
   })
 
-  it('opens on the signal plate', () => {
+  it('carries no plate figure or plate switcher', () => {
     renderLanding()
-    expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName(/signal/i)
-  })
-})
-
-describe('LandingPage — plate switching', () => {
-  it('changes the caption and the hero readout together', async () => {
-    const user = userEvent.setup()
-    renderLanding()
-
-    // The signal plate's readout and caption.
-    expect(screen.getByText('3.2σ')).toBeInTheDocument()
-    expect(
-      screen.getByText(/one district rises clear of its own normal range/i),
-    ).toBeInTheDocument()
-
-    await user.click(screen.getByRole('tab', { name: /cluster/i }))
-
-    // Both must move at once — the rail is a readout of the plate, so a caption
-    // that changed while the measurement lagged would be a lie on the page.
-    expect(screen.getByText('17 in 2 km')).toBeInTheDocument()
-    expect(screen.queryByText('3.2σ')).not.toBeInTheDocument()
-    expect(screen.getByText(/a second check runs alongside the first/i)).toBeInTheDocument()
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument()
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument()
+    expect(screen.queryByRole('figure')).not.toBeInTheDocument()
   })
 
-  it('moves between plates with the arrow keys', async () => {
-    const user = userEvent.setup()
+  it('carries no author byline', () => {
     renderLanding()
-
-    await user.click(screen.getByRole('tab', { name: /baseline/i }))
-    expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName(/baseline/i)
-
-    await user.keyboard('{ArrowRight}')
-    expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName(/signal/i)
-
-    await user.keyboard('{ArrowLeft}')
-    expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName(/baseline/i)
-  })
-
-  it('wraps from the first plate to the last', async () => {
-    const user = userEvent.setup()
-    renderLanding()
-
-    await user.click(screen.getByRole('tab', { name: /baseline/i }))
-    await user.keyboard('{ArrowLeft}')
-    expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName(/spread/i)
-  })
-
-  it('jumps to the first and last plates with Home and End', async () => {
-    const user = userEvent.setup()
-    renderLanding()
-
-    await user.click(screen.getByRole('tab', { name: /signal/i }))
-    await user.keyboard('{End}')
-    expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName(/spread/i)
-
-    await user.keyboard('{Home}')
-    expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName(/baseline/i)
-  })
-
-  it('gives every plate a text alternative carrying the same information', async () => {
-    const user = userEvent.setup()
-    renderLanding()
-
-    expect(screen.getByText(/rising well clear of the shaded normal range/i)).toBeInTheDocument()
-
-    await user.click(screen.getByRole('tab', { name: /spread/i }))
-    expect(screen.getByText(/spread evenly across a district with no ring/i)).toBeInTheDocument()
+    expect(screen.queryByText(/rimaz|saththar|iit sri lanka/i)).not.toBeInTheDocument()
   })
 })
 

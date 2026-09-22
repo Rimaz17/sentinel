@@ -78,12 +78,6 @@
   letter-spacing: 0.05em;
 }
 
-/* Safe to uppercase: plate names carry no units and no proper nouns. */
-.hero__readout-caps {
-  text-transform: uppercase;
-  letter-spacing: var(--track-label);
-}
-
 .hero__readout-note {
   color: var(--ink-70);
 }

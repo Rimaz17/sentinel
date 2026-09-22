@@ -1,17 +1,15 @@
 import { Action } from '@/components/ui/Action'
-import type { Plate } from '../plate/plates'
 import './hero.css'
-
-type HeroProps = { plate: Plate }
 
 /**
  * The first viewport.
  *
- * The metadata rail is a readout of whichever plate is showing, which is why it
- * sits at the headline's lower baseline rather than above it — it belongs to
- * the drawing below, not to the sentence above.
+ * The metadata rail states the shape of the system in three measured lines —
+ * how much it covers, what it compares, and where the line sits. It is set at
+ * the headline's lower baseline rather than above it, because a label stacked
+ * over a title is a kicker and the headline carries its own weight.
  */
-export function Hero({ plate }: HeroProps) {
+export function Hero() {
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero__inner shell">
@@ -39,25 +37,24 @@ export function Hero({ plate }: HeroProps) {
         <div className="hero__rail">
           <dl className="hero__readout">
             <div className="hero__readout-row">
-              <dt className="label label--sm">Plate</dt>
-              <dd className="label label--sm hero__readout-value">
-                <span className="tnum">{plate.ordinal}</span> —{' '}
-                <span className="hero__readout-caps">{plate.name}</span>
-              </dd>
-            </div>
-            <div className="hero__readout-row">
               <dt className="label label--sm">Coverage</dt>
               <dd className="label label--sm hero__readout-value tnum">
                 25 districts · 1,505 facilities
               </dd>
             </div>
             <div className="hero__readout-row">
-              <dt className="label label--sm">{plate.readout.label}</dt>
+              <dt className="label label--sm">Window</dt>
+              <dd className="label label--sm hero__readout-value tnum">
+                last 7 days against 8 weeks
+              </dd>
+            </div>
+            <div className="hero__readout-row">
+              <dt className="label label--sm">Threshold</dt>
               <dd className="label label--sm hero__readout-value">
-                {/* The single accent on the page. It marks the measurement the
-                    active plate exists to show, and nothing else. */}
-                <span className="label__value tnum">{plate.readout.value}</span>
-                <span className="hero__readout-note tnum"> {plate.readout.note}</span>
+                {/* The single accent on the page. It marks the one measurement
+                    the whole system turns on, and nothing else. */}
+                <span className="label__value tnum">3σ</span>
+                <span className="hero__readout-note"> above the area’s own average</span>
               </dd>
             </div>
           </dl>
