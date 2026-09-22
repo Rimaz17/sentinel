@@ -1,11 +1,12 @@
 .entries {
-  padding-block: var(--space-3xl);
+  padding-block: var(--space-2xl);
   border-top: var(--rule-hair);
 }
 
-.entries__inner {
+.entries__body {
   display: grid;
-  gap: var(--space-2xl);
+  gap: var(--space-xl);
+  align-content: start;
 }
 
 .entries__title {
@@ -28,15 +29,7 @@
   margin-top: var(--space-lg);
 }
 
-/* Held well short of the column so the island keeps its own margin, and so the
-   quiet staff block opposite is not dwarfed by it. */
-.entries__figure {
-  max-width: 22rem;
-  margin-top: var(--space-xl);
-}
-
-/* ---- Staff: quieter, and clearly a separate area ----------------------- */
-
+/* Quieter, and clearly a separate area. */
 .entries__staff {
   padding-top: var(--space-md);
   border-top: var(--rule-firm);
@@ -79,21 +72,4 @@
   color: var(--ink);
   text-decoration: underline;
   text-decoration-color: var(--ink-40);
-}
-
-@media (min-width: 64rem) {
-  .entries__inner {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: var(--space-3xl);
-    align-items: start;
-  }
-
-  .entries__staff {
-    padding-top: 0;
-    border-top: 0;
-  }
-
-  .entries__staff-list {
-    margin-top: 0;
-  }
 }

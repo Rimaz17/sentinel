@@ -16,8 +16,8 @@ const CHECKS = [
 export function Mechanism() {
   return (
     <section className="mechanism" id="mechanism" aria-labelledby="mechanism-title">
-      <div className="shell mechanism__inner">
-        <div className="mechanism__lede">
+      <div className="shell split split--paired split--flip">
+        <div className="mechanism__body">
           <h2 id="mechanism-title" className="mechanism__title">
             An outbreak rarely announces itself at one clinic.
           </h2>
@@ -28,19 +28,6 @@ export function Mechanism() {
             combined view continuously, so the rise is flagged on day three instead of day ten.
           </p>
 
-          <Figure
-            className="mechanism__figure"
-            image={twoViews}
-            sizes="(min-width: 90rem) 542px, (min-width: 60rem) 38vw, calc(100vw - 2rem)"
-            alt="One week drawn twice. Above: patients and hospitals scattered across a grey hillside, annotated “isolated cases” and “rainy season?”. Below: the same island as a single connected network, with three red clusters picked out and annotated “Sentinel alert”, “DBSCAN cluster” and “hidden outbreak”."
-            caption="The same week, seen twice · illustration"
-          />
-        </div>
-
-        {/* The checks and the caveat are one grid item. Left as siblings they
-            land in separate grid rows, and the caveat gets pushed to the foot
-            of the tall figure column instead of following the checks. */}
-        <div className="mechanism__detail">
           <dl className="mechanism__checks">
             {CHECKS.map((check) => (
               <div className="mechanism__check" key={check.term}>
@@ -56,6 +43,16 @@ export function Mechanism() {
             inspector, who can mark it a false alarm.
           </p>
         </div>
+
+        <Figure
+          className="mechanism__figure"
+          image={twoViews}
+          fit="cover"
+          ratio="6 / 7"
+          sizes="(min-width: 84rem) 636px, (min-width: 60rem) 45vw, calc(100vw - 2rem)"
+          alt="One week drawn twice. Above: patients and hospitals scattered across a grey hillside, annotated “isolated cases” and “rainy season?”. Below: the same ground as a single connected network, with a red cluster picked out and annotated “Sentinel alert”, “DBSCAN cluster” and “hidden outbreak”."
+          caption="The same week, seen twice · illustration"
+        />
       </div>
     </section>
   )

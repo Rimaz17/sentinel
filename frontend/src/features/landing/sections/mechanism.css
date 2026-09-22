@@ -1,11 +1,12 @@
 .mechanism {
-  padding-block: var(--space-3xl);
+  padding-block: var(--space-2xl);
   border-top: var(--rule-hair);
 }
 
-.mechanism__inner {
+.mechanism__body {
   display: grid;
-  gap: var(--space-xl);
+  gap: var(--space-lg);
+  align-content: start;
 }
 
 .mechanism__title {
@@ -18,7 +19,6 @@
 
 .mechanism__standfirst {
   max-width: var(--measure);
-  margin-top: var(--space-md);
   font-size: var(--step-body-lg);
   line-height: var(--leading-body);
   color: var(--ink-70);
@@ -51,44 +51,14 @@
   color: var(--ink-70);
 }
 
-.mechanism__figure {
-  margin-top: var(--space-lg);
-}
-
-.mechanism__detail {
-  display: grid;
-  gap: var(--space-lg);
-  align-content: start;
-}
-
 .mechanism__limit {
   max-width: var(--measure);
   color: var(--ink-70);
+  font-size: var(--step-small);
 }
 
-@media (min-width: 60rem) {
-  .mechanism__inner {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-    column-gap: var(--space-2xl);
-    align-items: start;
-  }
-
-  /* The lede is no longer sticky: with the figure under it the column is full,
-     so there is nothing to hold in place. */
-
-  .mechanism__checks {
-    border-top: 0;
-    margin-top: -0.4rem;
-  }
-
-  .mechanism__check:first-child {
-    padding-top: 0;
-  }
-}
-
-@media (min-width: 60rem) {
-  .mechanism__check {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-xs);
-  }
+/* The title's own margin does the spacing above the standfirst, so the grid
+   gap does not double it. */
+.mechanism__title + .mechanism__standfirst {
+  margin-top: calc(var(--space-lg) * -0.4);
 }

@@ -1,12 +1,13 @@
 .privacy {
-  padding-block: var(--space-3xl);
+  padding-block: var(--space-2xl);
   border-top: var(--rule-hair);
   background-color: var(--paper-sunk);
 }
 
-.privacy__inner {
+.privacy__body {
   display: grid;
-  gap: var(--space-xl);
+  gap: var(--space-md);
+  align-content: start;
 }
 
 .privacy__title {
@@ -19,10 +20,15 @@
 
 .privacy__standfirst {
   max-width: var(--measure);
-  margin-top: var(--space-md);
   font-size: var(--step-body-lg);
   line-height: var(--leading-body);
   color: var(--ink-70);
+}
+
+.privacy__note {
+  max-width: var(--measure);
+  color: var(--ink-70);
+  font-size: var(--step-small);
 }
 
 .privacy__table {
@@ -40,9 +46,8 @@
 }
 
 .privacy__cell {
-  padding: var(--space-md) var(--space-md) 0 0;
+  padding: var(--space-sm) var(--space-md) 0 0;
   vertical-align: top;
-  border-bottom: 0;
 }
 
 .privacy__list {
@@ -58,14 +63,8 @@
   line-height: var(--leading-snug);
 }
 
-.privacy__note {
-  max-width: var(--measure);
-  color: var(--ink-70);
-  font-size: var(--step-small);
-}
-
-/* On a phone the three columns stack. The header cells become the group titles
-   so the reading order stays "question, then answers". */
+/* On a phone the three columns stack, and the column headers become the group
+   titles so the reading order stays "question, then answers". */
 @media (max-width: 48rem) {
   .privacy__table,
   .privacy__table thead,
@@ -101,18 +100,5 @@
     letter-spacing: var(--track-label-wide);
     text-transform: uppercase;
     color: var(--ink-70);
-  }
-}
-
-@media (min-width: 60rem) {
-  .privacy__inner {
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
-    column-gap: var(--space-2xl);
-    align-items: start;
-  }
-
-  .privacy__note {
-    grid-column: 2;
-    margin-top: calc(var(--space-md) * -1);
   }
 }

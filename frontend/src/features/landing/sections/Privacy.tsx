@@ -16,17 +16,15 @@ const COLUMNS = [
 ]
 
 /**
- * The privacy model, stated as the record it is.
- *
- * This is a real table rather than three styled boxes, because it is genuinely
- * tabular: the same question — what happens to this field — asked of every
- * field, and a visitor should be able to read down a column.
+ * The privacy model, stated as the record it is — a real table, because the
+ * same question is asked of every field and a reader should be able to read
+ * down a column.
  */
 export function Privacy() {
   return (
     <section className="privacy" aria-labelledby="privacy-title">
-      <div className="shell privacy__inner">
-        <div className="privacy__lede">
+      <div className="shell split">
+        <div className="privacy__body">
           <h2 id="privacy-title" className="privacy__title">
             Identity is stripped at the front door.
           </h2>
@@ -34,6 +32,11 @@ export function Privacy() {
             Personal fields are removed in the ingestion API before anything is written to storage.
             Nothing downstream — the database, the event stream, the backups or the logs — ever
             holds personal data.
+          </p>
+          <p className="privacy__note">
+            The public view is coarser than the internal one on purpose. A dot plotted at a
+            pharmacy’s exact coordinates can let someone infer which household got sick, even with
+            no name attached — so the public map shows shaded districts, never individual reports.
           </p>
         </div>
 
@@ -66,12 +69,6 @@ export function Privacy() {
             </tr>
           </tbody>
         </table>
-
-        <p className="privacy__note">
-          The public view is coarser than the internal one on purpose. A dot plotted at a pharmacy’s
-          exact coordinates can let someone infer which household got sick, even with no name
-          attached — so the public map shows shaded districts, never individual reports.
-        </p>
       </div>
     </section>
   )
