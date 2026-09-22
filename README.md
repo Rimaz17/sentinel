@@ -16,7 +16,7 @@ extra patients at each of a dozen different places, and each of those numbers is
 small enough to explain away as the rainy season or a virus going round.
 
 Twelve facilities around Kandy normally see 25 dengue-like cases a week between
-them. In the first week of a simulated outbreak they see 87 — but no single facility
+them. In the first week of a simulated outbreak they see 87, but no single facility
 sees more than eleven, and most see six or seven. Nobody on the ground has enough
 information to sound an alarm.
 
@@ -41,14 +41,14 @@ spread evenly across a district suggests a wider seasonal wave.
 
 | Phase | Scope | State |
 |---|---|---|
-| 1 | Walking skeleton — facility registry, simulator, ingestion API, PostgreSQL | Not started |
-| 2 | Detection v1 — z-score baseline job writing alerts | Not started |
-| 3 | Dashboard v1 — React + Leaflet, polling | Not started |
-| 4 | Accounts and roles — invite codes, PHI accounts, public dashboard | Not started |
-| 5 | Real-time — Kafka, Redis windows, WebSocket alerts | Not started |
-| 6 | Geography — PostGIS, DBSCAN, cluster rings | Not started |
-| 7 | Ship it — Docker Compose, CI, deployed demo | Not started |
-| — | **Landing page** — the public entry point at `/` | **Built** |
+| 1 | Walking skeleton, facility registry, simulator, ingestion API, PostgreSQL | Not started |
+| 2 | Detection v1, z-score baseline job writing alerts | Not started |
+| 3 | Dashboard v1, React + Leaflet, polling | Not started |
+| 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | Not started |
+| 5 | Real-time, Kafka, Redis windows, WebSocket alerts | Not started |
+| 6 | Geography, PostGIS, DBSCAN, cluster rings | Not started |
+| 7 | Ship it, Docker Compose, CI, deployed demo | Not started |
+| n/a | **Landing page**, the public entry point at `/` | **Built** |
 
 The landing page is the one surface that exists today. Every other route renders a
 page stating which phase it belongs to and what will live there; see
@@ -87,7 +87,7 @@ npm run dev
 
 The dev server prints a local URL, normally <http://localhost:5173>.
 
-There is **no backend to run yet** — the landing page is entirely static and makes
+There is **no backend to run yet**, the landing page is entirely static and makes
 no network requests. Phase 1 is the first phase that produces something to open in
 IntelliJ.
 
@@ -148,7 +148,7 @@ git config core.hooksPath scripts/git-hooks
 
 ## Privacy model
 
-Identity is stripped at the ingestion API — the front door — before anything is
+Identity is stripped at the ingestion API, the front door, before anything is
 written to storage. Nothing downstream, including backups and logs, ever holds
 personal data.
 
@@ -158,7 +158,7 @@ personal data.
 
 The public view is deliberately coarser than the internal one. A dot plotted at a
 pharmacy's exact coordinates can let someone infer which household got sick, even
-with no name attached, so public geography is shaded districts or a heatmap —
+with no name attached, so public geography is shaded districts or a heatmap ,
 never individual reports.
 
 ## Known limitations

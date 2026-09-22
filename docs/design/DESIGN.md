@@ -11,12 +11,12 @@ the page's attention, and is spent in exactly two places.
 
 A survey sheet. A set headline, a column of measured annotations in letter-spaced
 monospace, and content separated by rules rather than boxed into panels. What keeps
-it from being editorial pastiche is that the annotations are real — every mono
+it from being editorial pastiche is that the annotations are real, every mono
 string on the page is a count, a window, a threshold or a district figure. If a
 mono string is not a measured value, it is in the wrong face.
 
-Every section that splits in two uses **one shared grid** — the same 50/50 ratio
-and the same gap — so the column edges line up from the header to the footer.
+Every section that splits in two uses **one shared grid**, the same 50/50 ratio
+and the same gap, so the column edges line up from the header to the footer.
 Sections inventing their own ratios is what made an earlier build read as
 unaligned. What must never come back is the segmented **plate switcher** that sat
 over a figure in an earlier build; it came from a mis-cropped reference image and
@@ -31,7 +31,7 @@ does not exist on the page the reference was taken from.
 | `--paper-sunk` | `#e7ebec` | The privacy band |
 | `--ink` | `#15222b` | Body text, rules at full strength |
 | `--ochre` | `#8f6203` | The accent. Text-safe at 4.89:1 on paper |
-| `--ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces — 2.70:1 on paper, so never type there |
+| `--ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces, 2.70:1 on paper, so never type there |
 | `--alert` | `#e0443e` | Reserved for the alert vocabulary; unused so far |
 
 Ink alphas and their measured ratios on `--paper`:
@@ -40,10 +40,10 @@ Ink alphas and their measured ratios on `--paper`:
 |---|---|---|
 | `--ink` | 14.78:1 | Any text |
 | `--ink-85` | 9.46:1 | Any text |
-| `--ink-70` | 5.76:1 | Any text — the secondary body colour |
+| `--ink-70` | 5.76:1 | Any text, the secondary body colour |
 | `--ink-55` | 3.62:1 | Large text only (≥24px, or ≥18.7px bold). Nothing on the landing page qualifies, so it is currently non-text only |
 | `--ink-40` / `--ink-24` | 2.40:1 / 1.64:1 | Non-text: rules, inactive marks |
-| `--ink-14` / `--ink-08` / `--ink-04` | — | Hairline rules and washes |
+| `--ink-14` / `--ink-08` / `--ink-04` | n/a | Hairline rules and washes |
 
 **Colour strategy: restrained.** Neutrals plus one accent. The visitor came to
 understand something and then leave for the dashboard, and a system about outbreaks
@@ -51,9 +51,9 @@ has no business being loud.
 
 **Where the ochre is spent.** Twice per view, and never on furniture:
 
-1. the one measurement the whole system turns on — the `3σ` threshold in the hero
+1. the one measurement the whole system turns on, the `3σ` threshold in the hero
    rail;
-2. the one thing every visitor must know — the simulated-data notice, which takes
+2. the one thing every visitor must know, the simulated-data notice, which takes
    an ochre wash and a 1px ochre rule.
 
 Nothing else gets it. Hover states, borders, headings and links are all ink. The
@@ -71,9 +71,9 @@ GI `#6e7f1f`, leptospirosis `#12806e`.
 Two self-hosted variable faces. No third-party font request, so no layout shift
 waiting on one.
 
-- **Schibsted Grotesk Variable** — display and body. A neo-grotesque with a wide,
+- **Schibsted Grotesk Variable**, display and body. A neo-grotesque with a wide,
   open lower case that holds together set tight at display sizes.
-- **Geist Mono Variable** — measurement only. Tabular figures are on wherever two
+- **Geist Mono Variable**, measurement only. Tabular figures are on wherever two
   numbers might be compared.
 
 | Token | Value |
@@ -102,7 +102,7 @@ It is the one size that does not belong to the viewport, so it is set on
 
 Above `60rem` the headline sits in a grid column roughly half the viewport's width.
 A viewport-fluid size makes the ratio of column width to type size drift as the
-window narrows, which moves where the real headline breaks — at 1100px it produced
+window narrows, which moves where the real headline breaks, at 1100px it produced
 a fourth line carrying only the words "no single". Container units hold that ratio
 constant, so the headline stays at three even lines from 960px up. The two slopes
 are chosen to meet at the breakpoint, so the type does not jump as the layout
@@ -114,7 +114,7 @@ reflows (980px → 55.9px, 940px → 54.5px).
   container. `ch` resolves against the element's own font size, so `max-width: 24ch`
   on a 16px wrapper clamps a whole column to ~235px on a phone.
 - **Never apply `text-transform: uppercase` to a value.** Values carry units and
-  proper nouns, and uppercasing silently turns `3.2σ` into `3.2Σ` — a different
+  proper nouns, and uppercasing silently turns `3.2σ` into `3.2Σ`, a different
   symbol. Terms may be uppercased; values may not. Mono plus tabular figures already
   supplies the technical register.
 
@@ -141,8 +141,8 @@ figure's top and bottom edges land on exactly the same lines as the text beside
 it. The detection and entry sections use `--fill`; measured top and bottom deltas
 between figure and text are 0px in both.
 
-**Why `--flip` exists.** The figure side alternates down the page — right, left,
-right, left — while the DOM keeps heading-then-figure order, so a screen reader
+**Why `--flip` exists.** The figure side alternates down the page, right, left,
+right, left, while the DOM keeps heading-then-figure order, so a screen reader
 and the stacked phone layout both get the heading first.
 
 **A section read in one screen.** The detection and entry sections are meant to be
@@ -163,7 +163,7 @@ entry paths right.
 | Figure | Where | Why there |
 |---|---|---|
 | `dengue-vector` | Hero, right | Dengue is the symptom group the specification's worked example follows |
-| `two-views` | Detection, left | Its own annotations — "isolated cases", "rainy season?" — are the argument that section makes |
+| `two-views` | Detection, left | Its own annotations, "isolated cases", "rainy season?", are the argument that section makes |
 | `network-map` | Entry paths, right | The country, at the moment the page asks the visitor to pick their district |
 
 **No visible captions.** The figures carry none. The disclosure they used to hold
@@ -178,7 +178,7 @@ does not move and does not get quieter.
 transparency baked in as a checkerboard. `scripts/build-images.py` keys that back
 out: the artwork is dark on a light checker, so anything at or above the darker
 square is background and how far below it a pixel sits gives its opacity. The last
-few percent of opacity is discarded — that is JPEG ringing around the checker
+few percent of opacity is discarded, that is JPEG ringing around the checker
 edges, and without the cut a faint checker ghost survives into the page.
 
 **Trimmed to the artwork.** Each cut-out is then cropped to its own alpha bounding
@@ -211,11 +211,11 @@ A 4px-rooted scale, fluid at the larger steps: `--space-3xs` `0.25rem` through
 `clamp(1rem, 0.55rem + 2vw, 2.5rem)` and never drops below 16px. Shell max width
 `84rem`.
 
-Easing is `cubic-bezier(0.16, 1, 0.3, 1)` — exponential ease-out, always from an
+Easing is `cubic-bezier(0.16, 1, 0.3, 1)`, exponential ease-out, always from an
 already-visible default. Nothing on the page animates in from nothing.
 
 **One authored moment: the primary action takes its ink from the foot of the box
-upward** on hover, rather than fading in — the control reads as being inked, not
+upward** on hover, rather than fading in, the control reads as being inked, not
 lit. Everything else is 120–200ms and gets out of the way.
 `prefers-reduced-motion: reduce` collapses the duration tokens to `1ms` at the token
 level, so a component that forgets its own media query still respects the

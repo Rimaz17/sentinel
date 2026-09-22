@@ -10,17 +10,17 @@ web
 
 Four audiences, with sharply different needs and access:
 
-- **General public** — a resident of a Sri Lankan district who wants to know whether
+- **General public**, a resident of a Sri Lankan district who wants to know whether
   anything unusual is happening near them. No account. Arrives cold, often on a phone,
   often from a search result or a shared link. Has never heard of Sentinel.
-- **Healthcare data provider** — staff at a hospital, clinic or pharmacy submitting
+- **Healthcare data provider**, staff at a hospital, clinic or pharmacy submitting
   anonymised symptom reports on behalf of their facility. Self-registers, but only with a
   valid facility invite code. Submitting is a repeated chore inside a working shift, not an
   occasion.
-- **PHI (public health inspector)** — district or national. Investigates alerts on the
+- **PHI (public health inspector)**, district or national. Investigates alerts on the
   internal dashboard. Accounts are created by an admin; there is no signup. Works long
   shifts and must not be logged out mid-investigation.
-- **System admin** — maintains the facility registry and invite codes, creates PHI
+- **System admin**, maintains the facility registry and invite codes, creates PHI
   accounts. Provisioned at setup.
 
 ## Product Purpose
@@ -33,7 +33,7 @@ day ten.
 For each of the 25 districts and each symptom group it compares the last 7 days against
 that area's own previous 8 weeks, and raises an alert when the count sits more than three
 standard deviations above that area's average. Success is a measured detection rate and a
-measured median time to detect — not a claim that the system works.
+measured median time to detect, not a claim that the system works.
 
 What it is not: it does not diagnose anyone, it counts symptom patterns rather than
 confirmed cases, it does not decide what happens next, and it stores no personally
@@ -64,7 +64,7 @@ district suggests a wider seasonal wave. The distinction changes the response.
   individuals.
 - Two thresholds, deliberately. An inspector sees a watch-level signal immediately. The
   public sees an alert only after an inspector confirms it, or after a higher-confidence
-  threshold is crossed — because publishing every fluctuation causes needless alarm and
+  threshold is crossed, because publishing every fluctuation causes needless alarm and
   erodes trust.
 
 ## Capabilities and Constraints
@@ -72,14 +72,14 @@ district suggests a wider seasonal wave. The distinction changes the response.
 - **Privacy is enforced at the front door.** Name, NIC number, date of birth, phone number
   and home address are removed entirely at the ingestion API. Exact age becomes a 10-year
   band; exact GPS is rounded to ~100 m. District, symptom group, facility ID, timestamp and
-  approximate location are kept. Nothing downstream — database, Kafka, backups, logs — ever
+  approximate location are kept. Nothing downstream, database, Kafka, backups, logs, ever
   holds personal data.
 - **The public view never shows per-report GPS dots.** A dot at a pharmacy's exact
   coordinates can reveal which household got sick. Public geography is district polygons or
   a heatmap only.
 - **PHI accounts have no public signup route.** A PHI officer without an account contacts a
   system administrator. The sign-in page says so rather than offering a dead link. No
-  contact address is fabricated — the instruction is generic.
+  contact address is fabricated, the instruction is generic.
 - **Data provider registration requires a valid facility invite code**, validated
   server-side. Without a code, registration is not possible at all.
 - Stack is fixed by the project: Spring Boot (Java 17) for the API, Python for the
@@ -95,11 +95,11 @@ district suggests a wider seasonal wave. The distinction changes the response.
 ## Brand Commitments
 
 - **Name:** Sentinel. No tagline is fixed yet.
-- **Voice:** plain, calm, measured. Internally technical ("Alert A-1001 — 41 reports, 3.2σ
+- **Voice:** plain, calm, measured. Internally technical ("Alert A-1001, 41 reports, 3.2σ
   above baseline, cluster confirmed across 7 facilities"); publicly plain ("Kandy district:
   elevated dengue activity. Follow standard precautions."). Never alarmist, never
   marketing-flavoured. The project documents its own limitations on purpose.
-- **Binding visual reference (user-supplied):** a monochrome editorial layout — restrained
+- **Binding visual reference (user-supplied):** a monochrome editorial layout, restrained
   near-white ground, a large geometric sans headline set tight, uppercase letter-spaced
   monospace metadata labels, a thin-ruled outlined button, and one muted ochre accent used
   only on a single data value. This is a pinned aesthetic and is to be honoured, not
@@ -113,17 +113,17 @@ district suggests a wider seasonal wave. The distinction changes the response.
   coherent with): ink `#15222B`, paper `#F2F5F5`, amber `#C88A05`, alert red `#E0443E`, and
   per-symptom-group hues dengue `#8B3A8F`, ILI `#2F67B1`, GI `#6E7F1F`, lepto `#12806E`.
 - **Framing (confirmed by the user):** the landing page reads as a working system with a
-  prominent notice that all case data is simulated. It carries **no author byline** — that
+  prominent notice that all case data is simulated. It carries **no author byline**, that
   was removed at the user's request on 2026-09-22. The dataset attribution to Team Watchdog
   stays, because it is owed to the publisher of the facility registry rather than being a
   credit line. Authorship is recorded in the repository README, not on the page.
 
 ## Evidence on Hand
 
-- `sentinel-context/Sentinel_Project_Overview.pdf` — the specification. Problem statement,
+- `sentinel-context/Sentinel_Project_Overview.pdf`, the specification. Problem statement,
   detection method, roles, privacy model, tech stack, build plan, success metrics, known
   limitations.
-- `sentinel-context/sentinel_walkthrough.html` — a narrative/visual reference by the
+- `sentinel-context/sentinel_walkthrough.html`, a narrative/visual reference by the
   author. Read for tone and palette only; its code is not copied into the product.
 - **Real figures that may be cited**, from the current simulation: twelve facilities around
   Kandy normally see 25 dengue-like cases a week between them and saw 87 in the first
@@ -134,7 +134,7 @@ district suggests a wider seasonal wave. The distinction changes the response.
 - **Absences future work must not fabricate:** there are no users, no customers, no
   testimonials, no press, no deployment, no uptime figures, no partner logos and no
   Ministry of Health endorsement. No photography or illustration assets exist. There is no
-  live case data of any kind — every number in the system is simulated.
+  live case data of any kind, every number in the system is simulated.
 
 ## Product Principles
 
@@ -147,7 +147,7 @@ district suggests a wider seasonal wave. The distinction changes the response.
 4. **Calm over urgent.** This is a system about outbreaks; alarmist presentation would be
    both distasteful and counterproductive. Restraint is the brand.
 5. **Document the limitations.** Simulated data, shared invite codes, 2022 facility data and
-   baseline-recalibration weakness are deliberate, disclosed trade-offs — never quietly
+   baseline-recalibration weakness are deliberate, disclosed trade-offs, never quietly
    removed.
 
 ## Accessibility & Inclusion
@@ -155,7 +155,7 @@ district suggests a wider seasonal wave. The distinction changes the response.
 - Alerts and severity must never rely on colour alone.
 - Semantic HTML, full keyboard navigation, visible focus states, labelled controls and
   sufficient contrast are required, not optional.
-- Charts and maps need an accessible fallback — a table or text summary carrying the same
+- Charts and maps need an accessible fallback, a table or text summary carrying the same
   information.
 - Visitors arrive on low-end phones over mobile data; the public entry point must work
   there.

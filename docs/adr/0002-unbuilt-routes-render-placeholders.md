@@ -1,4 +1,4 @@
-# 0002 — Unbuilt routes render honest placeholders
+# 0002, Unbuilt routes render honest placeholders
 
 Status: accepted · 2026-09-22
 
@@ -7,7 +7,7 @@ Status: accepted · 2026-09-22
 The landing page is built before the dashboards, the sign-in flow and the
 submission portal (CLAUDE.md §10 puts those in phases 3 and 4). It must still link
 to `/dashboard`, `/signin`, `/register` and `/app`, because those links are the
-page's entire reason to exist — it is the single public entry point and it carries
+page's entire reason to exist, it is the single public entry point and it carries
 three distinct paths.
 
 That leaves a question with three real answers: what happens when someone follows

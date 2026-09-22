@@ -1,4 +1,4 @@
-# 0001 — Frontend toolchain
+# 0001, Frontend toolchain
 
 Status: accepted · 2026-09-22
 
@@ -14,7 +14,7 @@ standards:
    ground.
 2. It does **not** enable TypeScript `strict`. CLAUDE.md §6 requires strict mode.
 
-Separately, `vitest@3` — the version matching the installed Vite major at the time —
+Separately, `vitest@3`, the version matching the installed Vite major at the time ,
 carries advisory GHSA-82fw-gwwq-j7x9 (path traversal via `@vitest/mocker`).
 
 ## Decision

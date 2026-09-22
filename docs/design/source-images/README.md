@@ -1,6 +1,6 @@
 # Source images
 
-Full-resolution originals for the landing page figures. These are **not shipped** —
+Full-resolution originals for the landing page figures. These are **not shipped** ,
 they are archived here so the web assets can be regenerated if sizes or formats
 change.
 
@@ -12,7 +12,7 @@ change.
 
 Two of these are cut-outs that were exported as JPEG, so their transparency
 arrived baked in as a checkerboard. The build script keys it back out and trims
-each one to its own artwork — see `## Imagery` in `../DESIGN.md`.
+each one to its own artwork, see `## Imagery` in `../DESIGN.md`.
 
 The shipped derivatives live in `frontend/src/assets/` as WebP at several widths.
 Regenerate them with:

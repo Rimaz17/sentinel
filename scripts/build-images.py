@@ -32,7 +32,7 @@ QUALITY = 80
 # `key`: the artwork is dark on a light checkerboard, so anything at or above
 # `dark` (the darker checker square) is background and anything below it is ink.
 # `cut` discards the last few percent of opacity, which is JPEG ringing around
-# the checker edges rather than artwork — without it a faint checker ghost
+# the checker edges rather than artwork, without it a faint checker ghost
 # survives into the page.
 SPEC = {
     "dengue-vector": dict(
