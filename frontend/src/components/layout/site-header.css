@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: rgb(242 245 245 / 0.86);
+  background-color: rgb(234 238 238 / 0.86);
   backdrop-filter: blur(10px);
   border-bottom: var(--rule-faint);
 }
@@ -19,9 +19,56 @@
 .site-header__inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-md);
   min-height: var(--header-h);
+}
+
+/* The section links take the middle, so the header reads as a way around the
+   page rather than as a wordmark with one sign-in stranded opposite it. */
+.site-header__nav {
+  display: none;
+  margin-inline: auto;
+}
+
+.site-header__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.site-header__link {
+  font-family: var(--font-mono);
+  font-size: var(--step-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-70);
+  text-decoration: none;
+  padding-block: 0.35rem;
+  border-bottom: 1px solid transparent;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.site-header__link:hover,
+.site-header__link:focus-visible {
+  color: var(--ink);
+  border-bottom-color: var(--ink-40);
+}
+
+.site-header__staff-nav {
+  margin-inline-start: auto;
+}
+
+@media (min-width: 48rem) {
+  .site-header__nav {
+    display: block;
+  }
+
+  .site-header__staff-nav {
+    margin-inline-start: 0;
+  }
 }
 
 .site-header__brand:hover {
