@@ -68,7 +68,11 @@
   gap: var(--space-xl);
 }
 
-@media (min-width: 60rem) {
+/* 68rem, not 60rem. Below this the columns are too narrow to carry a figure:
+   the text column keeps growing as it narrows while the figure only shrinks,
+   so the two drift apart and leave exactly the dead space the split exists to
+   avoid. Stacked is balanced by definition. */
+@media (min-width: 68rem) {
   .split {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: var(--space-2xl);

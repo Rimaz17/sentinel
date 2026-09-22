@@ -11,9 +11,9 @@
 
 .hero__title {
   /* Single column: the column is the viewport, so vw is the honest unit. The
-     slope meets the two-column value at the 60rem breakpoint, so the headline
-     does not jump size as the layout reflows. */
-  font-size: clamp(2.5rem, 5.8vw, 4rem);
+     slope is chosen to meet the two-column value at the 68rem breakpoint, so
+     the headline does not jump size as the layout reflows. */
+  font-size: clamp(2.5rem, 4.5vw, 4rem);
   font-weight: var(--weight-medium);
   line-height: var(--leading-display);
   letter-spacing: var(--track-display);
@@ -99,7 +99,7 @@
   }
 }
 
-@media (min-width: 60rem) {
+@media (min-width: 68rem) {
   .hero__title {
     /* Two columns: sized against its own column so the ratio of column width
        to type size stays fixed and the headline keeps its line breaks. */
