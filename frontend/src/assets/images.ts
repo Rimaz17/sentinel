@@ -17,6 +17,7 @@ import dengue2816 from './dengue-vector-2816.webp'
 import network512 from './network-map-512.webp'
 import network764 from './network-map-764.webp'
 import twoViews640 from './two-views-640.webp'
+import twoViews768 from './two-views-768.webp'
 import twoViews1024 from './two-views-1024.webp'
 
 export type ImageAsset = {
@@ -41,7 +42,7 @@ export const dengueVector: ImageAsset = {
 
 export const twoViews: ImageAsset = {
   src: twoViews1024,
-  srcSet: [`${twoViews640} 640w`, `${twoViews1024} 1024w`].join(', '),
+  srcSet: [`${twoViews640} 640w`, `${twoViews768} 768w`, `${twoViews1024} 1024w`].join(', '),
   width: 1024,
   height: 1054,
 }

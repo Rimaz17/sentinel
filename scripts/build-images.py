@@ -34,7 +34,7 @@ SPEC: dict[str, list[int]] = {
     # Full-bleed below the hero: spans the viewport, so it needs retina widths.
     "dengue-vector": [960, 1440, 2048, 2816],
     # Roughly a half-column figure.
-    "two-views": [640, 1024],
+    "two-views": [640, 768, 1024],
     # Roughly a third-column figure.
     "network-map": [512, 764],
 }
