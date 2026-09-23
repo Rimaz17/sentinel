@@ -121,18 +121,19 @@ display headline.
 It is the one size that does not belong to the viewport, so it is set on the
 hero `<h1>` with arbitrary values rather than as a token:
 
-- **Single column** (`< 60rem`): `clamp(2.5rem, 5.8vw, 4rem)`. Here the column *is*
-  the viewport, so `vw` is the honest unit.
-- **Two columns** (`≥ 60rem`): `clamp(2.5rem, 10.4cqw, 5rem)`, against a
+- **Single column** (below `68rem`, the `xl` breakpoint): `clamp(2.5rem, 4.5vw, 4rem)`.
+  Here the column *is* the viewport, so `vw` is the honest unit.
+- **Two columns** (from `68rem`): `clamp(2.5rem, 10.4cqw, 5rem)`, against a
   `@container/lede` on the headline's column.
 
-Above `60rem` the headline sits in a grid column roughly half the viewport's width.
+From `68rem` the headline sits in a grid column roughly half the viewport's width.
 A viewport-fluid size makes the ratio of column width to type size drift as the
-window narrows, which moves where the real headline breaks, at 1100px it produced
-a fourth line carrying only the words "no single". Container units hold that ratio
-constant, so the headline stays at three even lines from 960px up. The two slopes
-are chosen to meet at the breakpoint, so the type does not jump as the layout
-reflows (980px → 55.9px, 940px → 54.5px).
+window narrows, which moves where the real headline breaks: with an earlier,
+longer headline it produced a fourth line at 1100px carrying only the words "no
+single". Container units hold that ratio constant. The current headline, "Find it
+on day three, not day ten.", sets on two lines at every width measured from 375px
+to 1440px. The two slopes are chosen to meet at the breakpoint, so the type does
+not jump as the layout reflows (1087px → 48.92px, 1088px → 48.97px).
 
 **Two rules learned the hard way, both from shipped bugs:**
 
@@ -177,9 +178,10 @@ figure's top and bottom edges land on exactly the same lines as the text beside
 it. The detection section uses `stretch`; measured top and bottom deltas between
 figure and text are 0px.
 
-**Why the detection text takes `xl:order-2`.** The figure side alternates down the page, right, left,
-right, left, while the DOM keeps heading-then-figure order, so a screen reader
-and the stacked phone layout both get the heading first.
+**Why the detection text takes `xl:order-2`.** It moves the detection figure into
+the left column, so from `68rem` the figures sit right, left, right, right down the
+page (hero, detection, privacy, entry paths), while the DOM keeps heading-then-figure
+order, so a screen reader and the stacked phone layout both get the heading first.
 
 **Sections are not forced to fit one screen.** An earlier build budgeted the
 detection and entry sections in `vh` so each fitted the viewport without
@@ -189,9 +191,11 @@ sized by their content again. Room to breathe beats a fitted screen.
 
 ## Imagery
 
-Three figures, one per section, each filling its own column so all three share a
-width and a pair of edges. The figure side alternates: hero right, detection left,
-entry paths right.
+Four figures, one per section. Three fill their own column, so they share a width
+and a pair of edges. The privacy field sheet is the exception: it is a legend, not
+the section's subject, so it is capped at `27rem` and centred in its column. From
+`68rem` the figures sit hero right, detection left, privacy right, entry paths
+right.
 
 | Figure | Where | Why there |
 |---|---|---|
@@ -225,26 +229,34 @@ That fails for the icon sheet, whose grey fills sit *just below* the darker chec
 square and would be erased. Its artwork is opaque rather than a dark wash, so it is
 keyed by value instead: the background takes exactly two levels, and anything
 outside those two bands is artwork keeping its own colour. A morphological opening
-then clears the speckle that survives between the bands, and the sheet's two rows
-are found and restacked against a fixed gap, because the tall empty band between
-them would otherwise ship as dead space inside a column.
+then clears the speckle that survives between the bands, and an area filter removes
+the specks that survive the opening whole, which otherwise reach the page as grey
+flecks around the icons. On this sheet the largest speck is under 1,600 pixels and
+the smallest real stroke over 23,000, so one threshold separates them cleanly. The
+sheet's two rows are then found and restacked against a fixed gap, because the tall
+empty band between them would otherwise ship as dead space inside a column.
 
 **Trimmed to the artwork.** Each cut-out is then cropped to its own alpha bounding
 box. The exports carry a wide empty margin, and left in, that margin ships as
 whitespace inside the page's columns.
 
 **`contain`, not `cover`, by default.** Cropping a trimmed cut-out just clips the
-drawing. Opaque artwork opts into `cover` through the figure's `fit` prop; the
-detection collage uses `fit="cover"` with a `6 / 7` ratio so a square image fills a
-taller frame, and that crop was checked against all five of its labels.
+drawing. Opaque artwork opts into `cover` through the figure's `fit` prop. The
+detection collage uses `fit="cover"` with `fill`: below `68rem` it shows at the
+image's own square ratio, and from `68rem` the frame takes the text column's height,
+which crops the square to between about 0.80:1 (at 1088px) and 1.09:1 (at 1440px).
+All five of its labels stay in frame at both ends of that range; "rainy season?"
+reaches the right edge at 1088px.
 
 **Delivery.** WebP at 640/768/960 and up, with `srcset` and a real `sizes`. A phone
-at 2× asks for 686px and takes the 768 variant, so the three figures cost 164 KB
-rather than the 230 KB the 960s would have.
+at 2× asks for 686px and takes the 768 variant of each, so the four figures cost
+236 kB rather than the 320 kB the 960s would have.
 
-**No layout shift.** Every figure carries intrinsic `width`/`height` and its frame
-has an `aspect-ratio`, so its space is reserved before any bytes arrive. Measured
-CLS on load is 0.
+**Images never shift the layout.** Every figure carries intrinsic `width`/`height`
+and its frame has an `aspect-ratio`, so its space is reserved before any bytes
+arrive. Measured CLS on load is 0.013 on a 375px phone and under 0.001 at 1280px,
+all of it from the web fonts swapping in and nudging the hero text, and well inside
+the 0.1 that counts as good.
 
 **The ratio is a custom property, deliberately.** The component sets
 `--figure-ratio` inline and the frame reads it through `aspect-(--figure-ratio)`.
@@ -287,9 +299,10 @@ screens. The theme restores a plain `:hover` so the page behaves as it always ha
 - **Rules, not cards.** Every rule is a 1px border in an ink alpha: hairline
   `border-ink-14`, faint `border-ink-08`, firm `border-ink-24`, full `border-ink`.
   There are no elevation tokens because nothing is elevated.
-- **Tables are tables.** The privacy model is a real `<table>` because it is
-  genuinely tabular, and it restacks on a phone with its column headers preserved
-  as group labels via `data-head`.
+- **The privacy register is a description list.** Three bands, Removed entirely,
+  Generalised and Kept, each a `<dt>` naming the fate and a `<dd>` whose fields run
+  along the band rather than stacking into a narrow column. From `68rem` the fate
+  sits beside its fields; below that it sits above them, so a phone loses nothing.
 
 ## Browser surfaces
 
@@ -310,4 +323,5 @@ if one reaches the rendered page. Recorded in CLAUDE.md section 11.
 Verified on the built page, not asserted: every visible text node clears its WCAG
 threshold (4.5:1 body, 3:1 large), every focusable element shows a visible focus
 ring, there is no horizontal overflow from 375px up, one `<h1>` with no skipped
-heading levels, and the privacy table restacks on a phone with its headers intact.
+heading levels, and the privacy register keeps each fate above its fields on a
+phone.
