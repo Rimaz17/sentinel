@@ -18,11 +18,6 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
-/* The plain-CSS sheets stay in place while components move to utilities. */
-@import './styles/tokens.css';
-@import './styles/type.css';
-@import './styles/layout.css';
-
 /*
  * Tailwind v4 wraps `hover:` in `@media (hover: hover)`, so hover styles would
  * stop applying on touch screens. Restored to a plain :hover, as the page has
