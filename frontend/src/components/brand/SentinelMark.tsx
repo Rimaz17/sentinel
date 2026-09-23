@@ -15,7 +15,7 @@
 type SentinelMarkProps = {
   /** Rendered size in px. The mark is drawn on a 24-unit grid and scales cleanly. */
   size?: number
-  className?: string
+  className?: string | undefined
 }
 
 /** The week's readings. Baseline sits at y = 14; smaller y is a higher count. */

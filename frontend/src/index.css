@@ -1,8 +1,351 @@
+/*
+ * Layer order, declared before anything else. Cascade layers rank by first
+ * declaration, so without this the base layer below (declared after the
+ * utilities import) would outrank every utility, and the reset's
+ * `* { margin: 0 }` would beat `mx-auto`.
+ */
+@layer theme, base, utilities;
+
 /* Self-hosted variable fonts. No third-party font request, no layout shift. */
 @import '@fontsource-variable/schibsted-grotesk';
 @import '@fontsource-variable/geist-mono';
 
-@import './styles/tokens.css';
-@import './styles/type.css';
-@import './styles/layout.css';
-@import './styles/base.css';
+/*
+ * Tailwind without its preflight. The project keeps its own reset (the base
+ * layer below): preflight differs from it in ways that would change the page,
+ * such as stripping link underlines and resetting heading sizes.
+ */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/*
+ * Tailwind v4 wraps `hover:` in `@media (hover: hover)`, so hover styles would
+ * stop applying on touch screens. Restored to a plain :hover, as the page has
+ * always behaved.
+ */
+@custom-variant hover (&:hover);
+
+/* The one sub-phone breakpoint, inclusive, as the stylesheet always had it. */
+@custom-variant phone (@media (max-width: 30rem));
+
+/*
+ * Sentinel design tokens.
+ *
+ * Tailwind's default theme is cleared, so the only colours, sizes and steps a
+ * class can name are the project's own. `text-ink-70`, `gap-xl` and
+ * `tracking-label` are the design system; there is no `text-gray-500` to reach
+ * for by accident.
+ */
+@theme {
+  --*: initial;
+
+  /* ---- Ground and ink --------------------------------------------------
+     The palette is the project's own, carried over from the author's
+     walkthrough document so the landing page and the dashboards stay one
+     system. It is deliberately near-monochrome: ink on paper, with a single
+     ochre reserved for exactly one live measurement per view. Ochre is never
+     used for furniture, borders or hover states. The moment it decorates
+     something it stops meaning "this is the number that matters".
+
+     Every contrast ratio quoted below was computed against the ground named,
+     not estimated. Where a value fails, the comment says so and names what
+     may use it. */
+  --color-paper: #eaeeee;
+  --color-paper-raised: #f1f4f4;
+  --color-paper-sunk: #dfe4e4;
+  --color-ink: #15222b;
+
+  /* Ink at fixed alphas, measured on paper:
+     ink          13.86:1  any text
+     ink-85        9.02:1  any text
+     ink-70        5.58:1  any text, the secondary body colour
+     ink-55        3.55:1  LARGE text only (>=24px, or >=18.7px bold); never body.
+                           Nothing on the landing page is large enough to use
+                           it for type, so it is currently non-text only.
+     ink-40        2.40:1  non-text only: rules, inactive marks
+     ink-24        1.64:1  non-text only
+     ink-14/08/04          hairline rules and washes only */
+  --color-ink-85: rgb(21 34 43 / 0.85);
+  --color-ink-70: rgb(21 34 43 / 0.7);
+  --color-ink-55: rgb(21 34 43 / 0.55);
+  --color-ink-40: rgb(21 34 43 / 0.4);
+  --color-ink-24: rgb(21 34 43 / 0.24);
+  --color-ink-14: rgb(21 34 43 / 0.14);
+  --color-ink-08: rgb(21 34 43 / 0.08);
+  --color-ink-04: rgb(21 34 43 / 0.04);
+
+  /* Paper at fixed alphas, for the ink footer and the translucent header.
+     paper-72 and paper-62 are measured on ink: 62% is the floor for the
+     footer's 11px source line, at 6.4:1. */
+  --color-paper-86: rgb(234 238 238 / 0.86);
+  --color-paper-72: rgb(234 238 238 / 0.72);
+  --color-paper-62: rgb(234 238 238 / 0.62);
+
+  /* Two ochres on one hue (41deg), because the bright one cannot carry text.
+     ochre        #8f6203, 4.59:1 on paper. This is the accent in use.
+     ochre-bright #c88a05, 2.70:1 on paper, so it FAILS as text there, but
+                  5.48:1 on ink. Reserved for marks on dark surfaces, which
+                  the internal dashboard will have; never sets type on paper. */
+  --color-ochre: #8f6203;
+  --color-ochre-bright: #c88a05;
+  --color-ochre-wash: rgb(200 138 5 / 0.12);
+
+  /* Alert red. Reserved for the alert vocabulary; unused on this page, but
+     recorded here so later surfaces do not invent a second red. */
+  --color-alert: #e0443e;
+
+  /* Symptom groups. Fixed hues from the project's existing documents. Never
+     reassigned. */
+  --color-group-dengue: #8b3a8f;
+  --color-group-ili: #2f67b1;
+  --color-group-gi: #6e7f1f;
+  --color-group-lepto: #12806e;
+
+  /* ---- Typography -------------------------------------------------------
+     Two faces, both self-hosted as variable fonts.
+
+     Schibsted Grotesk carries display and body. It is a neo-grotesque with a
+     wide, open lower case that holds together when set tight at display
+     sizes, which is what the pinned reference does.
+
+     Geist Mono carries measurement: coordinates, ISO dates, counts, sigma
+     values, district codes. It is never used as decoration. If a mono string
+     on this page is not a measured value, it is in the wrong face. */
+  --font-sans:
+    'Schibsted Grotesk Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+
+  /* One size for every section heading, one for every sub-heading, and one
+     for every piece of body copy beneath them. Sections setting their own
+     sizes is what made the page's headings read as inconsistent with each
+     other.
+
+     The display size is NOT a token, because it is the one step in the scale
+     that does not belong to the viewport. The headline sits in a grid column
+     roughly half the viewport's width, and a viewport-fluid size makes the
+     ratio of column width to type size drift as the window narrows, which
+     changes where the real headline breaks. It is set in container units on
+     the hero title instead, where that ratio stays fixed by construction. */
+  --text-title: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  --text-section: clamp(1.0625rem, 1rem + 0.35vw, 1.1875rem);
+  --text-body-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-label: 0.75rem;
+  --text-label-sm: 0.6875rem;
+
+  --leading-display: 0.98;
+  --leading-title: 1.08;
+  --leading-snug: 1.3;
+  --leading-body: 1.6;
+
+  /* Tracking tightens as size grows, because a grotesque set large at default
+     tracking reads loose. */
+  --tracking-display: -0.03em;
+  --tracking-title: -0.02em;
+  --tracking-tight: -0.01em;
+  --tracking-label: 0.13em;
+  --tracking-label-wide: 0.18em;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Body measure. 68ch sits inside the 65-75ch band. */
+  --container-measure: 68ch;
+  --container-measure-narrow: 46ch;
+  --container-shell: 84rem;
+
+  /* ---- Spacing ----------------------------------------------------------
+     A 4px-rooted scale. The larger steps are fluid so that vertical rhythm
+     compresses on a phone instead of forcing the page into a long scroll of
+     identical gaps. */
+  --spacing: 0.25rem;
+  --spacing-3xs: 0.25rem;
+  --spacing-2xs: 0.5rem;
+  --spacing-xs: 0.75rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: clamp(2.5rem, 2rem + 2.2vw, 4rem);
+  --spacing-2xl: clamp(3.5rem, 2.6rem + 4vw, 6.5rem);
+  --spacing-3xl: clamp(5rem, 3.4rem + 7vw, 9rem);
+
+  /* The page gutter never drops below 16px, per the responsive floor. */
+  --spacing-gutter: clamp(1rem, 0.55rem + 2vw, 2.5rem);
+  --spacing-header: 4.25rem;
+
+  /* ---- Breakpoints -------------------------------------------------------
+     xl is 68rem, not 60rem. Below it the columns are too narrow to carry a
+     figure: the text column keeps growing as it narrows while the figure only
+     shrinks, so the two drift apart and leave exactly the dead space the split
+     exists to avoid. Stacked is balanced by definition. */
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 60rem;
+  --breakpoint-xl: 68rem;
+
+  /* ---- Motion ------------------------------------------------------------
+     One authored moment on this page: the primary action takes its ink from
+     the foot of the box upward. Everything else settles quickly and gets out
+     of the way. Exponential ease-out, from an already-visible default;
+     nothing on this page animates in from nothing. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/*
+ * Durations stay plain properties rather than theme values, so the reduced
+ * motion query below can override them. Motion is opt-out at the token level,
+ * so a component that forgets a `motion-reduce:` class still respects the
+ * preference. Used as `duration-(--dur-fast)`.
+ */
+:root {
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 420ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur-base: 1ms;
+    --dur-slow: 1ms;
+  }
+}
+
+/*
+ * Base layer: reset, document defaults, and the browser's own surfaces.
+ *
+ * The parts nobody draws (selection, caret, focus ring, scrollbar, underline
+ * offset) ship with defaults that belong to no design system. They are themed
+ * here from the palette. Anything a component sets with a utility wins over
+ * this layer.
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Anchor links and skip links land below the fixed header. */
+    scroll-padding-top: calc(var(--spacing-header) + var(--spacing-md));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--leading-body);
+    letter-spacing: var(--tracking-tight);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* The page is a fixed-width editorial column set; nothing should scroll
+       sideways on a phone. */
+    overflow-x: hidden;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: var(--font-weight-medium);
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-title);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ul,
+  ol {
+    padding: 0;
+    list-style: none;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  :root {
+    caret-color: var(--color-ochre);
+    accent-color: var(--color-ink);
+    /* Thin scrollbars in the page's own greys rather than the platform's. */
+    scrollbar-color: var(--color-ink-24) transparent;
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-ink-24);
+    border: 3px solid var(--color-paper);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-ink-40);
+  }
+
+  /* One focus ring for the whole page, offset so it stays clear of the element
+     it marks on both the paper and the sunk grounds. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 1px;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-color: var(--color-ink-40);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.28em;
+    transition: text-decoration-color var(--dur-fast) var(--ease-out);
+  }
+
+  a:hover {
+    text-decoration-color: var(--color-ink);
+  }
+}

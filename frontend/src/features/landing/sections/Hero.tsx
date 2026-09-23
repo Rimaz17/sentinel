@@ -1,7 +1,7 @@
 import { dengueVector } from '@/assets/images'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
-import './hero.css'
+import { caps, cx, labelSm, shell, split, tnum } from '@/styles/recipes'
 
 /** The three measurements the whole system turns on. */
 const FACTS = [
@@ -16,21 +16,31 @@ const FACTS = [
  */
 export function Hero() {
   return (
-    <section className="hero" aria-labelledby="hero-title">
-      <div className="shell">
-        <div className="split split--paired">
-          <div className="hero__lede">
-            <h1 id="hero-title" className="hero__title">
+    <section className="pt-[clamp(2rem,1.4rem_+_2.6vw,3.5rem)] pb-2xl" aria-labelledby="hero-title">
+      <div className={shell}>
+        <div className={split('center')}>
+          {/* The headline sizes itself against this column, not the viewport. */}
+          <div className="@container/lede min-w-0">
+            {/* Single column: the column is the viewport, so vw is the honest
+                unit, with a slope chosen to meet the two-column value at the
+                xl breakpoint so the headline does not jump as the layout
+                reflows. Two columns: sized against its own column, so the ratio
+                of column width to type size stays fixed and the headline keeps
+                its line breaks. */}
+            <h1
+              id="hero-title"
+              className="-mt-[0.12em] max-w-[22ch] text-[length:clamp(2.5rem,4.5vw,4rem)] leading-display font-medium tracking-display text-balance xl:text-[length:clamp(2.5rem,10.4cqw,5rem)]"
+            >
               Find it on day three, not day ten.
             </h1>
 
-            <p className="hero__standfirst">
+            <p className="mt-md max-w-[46ch] text-body-lg leading-snug text-ink-70">
               Sentinel gathers anonymised symptom reports from hospitals, clinics and pharmacies
               across Sri Lanka, learns what a normal week looks like for each district, and raises
               an alert when an area moves well outside that range.
             </p>
 
-            <div className="hero__actions">
+            <div className="mt-lg flex flex-wrap items-center gap-x-lg gap-y-md">
               <Action to="/dashboard" trailing="→">
                 View the public dashboard
               </Action>
@@ -41,7 +51,6 @@ export function Hero() {
           </div>
 
           <Figure
-            className="hero__figure"
             image={dengueVector}
             priority
             sizes="(min-width: 84rem) 636px, (min-width: 60rem) 45vw, calc(100vw - 2rem)"
@@ -49,26 +58,38 @@ export function Hero() {
           />
         </div>
 
-        <dl className="hero__strip">
+        {/* The measurement strip, ruled across the foot of both columns. */}
+        <dl className="mt-xl grid gap-0 border-t border-t-ink md:grid-cols-3 md:border-b md:border-b-ink-14">
           {FACTS.map((fact) => (
-            <div className="hero__fact" key={fact.term}>
-              <dt className="label label--sm">{fact.term}</dt>
-              <dd className="hero__fact-value label label--sm">
+            <div
+              className="grid gap-[0.2rem] border-b border-b-ink-14 py-sm md:border-s md:border-b-0 md:border-s-ink-14 md:px-md md:first:border-s-0 md:first:ps-0"
+              key={fact.term}
+            >
+              <dt className={cx(labelSm, caps, 'text-ink-70')}>{fact.term}</dt>
+              {/* Values carry units and proper nouns, so they keep their own
+                  case. Uppercasing them turns 3σ into 3Σ. */}
+              <dd className={cx(labelSm, 'tracking-[0.05em] text-ink-85')}>
                 {fact.note ? (
                   <>
                     {/* The single accent on the page. */}
-                    <span className="label__value tnum">{fact.value}</span>{' '}
-                    <span className="hero__fact-note">{fact.note}</span>
+                    <span className={cx(tnum, 'text-ochre')}>{fact.value}</span>{' '}
+                    <span className="text-ink-70">{fact.note}</span>
                   </>
                 ) : (
-                  <span className="tnum">{fact.value}</span>
+                  <span className={tnum}>{fact.value}</span>
                 )}
               </dd>
             </div>
           ))}
         </dl>
 
-        <p className="hero__simulated label label--sm">
+        <p
+          className={cx(
+            labelSm,
+            caps,
+            'mt-md w-fit border-l border-l-ochre bg-ochre-wash px-[0.7rem] py-[0.55rem] text-ink-85',
+          )}
+        >
           All case data simulated · demonstration system
         </p>
       </div>

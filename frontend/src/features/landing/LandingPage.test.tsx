@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
+import { SPLIT_COLUMNS } from '@/styles/recipes'
 import { LandingPage } from './LandingPage'
 
 function renderLanding() {
@@ -47,7 +48,10 @@ describe('LandingPage', () => {
     const { container } = renderLanding()
     // Sections inventing their own column ratios is what made the page read as
     // unaligned, so there must be no stray grid definitions left behind.
-    expect(container.querySelectorAll('.split').length).toBe(4)
+    const splits = [...container.querySelectorAll('[class]')].filter((el) =>
+      el.classList.contains(SPLIT_COLUMNS),
+    )
+    expect(splits).toHaveLength(4)
   })
 
   it('carries no plate switcher', () => {
@@ -139,7 +143,7 @@ describe('LandingPage: access routes', () => {
     // The negative case. A "Register" affordance anywhere in the inspector's
     // row would be a dead end: PHI accounts are admin-provisioned.
     const inspectorRow = screen
-      .getByText('Public health inspector', { selector: '.entries__staff-role' })
+      .getByText('Public health inspector', { selector: 'li > p' })
       .closest('li')
     expect(inspectorRow).not.toBeNull()
     const links = within(inspectorRow as HTMLElement).getAllByRole('link')

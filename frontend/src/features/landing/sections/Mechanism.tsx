@@ -1,6 +1,6 @@
 import { twoViews } from '@/assets/images'
 import { Figure } from '@/components/ui/Figure'
-import './mechanism.css'
+import { cx, sectionTitle, shell, split } from '@/styles/recipes'
 
 const CHECKS = [
   {
@@ -15,14 +15,23 @@ const CHECKS = [
 
 export function Mechanism() {
   return (
-    <section className="mechanism" id="mechanism" aria-labelledby="mechanism-title">
-      <div className="shell split split--fill split--flip mechanism__inner">
-        <div className="mechanism__body">
-          <h2 id="mechanism-title" className="mechanism__title">
+    <section
+      className="border-t border-t-ink-14 py-2xl"
+      id="mechanism"
+      aria-labelledby="mechanism-title"
+    >
+      {/* The text carries two sub-columns, so it is given the wider share. The
+          outer edges stay on the shell's gutters; only the divider moves. */}
+      <div className={cx(shell, split('stretch'), '[--split-a:0.88fr] [--split-b:1.12fr]')}>
+        {/* Moved into the second column from xl, so the figure side alternates
+            down the page while the DOM keeps heading-then-figure order for
+            screen readers and for the stacked layout on a phone. */}
+        <div className="grid content-start gap-lg xl:order-2">
+          <h2 id="mechanism-title" className={cx(sectionTitle, 'max-w-[26ch]')}>
             An outbreak rarely announces itself at one clinic.
           </h2>
 
-          <p className="mechanism__standfirst">
+          <p className="max-w-measure text-body leading-body text-ink-70">
             It appears as a handful of extra patients at each of a dozen places, each small enough
             to explain away as the rainy season. Nobody on the ground has enough to sound an alarm.
             Sentinel keeps the combined view continuously, so the rise is flagged on day three
@@ -31,20 +40,22 @@ export function Mechanism() {
 
           {/* The two checks sit side by side rather than stacked: they are a pair
               of alternatives, and reading them as columns makes that legible. */}
-          <dl className="mechanism__checks">
+          <dl className="grid gap-lg border-t border-t-ink-24 pt-md xl:grid-cols-2 xl:gap-xl">
             {CHECKS.map((check) => (
-              <div className="mechanism__check" key={check.term}>
-                <dt className="mechanism__check-term">{check.term}</dt>
-                <dd className="mechanism__check-body">{check.body}</dd>
+              <div className="grid content-start gap-2xs" key={check.term}>
+                <dt className="text-section leading-snug font-medium tracking-tight">
+                  {check.term}
+                </dt>
+                <dd className="text-body leading-body text-ink-70">{check.body}</dd>
               </div>
             ))}
           </dl>
         </div>
 
         <Figure
-          className="mechanism__figure"
           image={twoViews}
           fit="cover"
+          fill
           sizes="(min-width: 84rem) 560px, (min-width: 68rem) 42vw, calc(100vw - 2rem)"
           alt="An illustration. One week drawn twice. Above: patients and hospitals scattered across a grey hillside, annotated “isolated cases” and “rainy season?”. Below: the same ground as a single connected network, with a red cluster picked out and annotated “Sentinel alert”, “DBSCAN cluster” and “hidden outbreak”."
         />
