@@ -47,10 +47,9 @@ describe('LandingPage', () => {
   it('puts every two-column section on the one shared grid', () => {
     const { container } = renderLanding()
     // Sections inventing their own column ratios is what made the page read as
-    // unaligned, so there must be no stray grid definitions left behind. The
-    // old class still counts while sections move to the utility.
-    const splits = [...container.querySelectorAll('[class]')].filter(
-      (el) => el.classList.contains('split') || el.classList.contains(SPLIT_COLUMNS),
+    // unaligned, so there must be no stray grid definitions left behind.
+    const splits = [...container.querySelectorAll('[class]')].filter((el) =>
+      el.classList.contains(SPLIT_COLUMNS),
     )
     expect(splits).toHaveLength(4)
   })
