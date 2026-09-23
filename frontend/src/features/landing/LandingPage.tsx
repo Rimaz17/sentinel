@@ -1,5 +1,6 @@
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
+import { SkipLink } from '@/components/layout/SkipLink'
 import { Entries } from './sections/Entries'
 import { Hero } from './sections/Hero'
 import { Mechanism } from './sections/Mechanism'
@@ -10,9 +11,7 @@ import './landing.css'
 export function LandingPage() {
   return (
     <div className="landing">
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
+      <SkipLink />
 
       <SiteHeader />
 

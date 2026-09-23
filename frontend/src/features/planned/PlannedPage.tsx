@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
+import { SkipLink } from '@/components/layout/SkipLink'
 import './planned.css'
 
 type PlannedPageProps = {
@@ -21,9 +22,7 @@ type PlannedPageProps = {
 export function PlannedPage({ title, phase, children }: PlannedPageProps) {
   return (
     <div className="planned">
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
+      <SkipLink />
 
       <SiteHeader />
 
