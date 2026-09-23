@@ -1,11 +1,33 @@
 # Design
 
 <!-- Written from the built landing page, not ahead of it. Every value here is
-     one that ships in `sentinel/frontend/src/styles/`. -->
+     one that ships in the Tailwind theme in `sentinel/frontend/src/index.css`. -->
 
 Sentinel's surfaces are **ink on paper, ruled**. Structure is carried by hairlines
 and weight, never by cards, shadows or rounded containers. A single ochre carries
 the page's attention, and is spent in exactly two places.
+
+## Implementation
+
+The system is written in **Tailwind CSS v4**, with Tailwind's default theme
+cleared. The only colours, sizes and steps a class can name are the ones below,
+declared in the `@theme` block of `src/index.css`: `--color-ink-70` is used as
+`text-ink-70` or `border-ink-70`, `--spacing-xl` as `gap-xl` or `py-xl`,
+`--text-title` as `text-title`. There is no `text-gray-500` to reach for by
+accident.
+
+Tailwind's preflight is **not** loaded. The project keeps its own reset in the
+same file's `base` layer, because preflight differs from it in ways that change
+the page (it strips link underlines and resets heading sizes). Layers are
+declared `theme, base, utilities` before anything else, so every utility beats
+the reset. Utility sets the page repeats are named once in
+`src/styles/recipes.ts` (`shell`, `split()`, `sectionTitle`, `labelSm`, `caps`,
+`tnum`, `monoLink`).
+
+The migration from plain CSS was verified as rendering-identical: full-page
+screenshots of every route at 375, 768, 1280 and 1440px match the plain-CSS
+build pixel for pixel, and a computed-style comparison of every element, at seven
+widths and under forced hover and focus, found no difference that draws.
 
 ## The world in one paragraph
 
@@ -26,24 +48,28 @@ does not exist on the page the reference was taken from.
 
 | Token | Value | Use |
 |---|---|---|
-| `--paper` | `#eaeeee` | Page ground |
-| `--paper-raised` | `#f1f4f4` | Raised ground |
-| `--paper-sunk` | `#dfe4e4` | Reserved; unused on the landing page |
-| `--ink` | `#15222b` | Body text, rules at full strength, the footer ground |
-| `--ochre` | `#8f6203` | The accent. Text-safe at 4.59:1 on paper |
-| `--ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces, 2.70:1 on paper, so never type there |
-| `--alert` | `#e0443e` | Reserved for the alert vocabulary; unused so far |
+| `--color-paper` | `#eaeeee` | Page ground |
+| `--color-paper-raised` | `#f1f4f4` | Raised ground |
+| `--color-paper-sunk` | `#dfe4e4` | Reserved; unused on the landing page |
+| `--color-ink` | `#15222b` | Body text, rules at full strength, the footer ground |
+| `--color-ochre` | `#8f6203` | The accent. Text-safe at 4.59:1 on paper |
+| `--color-ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces, 2.70:1 on paper, so never type there |
+| `--color-alert` | `#e0443e` | Reserved for the alert vocabulary; unused so far |
 
-Ink alphas and their measured ratios on `--paper`:
+Ink alphas and their measured ratios on paper:
 
 | Token | Ratio | Permitted use |
 |---|---|---|
-| `--ink` | 13.86:1 | Any text |
-| `--ink-85` | 9.02:1 | Any text |
-| `--ink-70` | 5.58:1 | Any text, the secondary body colour |
-| `--ink-55` | 3.55:1 | Large text only (≥24px, or ≥18.7px bold). Nothing on the landing page qualifies, so it is currently non-text only |
-| `--ink-40` / `--ink-24` | 2.40:1 / 1.64:1 | Non-text: rules, inactive marks |
-| `--ink-14` / `--ink-08` / `--ink-04` | n/a | Hairline rules and washes |
+| `--color-ink` | 13.86:1 | Any text |
+| `--color-ink-85` | 9.02:1 | Any text |
+| `--color-ink-70` | 5.58:1 | Any text, the secondary body colour |
+| `--color-ink-55` | 3.55:1 | Large text only (≥24px, or ≥18.7px bold). Nothing on the landing page qualifies, so it is currently non-text only |
+| `--color-ink-40` / `-24` | 2.40:1 / 1.64:1 | Non-text: rules, inactive marks |
+| `--color-ink-14` / `-08` / `-04` | n/a | Hairline rules and washes |
+
+Paper alphas, for the ink footer and the translucent header: `--color-paper-86`
+(header ground), `--color-paper-72` and `--color-paper-62` (footer text; 62% is
+the floor for its 11px line, at 6.4:1 on ink).
 
 **Colour strategy: restrained.** Neutrals plus one accent. The visitor came to
 understand something and then leave for the dashboard, and a system about outbreaks
@@ -78,13 +104,13 @@ waiting on one.
 
 | Token | Value |
 |---|---|
-| `--step-title` | `clamp(1.75rem, 1.3rem + 2vw, 2.75rem)` |
-| `--step-section` | `clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem)` |
-| `--step-body-lg` | `clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem)` |
-| `--step-body` | `1rem` |
-| `--step-small` | `0.875rem` |
-| `--step-label` | `0.75rem` |
-| `--step-label-sm` | `0.6875rem` |
+| `--text-title` | `clamp(1.5rem, 1.2rem + 1vw, 2rem)` |
+| `--text-section` | `clamp(1.0625rem, 1rem + 0.35vw, 1.1875rem)` |
+| `--text-body-lg` | `clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem)` |
+| `--text-body` | `1rem` |
+| `--text-small` | `0.875rem` |
+| `--text-label` | `0.75rem` |
+| `--text-label-sm` | `0.6875rem` |
 
 Tracking: `-0.03em` display, `-0.02em` title, `-0.01em` body, `0.13em` on mono
 labels and `0.18em` on the small ones. Measure is `68ch` for body, `22ch` for the
@@ -92,13 +118,13 @@ display headline.
 
 ### The display step is not in the scale
 
-It is the one size that does not belong to the viewport, so it is set on
-`.hero__title` rather than as a token:
+It is the one size that does not belong to the viewport, so it is set on the
+hero `<h1>` with arbitrary values rather than as a token:
 
 - **Single column** (`< 60rem`): `clamp(2.5rem, 5.8vw, 4rem)`. Here the column *is*
   the viewport, so `vw` is the honest unit.
 - **Two columns** (`≥ 60rem`): `clamp(2.5rem, 10.4cqw, 5rem)`, against a
-  `container-type: inline-size` on `.hero__lede`.
+  `@container/lede` on the headline's column.
 
 Above `60rem` the headline sits in a grid column roughly half the viewport's width.
 A viewport-fluid size makes the ratio of column width to type size drift as the
@@ -121,12 +147,15 @@ reflows (980px → 55.9px, 940px → 54.5px).
 ## Layout
 
 ```
-.split                two equal columns, gap --space-2xl, from 68rem up
-.split--paired        centres a text block against a figure
-.split--fill          stretches both columns to one shared height
-.split--flip          moves the first child to column two
+split()               two equal columns, gap-2xl, from xl (68rem) up
+split('center')       centres a text block against a figure
+split('stretch')      stretches both columns to one shared height; pair with <Figure fill>
+xl:order-2            on the first child, moves it to column two
 --split-a/--split-b   shifts the divider for one section
 ```
+
+`split()` lives in `src/styles/recipes.ts`. The breakpoints are `md` 48rem,
+`lg` 60rem and `xl` 68rem, plus a `phone:` variant for `max-width: 30rem`.
 
 The divider can move, the outer edges cannot. A section that genuinely needs an
 uneven split sets `--split-a` / `--split-b`; the detection section does, at
@@ -140,15 +169,15 @@ shrinks, so the two drift apart and leave exactly the dead space the split exist
 to avoid. At 1000px wide the detection section reached a 500px imbalance. Stacked
 is balanced by definition, so below the breakpoint the page stacks.
 
-**`--paired` versus `--fill`.** `--paired` centres the shorter column against the
+**`center` versus `stretch`.** `center` centres the shorter column against the
 taller, which halves a small imbalance and puts what is left on both sides, where
-it reads as margin. `--fill` goes further: both columns stretch to one shared
+it reads as margin. `stretch` goes further: both columns stretch to one shared
 height, the figure frame drops its own aspect ratio and fills the row, and the
 figure's top and bottom edges land on exactly the same lines as the text beside
-it. The detection and entry sections use `--fill`; measured top and bottom deltas
-between figure and text are 0px in both.
+it. The detection section uses `stretch`; measured top and bottom deltas between
+figure and text are 0px.
 
-**Why `--flip` exists.** The figure side alternates down the page, right, left,
+**Why the detection text takes `xl:order-2`.** The figure side alternates down the page, right, left,
 right, left, while the DOM keeps heading-then-figure order, so a screen reader
 and the stacked phone layout both get the heading first.
 
@@ -217,18 +246,21 @@ rather than the 230 KB the 960s would have.
 has an `aspect-ratio`, so its space is reserved before any bytes arrive. Measured
 CLS on load is 0.
 
-**Two ratio variables, deliberately.** The component sets `--figure-ratio` inline.
-An inline custom property cannot be overridden by a stylesheet rule on the same
-element, so a breakpoint that needs a different crop sets `--figure-ratio-override`
-instead. Setting `--figure-ratio` in a media query silently loses; that bug shipped
-once here.
+**The ratio is a custom property, deliberately.** The component sets
+`--figure-ratio` inline and the frame reads it through `aspect-(--figure-ratio)`.
+An inline `aspect-ratio` would beat every class, and `<Figure fill>` needs
+`xl:aspect-auto` to switch the ratio off at the wide breakpoint. The corollary:
+an inline custom property cannot be overridden by a class on the same element
+either, so a breakpoint that needs a different crop must change the `aspect-*`
+utility, not reassign `--figure-ratio`. That bug shipped once here.
 
 ## Space and motion
 
-A 4px-rooted scale, fluid at the larger steps: `--space-3xs` `0.25rem` through
-`--space-3xl` `clamp(5rem, 3.4rem + 7vw, 9rem)`. The page gutter is
+A 4px-rooted scale, fluid at the larger steps: `--spacing-3xs` `0.25rem` through
+`--spacing-3xl` `clamp(5rem, 3.4rem + 7vw, 9rem)`, used as `gap-xl`, `py-2xl` and
+so on. The page gutter, `--spacing-gutter` (`px-gutter`), is
 `clamp(1rem, 0.55rem + 2vw, 2.5rem)` and never drops below 16px. Shell max width
-`84rem`.
+`84rem` (`max-w-shell`).
 
 Easing is `cubic-bezier(0.16, 1, 0.3, 1)`, exponential ease-out, always from an
 already-visible default. Nothing on the page animates in from nothing.
@@ -238,26 +270,32 @@ upward** on hover, rather than fading in, the control reads as being inked, not
 lit. Everything else is 120–200ms and gets out of the way.
 `prefers-reduced-motion: reduce` collapses the duration tokens to `1ms` at the token
 level, so a component that forgets its own media query still respects the
-preference.
+preference. For that reason the durations are plain `--dur-fast` / `--dur-base` /
+`--dur-slow` properties outside the theme, used as `duration-(--dur-fast)`.
+
+**Hover is plain `:hover`.** Tailwind v4 wraps `hover:` in
+`@media (hover: hover)` by default, which would stop hover styles applying on touch
+screens. The theme restores a plain `:hover` so the page behaves as it always has.
 
 ## Components
 
-- **Two action shapes, and no third.** A ruled box (`.action--primary`) for the
-  thing most visitors came to do; a quiet underlined link (`.action--quiet`) for
-  everything else. A filled button would be a third voice.
-- **The mono label** (`.label`) is the only place mono appears, and it always
-  carries a measured value.
-- **Rules, not cards.** `--rule-hair` / `--rule-faint` / `--rule-firm` /
-  `--rule-ink`. There are no elevation tokens because nothing is elevated.
+- **Two action shapes, and no third.** A ruled box (`<Action>`) for the thing
+  most visitors came to do; a quiet underlined link (`<Action variant="quiet">`)
+  for everything else. A filled button would be a third voice.
+- **The mono label** (the `labelSm` recipe, plus `caps` for terms) is the only
+  place mono appears, and it always carries a measured value.
+- **Rules, not cards.** Every rule is a 1px border in an ink alpha: hairline
+  `border-ink-14`, faint `border-ink-08`, firm `border-ink-24`, full `border-ink`.
+  There are no elevation tokens because nothing is elevated.
 - **Tables are tables.** The privacy model is a real `<table>` because it is
   genuinely tabular, and it restacks on a phone with its column headers preserved
   as group labels via `data-head`.
 
 ## Browser surfaces
 
-Themed from the palette rather than left to the platform: selection (`--ink` ground,
-`--paper` text), caret (`--ochre`), `accent-color`, thin scrollbars in `--ink-24`,
-one 2px `--ink` focus ring at 2px offset for the whole page, and a `0.28em`
+Themed from the palette rather than left to the platform, in the base layer:
+selection (ink ground, paper text), caret (ochre), `accent-color`, thin scrollbars
+in ink-24, one 2px ink focus ring at 2px offset for the whole page, and a `0.28em`
 underline offset on links.
 
 ## House style
