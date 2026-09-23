@@ -139,7 +139,7 @@ describe('LandingPage: access routes', () => {
     // The negative case. A "Register" affordance anywhere in the inspector's
     // row would be a dead end: PHI accounts are admin-provisioned.
     const inspectorRow = screen
-      .getByText('Public health inspector', { selector: '.entries__staff-role' })
+      .getByText('Public health inspector', { selector: 'li > p' })
       .closest('li')
     expect(inspectorRow).not.toBeNull()
     const links = within(inspectorRow as HTMLElement).getAllByRole('link')
