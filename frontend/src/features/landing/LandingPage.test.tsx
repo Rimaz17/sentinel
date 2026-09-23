@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
+import { SPLIT_COLUMNS } from '@/styles/recipes'
 import { LandingPage } from './LandingPage'
 
 function renderLanding() {
@@ -46,8 +47,12 @@ describe('LandingPage', () => {
   it('puts every two-column section on the one shared grid', () => {
     const { container } = renderLanding()
     // Sections inventing their own column ratios is what made the page read as
-    // unaligned, so there must be no stray grid definitions left behind.
-    expect(container.querySelectorAll('.split').length).toBe(4)
+    // unaligned, so there must be no stray grid definitions left behind. The
+    // old class still counts while sections move to the utility.
+    const splits = [...container.querySelectorAll('[class]')].filter(
+      (el) => el.classList.contains('split') || el.classList.contains(SPLIT_COLUMNS),
+    )
+    expect(splits).toHaveLength(4)
   })
 
   it('carries no plate switcher', () => {
