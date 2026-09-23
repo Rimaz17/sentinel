@@ -14,7 +14,9 @@ function renderAt(path: string) {
 describe('AppRoutes', () => {
   it('renders the landing page at the root', () => {
     renderAt('/')
-    expect(screen.getByRole('heading', { level: 1, name: /early warning/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 1, name: /find it on day three/i }),
+    ).toBeInTheDocument()
   })
 
   it.each([
