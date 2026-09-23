@@ -5,17 +5,16 @@ import { Entries } from './sections/Entries'
 import { Hero } from './sections/Hero'
 import { Mechanism } from './sections/Mechanism'
 import { Privacy } from './sections/Privacy'
-import './landing.css'
 
 /** The single public entry point. */
 export function LandingPage() {
   return (
-    <div className="landing">
+    <div className="flex min-h-screen flex-col">
       <SkipLink />
 
       <SiteHeader />
 
-      <main id="main" className="landing__main">
+      <main id="main" className="flex-1">
         <Hero />
         <Mechanism />
         <Privacy />
