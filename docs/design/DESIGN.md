@@ -121,18 +121,19 @@ display headline.
 It is the one size that does not belong to the viewport, so it is set on the
 hero `<h1>` with arbitrary values rather than as a token:
 
-- **Single column** (`< 60rem`): `clamp(2.5rem, 5.8vw, 4rem)`. Here the column *is*
-  the viewport, so `vw` is the honest unit.
-- **Two columns** (`≥ 60rem`): `clamp(2.5rem, 10.4cqw, 5rem)`, against a
+- **Single column** (below `68rem`, the `xl` breakpoint): `clamp(2.5rem, 4.5vw, 4rem)`.
+  Here the column *is* the viewport, so `vw` is the honest unit.
+- **Two columns** (from `68rem`): `clamp(2.5rem, 10.4cqw, 5rem)`, against a
   `@container/lede` on the headline's column.
 
-Above `60rem` the headline sits in a grid column roughly half the viewport's width.
+From `68rem` the headline sits in a grid column roughly half the viewport's width.
 A viewport-fluid size makes the ratio of column width to type size drift as the
-window narrows, which moves where the real headline breaks, at 1100px it produced
-a fourth line carrying only the words "no single". Container units hold that ratio
-constant, so the headline stays at three even lines from 960px up. The two slopes
-are chosen to meet at the breakpoint, so the type does not jump as the layout
-reflows (980px → 55.9px, 940px → 54.5px).
+window narrows, which moves where the real headline breaks: with an earlier,
+longer headline it produced a fourth line at 1100px carrying only the words "no
+single". Container units hold that ratio constant. The current headline, "Find it
+on day three, not day ten.", sets on two lines at every width measured from 375px
+to 1440px. The two slopes are chosen to meet at the breakpoint, so the type does
+not jump as the layout reflows (1087px → 48.92px, 1088px → 48.97px).
 
 **Two rules learned the hard way, both from shipped bugs:**
 
