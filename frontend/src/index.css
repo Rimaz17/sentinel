@@ -22,7 +22,6 @@
 @import './styles/tokens.css';
 @import './styles/type.css';
 @import './styles/layout.css';
-@import './styles/base.css';
 
 /*
  * Tailwind v4 wraps `hover:` in `@media (hover: hover)`, so hover styles would
@@ -216,5 +215,142 @@
     --dur-fast: 1ms;
     --dur-base: 1ms;
     --dur-slow: 1ms;
+  }
+}
+
+/*
+ * Base layer: reset, document defaults, and the browser's own surfaces.
+ *
+ * The parts nobody draws (selection, caret, focus ring, scrollbar, underline
+ * offset) ship with defaults that belong to no design system. They are themed
+ * here from the palette. Anything a component sets with a utility wins over
+ * this layer.
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Anchor links and skip links land below the fixed header. */
+    scroll-padding-top: calc(var(--spacing-header) + var(--spacing-md));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--leading-body);
+    letter-spacing: var(--tracking-tight);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* The page is a fixed-width editorial column set; nothing should scroll
+       sideways on a phone. */
+    overflow-x: hidden;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: var(--font-weight-medium);
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-title);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ul,
+  ol {
+    padding: 0;
+    list-style: none;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  :root {
+    caret-color: var(--color-ochre);
+    accent-color: var(--color-ink);
+    /* Thin scrollbars in the page's own greys rather than the platform's. */
+    scrollbar-color: var(--color-ink-24) transparent;
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-ink-24);
+    border: 3px solid var(--color-paper);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-ink-40);
+  }
+
+  /* One focus ring for the whole page, offset so it stays clear of the element
+     it marks on both the paper and the sunk grounds. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 1px;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-color: var(--color-ink-40);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.28em;
+    transition: text-decoration-color var(--dur-fast) var(--ease-out);
+  }
+
+  a:hover {
+    text-decoration-color: var(--color-ink);
   }
 }
