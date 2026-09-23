@@ -15,7 +15,7 @@ describe('LandingPage', () => {
   it('says what Sentinel is in its heading', () => {
     renderLanding()
     expect(
-      screen.getByRole('heading', { level: 1, name: /early warning for the outbreak/i }),
+      screen.getByRole('heading', { level: 1, name: /find it on day three/i }),
     ).toBeInTheDocument()
   })
 

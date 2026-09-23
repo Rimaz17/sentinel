@@ -21,7 +21,7 @@ export function Hero() {
         <div className="split split--paired">
           <div className="hero__lede">
             <h1 id="hero-title" className="hero__title">
-              Early warning for the outbreak no single clinic can see.
+              Find it on day three, not day ten.
             </h1>
 
             <p className="hero__standfirst">
