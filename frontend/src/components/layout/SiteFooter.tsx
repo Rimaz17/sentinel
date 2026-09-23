@@ -7,7 +7,7 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="shell site-footer__inner">
         <div className="site-footer__brand">
-          <SentinelWordmark size="lg" />
+          <SentinelWordmark size="lg" tone="paper" />
           <p className="site-footer__line">
             Outbreak early warning for Sri Lanka. All case data is simulated.
           </p>
