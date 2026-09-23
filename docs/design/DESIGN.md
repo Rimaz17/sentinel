@@ -299,9 +299,10 @@ screens. The theme restores a plain `:hover` so the page behaves as it always ha
 - **Rules, not cards.** Every rule is a 1px border in an ink alpha: hairline
   `border-ink-14`, faint `border-ink-08`, firm `border-ink-24`, full `border-ink`.
   There are no elevation tokens because nothing is elevated.
-- **Tables are tables.** The privacy model is a real `<table>` because it is
-  genuinely tabular, and it restacks on a phone with its column headers preserved
-  as group labels via `data-head`.
+- **The privacy register is a description list.** Three bands, Removed entirely,
+  Generalised and Kept, each a `<dt>` naming the fate and a `<dd>` whose fields run
+  along the band rather than stacking into a narrow column. From `68rem` the fate
+  sits beside its fields; below that it sits above them, so a phone loses nothing.
 
 ## Browser surfaces
 
@@ -322,4 +323,5 @@ if one reaches the rendered page. Recorded in CLAUDE.md section 11.
 Verified on the built page, not asserted: every visible text node clears its WCAG
 threshold (4.5:1 body, 3:1 large), every focusable element shows a visible focus
 ring, there is no horizontal overflow from 375px up, one `<h1>` with no skipped
-heading levels, and the privacy table restacks on a phone with its headers intact.
+heading levels, and the privacy register keeps each fate above its fields on a
+phone.
