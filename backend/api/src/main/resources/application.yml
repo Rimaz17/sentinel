@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: sentinel-api
+  config:
+    # Local runs read the repository's .env, whether started from the repository
+    # root or from backend/api. Real environment variables take precedence.
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../../.env[.properties]
+  datasource:
+    url: ${SENTINEL_DB_URL}
+    username: ${SENTINEL_DB_USERNAME}
+    password: ${SENTINEL_DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Flyway migrations are the only schema authority.
+      ddl-auto: validate
