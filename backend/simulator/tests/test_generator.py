@@ -13,6 +13,7 @@ from sentinel_simulator.generator import (
     Generator,
     poisson,
 )
+from sentinel_simulator.outbreaks import Outbreak
 from sentinel_simulator.rhythm import SRI_LANKA
 
 START = datetime(2026, 7, 6, tzinfo=UTC)  # a Monday
@@ -130,3 +131,92 @@ def test_a_district_without_a_located_facility_is_refused():
     facilities = [f for f in registry() if not (f.district_code == "MUL" and f.latitude)]
     with pytest.raises(ValueError, match="MUL"):
         Generator(facilities, random.Random(1))
+
+
+def kandy_town():
+    """The shared registry, with Kandy given ten facilities a couple of kilometres apart."""
+    others = [f for f in registry() if f.district_code != "KDY"]
+    kandy = [
+        Facility(f"PKDY00001{i:02d}", "KDY", "Divisional B", 7.25 + 0.02 * i, 80.60 + 0.015 * i)
+        for i in range(10)
+    ]
+    return others + kandy
+
+
+def kandy_outbreak(**changes):
+    settings = dict(
+        district_code="KDY",
+        symptom_group="DENGUE_LIKE",
+        start=START + timedelta(days=7),
+        extra_per_week=70,
+        days=14,
+        profile="step",
+        spread="point",
+    )
+    return Outbreak(**{**settings, **changes})
+
+
+def outbreak_run(outbreak, seed=11):
+    generator = Generator(kandy_town(), random.Random(seed), outbreaks=[outbreak])
+    return list(generator.reports(START, START + timedelta(weeks=4)))
+
+
+def kandy_dengue(reports, start, end):
+    return [
+        r
+        for r in reports
+        if r.symptom_group == "DENGUE_LIKE"
+        and r.facility_code.startswith("PKDY")
+        and start <= r.reported_at < end
+    ]
+
+
+def within_four_sd(observed, expected):
+    """A Poisson count close enough to its expectation that only a fault would miss."""
+    return abs(observed - expected) <= 4 * math.sqrt(expected)
+
+
+def test_an_outbreak_adds_its_reports_during_it_and_not_outside():
+    o = kandy_outbreak()
+    reports = outbreak_run(o)
+
+    baseline = WEEKLY_BASELINES["KDY"]["DENGUE_LIKE"]
+    assert within_four_sd(len(kandy_dengue(reports, o.start, o.end)), 2 * (baseline + 70))
+    assert within_four_sd(len(kandy_dengue(reports, START, o.start)), baseline)
+
+
+def test_a_point_outbreak_is_bunched_within_about_two_km_and_seen_by_several_facilities():
+    o = kandy_outbreak()
+    extra = Counter()
+    positions = []
+    for r in kandy_dengue(outbreak_run(o), o.start, o.end):
+        positions.append((r.latitude, r.longitude))
+        extra[r.facility_code] += 1
+
+    # Find the hotspot: the densest point among the reports.
+    def neighbours(p):
+        return sum(
+            math.hypot(
+                (q[0] - p[0]) * KM_PER_DEGREE_LATITUDE,
+                (q[1] - p[1]) * 111.320 * math.cos(math.radians(p[0])),
+            )
+            <= 2.5
+            for q in positions
+        )
+
+    densest = max(positions, key=neighbours)
+    assert neighbours(densest) >= 140 * 0.8
+    assert len(extra) >= 4
+
+
+def test_a_wave_is_spread_over_the_district_like_its_everyday_load():
+    o = kandy_outbreak(spread="wave")
+    facilities = Counter(r.facility_code for r in kandy_dengue(outbreak_run(o), o.start, o.end))
+    assert len(facilities) == 10
+
+
+def test_an_outbreak_that_has_ended_adds_nothing():
+    # A wave, because a point outbreak draws its centre from the random stream up front.
+    o = kandy_outbreak(spread="wave", start=START - timedelta(days=30))
+    without = Generator(kandy_town(), random.Random(11)).reports(START, START + timedelta(weeks=4))
+    assert outbreak_run(o) == list(without)
