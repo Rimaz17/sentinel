@@ -66,8 +66,12 @@ export function WeeklyChart({ query, areaName }: WeeklyChartProps) {
   )
 }
 
-const WIDTH = 240
-const HEIGHT = 88
+/*
+ * Drawn at close to its rendered size in a two-column layout, so the bars stay
+ * near 24px wide and the label near 11px rather than scaling up with the column.
+ */
+const WIDTH = 320
+const HEIGHT = 84
 const SLOT = WIDTH / 9
 const BAR = Math.min(24, SLOT - 2)
 
@@ -101,7 +105,7 @@ function GroupPanel({
       </figcaption>
 
       <svg
-        viewBox={`0 -14 ${WIDTH} ${HEIGHT + 15}`}
+        viewBox={`0 -16 ${WIDTH} ${HEIGHT + 17}`}
         role="img"
         aria-label={chartLabel(style.label, areaName, series)}
         className="h-auto w-full overflow-visible"
@@ -130,7 +134,11 @@ function GroupPanel({
                   x={x + BAR / 2}
                   y={y(count) - 4}
                   textAnchor="middle"
-                  className="fill-ink font-mono text-[9px] font-medium"
+                  // A paper halo, so the dashed average never runs through the figure.
+                  stroke="var(--color-paper)"
+                  strokeWidth={3}
+                  paintOrder="stroke"
+                  className="fill-ink font-mono text-[11px] font-medium"
                 >
                   {count}
                 </text>
