@@ -1,7 +1,10 @@
 package io.github.rimaz17.sentinel.reports;
 
 import io.github.rimaz17.sentinel.facilities.FacilityService;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,5 +37,12 @@ public class ReportService {
   @Transactional(readOnly = true)
   public List<Report> recentInDistrict(String districtCode, int limit) {
     return reports.findByDistrictCodeOrderByReportedAtDescIdDesc(districtCode, Limit.of(limit));
+  }
+
+  /** How many reports each district has, by when the patient presented, in [from, to). */
+  @Transactional(readOnly = true)
+  public Map<String, Long> countsByDistrict(Instant from, Instant to) {
+    return reports.countByDistrict(from, to).stream()
+        .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]));
   }
 }
