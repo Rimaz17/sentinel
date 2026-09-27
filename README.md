@@ -32,9 +32,17 @@ that area's average raises an alert. Comparing an area against its own history
 rather than against other areas matters: 40 dengue cases a week is normal for
 Colombo and highly abnormal for Nuwara Eliya.
 
-A second, geographic check runs alongside it. DBSCAN clustering on report
-coordinates looks for reports bunched within ~2 km arriving from several different
-facilities. A tight cluster from many sources suggests a real local outbreak; a rise
+The check runs every hour. One refinement, adopted because it was measured: the
+standard deviation is never taken as less than the square root of the baseline
+average, the least a count of independent events varies. Eight weeks are too few
+to show that reliably, and without the floor the rule raised three times as many
+false alarms. While a series stays high, each hourly check extends the same alert
+rather than raising a new one. See
+[ADR 0007](docs/adr/0007-detection-v1.md).
+
+A second, geographic check will run alongside it from Phase 6. DBSCAN clustering
+on report coordinates looks for reports bunched within ~2 km arriving from several
+different facilities. A tight cluster from many sources suggests a real local outbreak; a rise
 spread evenly across a district suggests a wider seasonal wave.
 
 ## Build status
@@ -42,7 +50,7 @@ spread evenly across a district suggests a wider seasonal wave.
 | Phase | Scope | State |
 |---|---|---|
 | 1 | Walking skeleton, facility registry, simulator, ingestion API, PostgreSQL | **Built** |
-| 2 | Detection v1, z-score baseline job writing alerts | Not started |
+| 2 | Detection v1, z-score baseline job writing alerts | **Built** |
 | 3 | Dashboard v1, React + Leaflet, polling | Not started |
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | Not started |
 | 5 | Real-time, Kafka, Redis windows, WebSocket alerts | Not started |
@@ -53,14 +61,55 @@ spread evenly across a district suggests a wider seasonal wave.
 Phase 1 is the backend's walking skeleton: the facility registry seeded from
 Ministry of Health data, a Python simulator posting reports to a Spring Boot
 ingestion API, anonymised reports stored in PostgreSQL, and an endpoint listing
-recent reports. It has no user interface yet; the dashboards arrive in Phase 3.
+recent reports. Phase 2 adds the detector: an hourly Python job that scores every
+district and symptom group against its own baseline and writes alerts, and
+outbreak injection in the simulator to test it against. Neither has a user
+interface yet; the dashboards arrive in Phase 3.
 
 The landing page is the one browser surface that exists today. Every other route
 renders a page stating which phase it belongs to and what will live there; see
 [ADR 0002](docs/adr/0002-unbuilt-routes-render-placeholders.md).
 
-No detector metrics appear in this README yet, because the detector has not been
-built. When it is, the numbers here will come from an actual run.
+## Measured detection
+
+Because the simulator decides when each outbreak starts, the detector can be
+scored against ground truth. These figures come from an actual run of
+`python -m sentinel_detector evaluate` (seed 2026, about 16 seconds): 600
+injected outbreaks of 14 days, one of each size and shape in every district and
+symptom group, sized as extra reports at their peak relative to that series'
+usual week, and 52 weeks of all 100 series with nothing injected. How it works:
+[ADR 0008](docs/adr/0008-detector-measured-against-the-simulator.md).
+
+| Threshold | Detected | at +50% | at +100% | at +200% | Median hours to detect | False alarms per quiet week |
+|---|---|---|---|---|---|---|
+| 2.0 sd | 80% | 62% | 85% | 94% | 113 | 13.83 |
+| 2.5 sd | 72% | 46% | 78% | 92% | 127 | 6.85 |
+| 3.0 sd | 61% | 28% | 67% | 89% | 140 | 3.31 |
+| 3.5 sd | 52% | 18% | 55% | 82% | 152 | 1.19 |
+
+The shipped threshold is **3.0 sd**. An outbreak counts as detected if an alert
+is raised while it is still going. False alarms are alerts raised nationally,
+across all 100 series, in a week with no outbreak anywhere. Two other seeds (1
+and 7) gave 62% detected and 3.6 to 3.8 false alarms a week at 3.0 sd.
+
+Kandy dengue-like, where a usual week is about 25 reports, at 3.0 sd:
+
+- +50% at peak, ramp: not detected while it lasted
+- +50% at peak, step: not detected while it lasted
+- +100% at peak, ramp: detected after 179 hours, at 41 reports in the week
+- +100% at peak, step: detected after 33 hours, at 37 reports in the week
+- +200% at peak, ramp: detected after 126 hours, at 40 reports in the week
+- +200% at peak, step: detected after 45 hours, at 41 reports in the week
+
+What these numbers say: an outbreak that doubles or triples a district's usual
+week is usually caught, a step change within a day or two, a slow ramp after
+several days; one that adds half again is mostly missed, because it stays
+inside ordinary week-to-week variation. Each lower threshold buys detection
+with false alarms, which is the trade-off the overview's "two thresholds"
+describe. They measure the detector against this simulator, not against real
+disease: series are independent, baselines hold no past epidemics, and every
+report arrives on time. Throughput and end-to-end latency are pipeline figures
+and are measured when Kafka arrives in Phase 5.
 
 ## Stack
 
@@ -163,6 +212,54 @@ points it at another API.
 curl "http://localhost:8080/api/reports?limit=5&district=KDY"
 ```
 
+**5. Run the detector.** It needs pandas and psycopg, and reads the same database
+settings as the API, from `.env`. From `backend/detector`:
+
+```bash
+pip install -r requirements.txt
+```
+
+```bash
+python -m sentinel_detector run
+```
+
+`run` checks once; `watch` checks at a minute past every hour until stopped. A
+check refuses to run until reports reach back 63 days, which the backfill
+provides. Alerts are written to the `alerts` table, numbered from `A-1001`; the
+alert list arrives with the dashboards in Phase 3.
+
+### Injecting an outbreak
+
+`--outbreak` adds an outbreak on top of the simulated baseline, timed from now.
+To see the detector raise an alert, fill in history with an outbreak that began
+four days ago, then check. From `backend/simulator`, then `backend/detector`:
+
+```bash
+python -m sentinel_simulator --seed 2026 --outbreak district=KDY,group=DENGUE_LIKE,extra=60,start=-4d,profile=step backfill --days 63
+```
+
+```bash
+python -m sentinel_detector run
+```
+
+In a run of these commands, the check found that outbreak and nothing else:
+
+```
+Checked 100 series for the 7 days to 2026-09-27 16:00 UTC: 1 above threshold
+  A-1001   new      KDY DENGUE_LIKE         55 reports, 5.2 sd above baseline
+```
+
+| Setting | Meaning |
+|---|---|
+| `district`, `group` | Where, as a district code such as `KDY` and a symptom group such as `DENGUE_LIKE` (required) |
+| `extra` | Extra reports a week at the outbreak's peak (required) |
+| `start` | Offset from now, such as `-4d` or `12h` (default: now) |
+| `days` | How long it lasts (default: 14) |
+| `profile` | `ramp` rises to its peak halfway through and falls; `step` is at full strength throughout (default: `ramp`) |
+| `spread` | `point` bunches patients within about 2 km of one spot, seen by the nearest few facilities; `wave` spreads them across the district (default: `point`) |
+
+`--outbreak` can be repeated, and works with `live` as well as `backfill`.
+
 ### API
 
 | Endpoint | What it does |
@@ -207,6 +304,9 @@ own machine until Phase 4 replaces the header with sign-in; see
 | `./mvnw spotless:apply` | `backend/api` | Format the Java sources |
 | `pip install -r requirements-dev.txt` | `backend/simulator` | Install pytest, Ruff and Black |
 | `pytest` · `ruff check .` · `black .` | `backend/simulator` or `scripts/facility-registry` | Test, lint and format either Python project |
+| `pip install -r requirements-dev.txt` | `backend/detector` | Install the detector's packages with pytest, Ruff, Black and Testcontainers |
+| `pytest` · `ruff check .` · `black .` | `backend/detector` | Test (the integration tests need Docker), lint and format |
+| `python -m sentinel_detector evaluate` | `backend/detector` | Measure detection against simulated outbreaks, as in [Measured detection](#measured-detection); `--seed N` for another run |
 
 ## Repository layout
 
@@ -215,7 +315,8 @@ sentinel/
 ├── backend/
 │   ├── api/               Spring Boot: facility registry, ingestion, reports
 │   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
-│   └── simulator/         Python: simulated reports, backfill and live modes
+│   ├── detector/          Python: hourly z-score check, alerts, evaluation
+│   └── simulator/         Python: simulated reports and outbreaks, backfill and live modes
 ├── frontend/
 │   └── src/assets/        Shipped WebP figures, several widths each
 ├── infra/
@@ -288,6 +389,11 @@ These are documented on purpose and are not defects.
 - **No authentication until Phase 4.** A facility names itself in a request
   header, and every endpoint is open. See
   [ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
+- **Small or gradual outbreaks are caught late or not at all.** At the shipped
+  3 sd, an outbreak adding half again to a district's usual week is detected
+  28% of the time, and the median time to detect across all injected outbreaks
+  is 140 hours, because a 7-day window only fills as an outbreak grows. See
+  [Measured detection](#measured-detection).
 - **Detection assumes a stable baseline.** A prior year containing a real epidemic
   inflates "normal" and reduces future sensitivity. Periodic recalibration would be
   needed.

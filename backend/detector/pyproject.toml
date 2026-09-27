@@ -1,0 +1,25 @@
+[project]
+name = "sentinel-detector"
+version = "0.1.0"
+description = "Hourly z-score check of each district and symptom group against its own baseline"
+requires-python = ">=3.12"
+# Runtime dependencies are pinned in requirements.txt, development tools in requirements-dev.txt.
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sentinel_detector", "sentinel_simulator"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The evaluation drives the simulator's own distributions, so its package is importable too.
+pythonpath = [".", "../simulator"]

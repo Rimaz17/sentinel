@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import math
 import random
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
 
@@ -22,6 +22,7 @@ from sentinel_simulator.baselines import (
     LEPTOSPIROSIS_LIKE,
     WEEKLY_BASELINES,
 )
+from sentinel_simulator.outbreaks import Outbreak
 from sentinel_simulator.rhythm import SRI_LANKA, expected_in_hour, hour_slices
 
 # The bounds the ingestion API accepts. Jittered points are kept inside them.
@@ -64,6 +65,11 @@ AGE_BAND_WEIGHTS = {
 
 # Share of reports that give a date of birth instead of an age.
 DATE_OF_BIRTH_SHARE = 0.2
+
+# A point outbreak's patients live within about 2 km of its centre (three spreads)
+# and go to whichever of the nearest few facilities they choose.
+POINT_SPREAD_KM = 0.7
+POINT_FACILITIES = 6
 
 
 @dataclass(frozen=True)
@@ -130,6 +136,7 @@ class Generator:
         rng: random.Random,
         spread_km: float = 2.0,
         baselines: Mapping[str, Mapping[str, float]] = WEEKLY_BASELINES,
+        outbreaks: Sequence[Outbreak] = (),
     ):
         self._rng = rng
         self._spread_km = spread_km
@@ -146,8 +153,17 @@ class Generator:
             ]
             if not located:
                 raise ValueError(f"no located facility can report for district {district}")
-            weights = [TYPE_WEIGHTS.get(f.institution_type, DEFAULT_TYPE_WEIGHT) for f in located]
-            self._candidates[district] = (located, weights)
+            self._candidates[district] = (located, _weights(located))
+
+        self._outbreaks = list(outbreaks)
+        # For each point outbreak: its centre, and the facilities nearest to it.
+        self._hotspots: dict[int, tuple[Facility, list[Facility], list[float]]] = {}
+        for i, outbreak in enumerate(self._outbreaks):
+            if outbreak.spread == "point":
+                located, weights = self._candidates[outbreak.district_code]
+                centre = self._rng.choices(located, weights)[0]
+                nearest = sorted(located, key=lambda f: _distance_km(centre, f))[:POINT_FACILITIES]
+                self._hotspots[i] = (centre, nearest, _weights(nearest))
 
     def reports(self, start: datetime, end: datetime) -> Iterator[SimulatedReport]:
         """Reports presenting in [start, end), hour by hour."""
@@ -157,13 +173,38 @@ class Generator:
                 for group, weekly_mean in groups.items():
                     mean = expected_in_hour(weekly_mean, slice_start) * fraction
                     for _ in range(poisson(mean, self._rng)):
-                        offset = (slice_end - slice_start) * self._rng.random()
-                        yield self._report(district, group, slice_start + offset)
+                        yield self._ordinary(district, group, self._during(slice_start, slice_end))
+            for i, outbreak in enumerate(self._outbreaks):
+                for _ in range(poisson(outbreak.expected_in(slice_start, slice_end), self._rng)):
+                    reported_at = self._during(slice_start, slice_end)
+                    if i in self._hotspots:
+                        centre, nearest, weights = self._hotspots[i]
+                        facility = self._rng.choices(nearest, weights)[0]
+                        location = self._near(centre.latitude, centre.longitude, POINT_SPREAD_KM)
+                        yield self._report(facility, outbreak.symptom_group, reported_at, location)
+                    else:
+                        yield self._ordinary(
+                            outbreak.district_code, outbreak.symptom_group, reported_at
+                        )
 
-    def _report(self, district: str, group: str, reported_at: datetime) -> SimulatedReport:
+    def _during(self, start: datetime, end: datetime) -> datetime:
+        return start + (end - start) * self._rng.random()
+
+    def _ordinary(self, district: str, group: str, reported_at: datetime) -> SimulatedReport:
+        """A report placed like the district's everyday load: near a facility of any size."""
         facilities, weights = self._candidates[district]
         facility = self._rng.choices(facilities, weights)[0]
-        latitude, longitude = self._near(facility.latitude, facility.longitude)
+        location = self._near(facility.latitude, facility.longitude, self._spread_km)
+        return self._report(facility, group, reported_at, location)
+
+    def _report(
+        self,
+        facility: Facility,
+        group: str,
+        reported_at: datetime,
+        location: tuple[float, float],
+    ) -> SimulatedReport:
+        latitude, longitude = location
         age = self._age(group)
         gives_date_of_birth = self._rng.random() < DATE_OF_BIRTH_SHARE
         self._serial += 1
@@ -178,15 +219,15 @@ class Generator:
             patient_name=f"SIMULATED patient {self._serial:06d}",
             nic_number=f"SIMULATED-{self._serial:06d}",
             phone_number="SIMULATED-0000000000",
-            home_address=f"SIMULATED address {self._serial:06d}, {district}",
+            home_address=f"SIMULATED address {self._serial:06d}, {facility.district_code}",
         )
 
-    def _near(self, latitude: float, longitude: float) -> tuple[float, float]:
-        """A point around a facility, normally distributed, cut off at three spreads."""
+    def _near(self, latitude: float, longitude: float, spread_km: float) -> tuple[float, float]:
+        """A point around another, normally distributed, cut off at three spreads."""
         while True:
-            north_km = self._rng.gauss(0, self._spread_km)
-            east_km = self._rng.gauss(0, self._spread_km)
-            if math.hypot(north_km, east_km) <= 3 * self._spread_km:
+            north_km = self._rng.gauss(0, spread_km)
+            east_km = self._rng.gauss(0, spread_km)
+            if math.hypot(north_km, east_km) <= 3 * spread_km:
                 break
         lat = latitude + north_km / KM_PER_DEGREE_LATITUDE
         lon = longitude + east_km / (
@@ -207,3 +248,17 @@ class Generator:
         day = 28 if (reported_on.month, reported_on.day) == (2, 29) else reported_on.day
         birthday = reported_on.replace(year=reported_on.year - age, day=day)
         return date.fromordinal(birthday.toordinal() - self._rng.randrange(365))
+
+
+def _weights(facilities: list[Facility]) -> list[float]:
+    return [TYPE_WEIGHTS.get(f.institution_type, DEFAULT_TYPE_WEIGHT) for f in facilities]
+
+
+def _distance_km(a: Facility, b: Facility) -> float:
+    north = (b.latitude - a.latitude) * KM_PER_DEGREE_LATITUDE
+    east = (
+        (b.longitude - a.longitude)
+        * KM_PER_DEGREE_LONGITUDE_AT_EQUATOR
+        * math.cos(math.radians(a.latitude))
+    )
+    return math.hypot(north, east)
