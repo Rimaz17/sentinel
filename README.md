@@ -51,7 +51,7 @@ spread evenly across a district suggests a wider seasonal wave.
 |---|---|---|
 | 1 | Walking skeleton, facility registry, simulator, ingestion API, PostgreSQL | **Built** |
 | 2 | Detection v1, z-score baseline job writing alerts | **Built** |
-| 3 | Dashboard v1, React + Leaflet, polling | Not started |
+| 3 | Dashboard v1, React + Leaflet, polling | **Built** |
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | Not started |
 | 5 | Real-time, Kafka, Redis windows, WebSocket alerts | Not started |
 | 6 | Geography, PostGIS, DBSCAN, cluster rings | Not started |
@@ -63,11 +63,15 @@ Ministry of Health data, a Python simulator posting reports to a Spring Boot
 ingestion API, anonymised reports stored in PostgreSQL, and an endpoint listing
 recent reports. Phase 2 adds the detector: an hourly Python job that scores every
 district and symptom group against its own baseline and writes alerts, and
-outbreak injection in the simulator to test it against. Neither has a user
-interface yet; the dashboards arrive in Phase 3.
+outbreak injection in the simulator to test it against. Phase 3 adds the
+inspector's dashboard at `/app`: the alert queue, every report on a Leaflet map,
+the district list, and a weekly chart per symptom group for the country or one
+district, all refreshed by polling every 30 seconds. See
+[ADR 0009](docs/adr/0009-dashboard-v1-polling-and-figures.md).
 
-The landing page is the one browser surface that exists today. Every other route
-renders a page stating which phase it belongs to and what will live there; see
+The landing page and the internal dashboard are the browser surfaces that exist
+today. Every other route renders a page stating which phase it belongs to and
+what will live there; see
 [ADR 0002](docs/adr/0002-unbuilt-routes-render-placeholders.md).
 
 ## Measured detection
