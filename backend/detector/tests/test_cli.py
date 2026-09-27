@@ -88,3 +88,16 @@ def test_watch_survives_the_database_being_unavailable(monkeypatch, capsys):
     moments = iter([END, END, END + timedelta(hours=1)])
     watch({}, 3.0, clock=lambda: next(moments), sleep=lambda s: None, checks=2)
     assert capsys.readouterr().out.count("the database is unavailable") == 2
+
+
+def test_evaluate_prints_the_measurements_as_markdown_without_a_database(monkeypatch, capsys):
+    for key in ("SENTINEL_DB_URL", "SENTINEL_DB_USERNAME", "SENTINEL_DB_PASSWORD"):
+        monkeypatch.delenv(key, raising=False)
+
+    assert main(["evaluate", "--seed", "3", "--quiet-weeks", "2"]) == 0
+
+    out = capsys.readouterr().out
+    assert out.startswith("Seed 3: 600 injected outbreaks of 14 days")
+    assert "| Threshold | Detected | at +50% | at +100% | at +200% |" in out
+    assert out.count(" sd | ") == 4
+    assert "Kandy dengue-like (usual week about 25 reports) at 3.0 sd:" in out
