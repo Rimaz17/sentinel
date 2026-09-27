@@ -67,3 +67,38 @@ def test_an_unreachable_api_exits_with_an_error(capsys):
     # Port 9 (discard) on loopback is closed on any ordinary machine.
     assert main(["--api-url", "http://127.0.0.1:9", "backfill", "--days", "1"]) == 1
     assert "Could not reach the API" in capsys.readouterr().err
+
+
+def test_outbreaks_are_collected_from_repeated_options():
+    args = parse_args(
+        [
+            "--outbreak",
+            "district=KDY,group=DENGUE_LIKE,extra=40,start=-3d",
+            "--outbreak",
+            "district=CMB,group=INFLUENZA_LIKE,extra=90,spread=wave",
+            "backfill",
+        ]
+    )
+    assert len(args.outbreak) == 2
+
+
+def test_an_invalid_outbreak_is_refused_before_anything_is_posted(capsys):
+    assert main(["--outbreak", "district=KDY,group=DENGUE_LIKE", "backfill"]) == 2
+    assert "Not a valid outbreak: an outbreak needs extra" in capsys.readouterr().err
+
+
+def test_backfill_includes_an_injected_outbreak(capsys):
+    from sentinel_simulator.outbreaks import parse_outbreak
+
+    outbreak = parse_outbreak("district=KDY,group=DENGUE_LIKE,extra=300,start=-5d,days=4", NOW)
+    facilities = [Facility(f"P{d}0000001", d, "Teaching", 7.0, 80.5) for d in WEEKLY_BASELINES]
+    client = RecordingClient()
+
+    backfill(client, Generator(facilities, random.Random(5), outbreaks=[outbreak]), days=7, now=NOW)
+
+    kandy_dengue = [
+        r
+        for r in client.submitted
+        if r.facility_code == "PKDY0000001" and r.symptom_group == "DENGUE_LIKE"
+    ]
+    assert len(kandy_dengue) > 100

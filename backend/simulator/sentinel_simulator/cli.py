@@ -2,9 +2,12 @@
 
     python -m sentinel_simulator backfill --days 63
     python -m sentinel_simulator live
+    python -m sentinel_simulator \
+        --outbreak district=KDY,group=DENGUE_LIKE,extra=40,start=-3d backfill
 
 Detection compares the last 7 days with the 8 weeks before them, so a 63-day
-backfill gives it a full window on first run.
+backfill gives it a full window on first run. `--outbreak` injects an outbreak
+on top of the baseline, timed relative to now; see sentinel_simulator.outbreaks.
 """
 
 from __future__ import annotations
@@ -19,6 +22,7 @@ from datetime import UTC, datetime, timedelta
 
 from sentinel_simulator.client import ApiError, SentinelClient
 from sentinel_simulator.generator import Generator
+from sentinel_simulator.outbreaks import parse_outbreak
 
 DEFAULT_API_URL = "http://localhost:8080"
 PROGRESS_EVERY = 1000
@@ -40,6 +44,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=2.0,
         help="how far patients live from their facility, as a standard deviation (default: 2)",
+    )
+    parser.add_argument(
+        "--outbreak",
+        action="append",
+        default=[],
+        metavar="SETTINGS",
+        help=(
+            "inject an outbreak, as district=KDY,group=DENGUE_LIKE,extra=40 plus optional"
+            " start=-3d (offset from now), days=14, profile=ramp|step, spread=point|wave;"
+            " repeatable"
+        ),
     )
     commands = parser.add_subparsers(dest="command", required=True)
 
@@ -100,14 +115,26 @@ def live(
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     rng = random.Random(args.seed)
+    now = datetime.now(UTC)
+    try:
+        outbreaks = [parse_outbreak(text, now) for text in args.outbreak]
+    except ValueError as error:
+        print(f"Not a valid outbreak: {error}", file=sys.stderr)
+        return 2
     try:
         with SentinelClient(args.api_url) as client:
             facilities = client.facilities()
-            generator = Generator(facilities, rng, spread_km=args.spread_km)
+            generator = Generator(facilities, rng, spread_km=args.spread_km, outbreaks=outbreaks)
             located = sum(1 for f in facilities if f.latitude is not None)
             print(f"{len(facilities):,} facilities in the registry, {located:,} with a location")
+            for outbreak in outbreaks:
+                print(f"Injecting an outbreak: {outbreak.describe()}")
+                if args.command == "backfill" and outbreak.start >= now:
+                    print(
+                        "  It starts after the backfill ends, so the backfill will not include it."
+                    )
             if args.command == "backfill":
-                backfill(client, generator, args.days, datetime.now(UTC))
+                backfill(client, generator, args.days, now)
             else:
                 print(f"Posting live every {args.interval:g} s; Ctrl+C to stop", flush=True)
                 live(client, generator, args.interval)
