@@ -47,6 +47,17 @@ public class ReportService {
     return reports.findByDistrictCodeOrderByReportedAtDescIdDesc(districtCode, Limit.of(limit));
   }
 
+  /**
+   * Reports with a location that presented within the last {@code days} days, newest first, at most
+   * {@code limit}. A null district means the whole country.
+   */
+  @Transactional(readOnly = true)
+  public List<Report> locatedWithin(String districtCode, int days, int limit) {
+    Instant now = clock.instant();
+    return reports.findLocated(
+        now.minus(Duration.ofDays(days)), now, districtCode, Limit.of(limit));
+  }
+
   /** How many reports each district has, by when the patient presented, in [from, to). */
   @Transactional(readOnly = true)
   public Map<String, Long> countsByDistrict(Instant from, Instant to) {

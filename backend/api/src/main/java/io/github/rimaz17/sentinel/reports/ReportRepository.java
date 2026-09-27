@@ -17,6 +17,20 @@ interface ReportRepository extends JpaRepository<Report, UUID> {
   List<Report> findByDistrictCodeOrderByReportedAtDescIdDesc(String districtCode, Limit limit);
 
   /**
+   * Reports with a location that presented in [from, to), newest first, for the map. A null
+   * district means the whole country.
+   */
+  @Query(
+      """
+      select r from Report r join fetch r.facility
+      where r.latitude is not null
+        and r.reportedAt >= :from and r.reportedAt < :to
+        and (:district is null or r.districtCode = :district)
+      order by r.reportedAt desc, r.id desc
+      """)
+  List<Report> findLocated(Instant from, Instant to, String district, Limit limit);
+
+  /**
    * Reports per district in [from, to), as {@code [districtCode, count]}; empty districts omitted.
    */
   @Query(
