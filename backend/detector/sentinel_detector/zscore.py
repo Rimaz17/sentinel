@@ -5,16 +5,21 @@ the eight weeks before it. More than `threshold` standard deviations above their
 mean raises an alert. This is the z-score comparison behind the CDC's EARS
 methods, and it can be explained to a health officer in one sentence.
 
-One refinement: the standard deviation is never taken as less than one report.
-A series with the same count every week, most often zero, has no spread at all,
-and without a floor its first extra report would be infinitely many standard
-deviations out.
+One refinement, measured before it was adopted (docs/adr/0007): the standard
+deviation is never taken as less than the square root of the baseline mean, nor
+less than one report. Counts of independent events vary at least that much (a
+Poisson count's spread is the square root of its mean), but eight weeks are too
+few to show it reliably, and an unluckily steady baseline would otherwise make an
+ordinary week look extraordinary. Against the simulator this cut false alarms by
+two thirds at 3 sd. The floor of one report covers series whose mean is below
+one, most often all zeros, which would otherwise have no spread at all.
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterable
 
+import numpy as np
 import pandas as pd
 
 from sentinel_detector.windows import BASELINE, CURRENT, WEEKS
@@ -52,7 +57,7 @@ def score(weekly: pd.DataFrame, threshold: float = DEFAULT_THRESHOLD) -> pd.Data
         raise ValueError("threshold must be positive")
     baseline = weekly[BASELINE]
     mean = baseline.mean(axis=1)
-    sd = baseline.std(axis=1, ddof=1).clip(lower=MIN_SD)
+    sd = np.maximum(baseline.std(axis=1, ddof=1), np.sqrt(mean)).clip(lower=MIN_SD)
     z = (weekly[CURRENT] - mean) / sd
     return pd.DataFrame(
         {

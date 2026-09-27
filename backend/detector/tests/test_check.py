@@ -80,8 +80,9 @@ def test_a_week_far_above_baseline_raises_a_new_alert(db):
     assert (district, group, status, observed) == ("KDY", "DENGUE_LIKE", "NEW", 41)
     assert first == last == END
     assert float(mean) == 25.0
-    assert float(sd) == pytest.approx(3.55, abs=0.01)
-    assert float(z) == pytest.approx(4.51, abs=0.01) and peak == z
+    # The baseline's own spread (3.5) is below a Poisson count's, so that floor applies.
+    assert float(sd) == 5.0
+    assert float(z) == 3.2 and peak == z
     assert float(threshold) == 3.0
 
 
@@ -131,7 +132,7 @@ def test_an_older_check_does_not_rewrite_a_newer_one(db):
 
 
 def test_the_threshold_used_is_recorded(db):
-    seed_history(db, current=35)
+    seed_history(db, current=39)
 
     assert run_check(db, END, threshold=3.0).alerts == []
     [raised] = run_check(db, END, threshold=2.5).alerts

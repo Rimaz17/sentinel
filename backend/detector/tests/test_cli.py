@@ -32,7 +32,7 @@ def test_run_checks_once_and_reports_what_it_raised(db, api_style_env, capsys):
 
     out = capsys.readouterr().out
     assert "Checked 100 series for the 7 days to 2026-09-27 06:00 UTC: 1 above threshold" in out
-    assert "new" in out and "KDY DENGUE_LIKE" in out and "41 reports, 4.5 sd above baseline" in out
+    assert "new" in out and "KDY DENGUE_LIKE" in out and "41 reports, 3.2 sd above baseline" in out
     assert len(alerts(db)) == 1
 
 
