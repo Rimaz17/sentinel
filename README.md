@@ -41,7 +41,7 @@ spread evenly across a district suggests a wider seasonal wave.
 
 | Phase | Scope | State |
 |---|---|---|
-| 1 | Walking skeleton, facility registry, simulator, ingestion API, PostgreSQL | Not started |
+| 1 | Walking skeleton, facility registry, simulator, ingestion API, PostgreSQL | **Built** |
 | 2 | Detection v1, z-score baseline job writing alerts | Not started |
 | 3 | Dashboard v1, React + Leaflet, polling | Not started |
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | Not started |
@@ -50,8 +50,13 @@ spread evenly across a district suggests a wider seasonal wave.
 | 7 | Ship it, Docker Compose, CI, deployed demo | Not started |
 | n/a | **Landing page**, the public entry point at `/` | **Built** |
 
-The landing page is the one surface that exists today. Every other route renders a
-page stating which phase it belongs to and what will live there; see
+Phase 1 is the backend's walking skeleton: the facility registry seeded from
+Ministry of Health data, a Python simulator posting reports to a Spring Boot
+ingestion API, anonymised reports stored in PostgreSQL, and an endpoint listing
+recent reports. It has no user interface yet; the dashboards arrive in Phase 3.
+
+The landing page is the one browser surface that exists today. Every other route
+renders a page stating which phase it belongs to and what will live there; see
 [ADR 0002](docs/adr/0002-unbuilt-routes-render-placeholders.md).
 
 No detector metrics appear in this README yet, because the detector has not been
@@ -87,9 +92,8 @@ npm run dev
 
 The dev server prints a local URL, normally <http://localhost:5173>.
 
-There is **no backend to run yet**, the landing page is entirely static and makes
-no network requests. Phase 1 is the first phase that produces something to open in
-IntelliJ.
+The landing page is entirely static and makes no network requests; it does not
+need the backend running.
 
 ### Frontend scripts
 
