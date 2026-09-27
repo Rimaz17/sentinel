@@ -1,6 +1,7 @@
 import { dengueVector } from '@/assets/images'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
+import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
 import { caps, cx, labelSm, shell, split, tnum } from '@/styles/recipes'
 
 /** The three measurements the whole system turns on. */
@@ -83,15 +84,7 @@ export function Hero() {
           ))}
         </dl>
 
-        <p
-          className={cx(
-            labelSm,
-            caps,
-            'mt-md w-fit border-l border-l-ochre bg-ochre-wash px-[0.7rem] py-[0.55rem] text-ink-85',
-          )}
-        >
-          All case data simulated · demonstration system
-        </p>
+        <SimulatedNotice className="mt-md" />
       </div>
     </section>
   )
