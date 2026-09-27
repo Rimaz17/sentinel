@@ -167,7 +167,7 @@ Maven is not needed; the Maven wrapper fetches it.
 (and change the password in `.env`), then start PostgreSQL:
 
 ```bash
-cp .env.example .env
+cp infra/.env.example .env
 ```
 
 ```bash
@@ -320,7 +320,8 @@ sentinel/
 ├── frontend/
 │   └── src/assets/        Shipped WebP figures, several widths each
 ├── infra/
-│   └── docker-compose.yml Local PostgreSQL
+│   ├── docker-compose.yml Local PostgreSQL
+│   └── .env.example       Local settings, dummy values; copy to .env at the root
 ├── docs/
 │   ├── adr/               Architecture decision records
 │   └── design/
@@ -331,7 +332,6 @@ sentinel/
 │   ├── build-images.py    Regenerates frontend/src/assets from the originals
 │   ├── facility-registry/ Builds the registry seed from the Ministry of Health list
 │   └── git-hooks/         commit-msg hook
-├── .env.example           Local settings, dummy values; copy to .env
 └── README.md
 ```
 
