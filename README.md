@@ -109,6 +109,105 @@ need the backend running.
 | `npm run test:watch` | Vitest, watch mode |
 | `npm run test:coverage` | Vitest with a v8 coverage report |
 
+## Running the backend
+
+Requires **Docker**, **Java 17** and, for the simulator, **Python 3.12 or later**.
+Maven is not needed; the Maven wrapper fetches it.
+
+**1. Start the database.** From the repository root, copy the example settings
+(and change the password in `.env`), then start PostgreSQL:
+
+```bash
+cp .env.example .env
+```
+
+```bash
+docker compose --env-file .env -f infra/docker-compose.yml up -d
+```
+
+It listens on `localhost:5433`, so it does not collide with a PostgreSQL already
+installed on the default port.
+
+**2. Start the API.** It reads the repository's `.env`, applies the database
+migrations and, on first start, seeds the facility registry. On Windows, use
+`mvnw.cmd`.
+
+```bash
+cd backend/api
+./mvnw spring-boot:run
+```
+
+The API listens on <http://localhost:8080>.
+
+**3. Feed it reports.** The simulator uses only Python's standard library. From
+`backend/simulator`, fill in nine weeks of history, which is what detection
+compares against, then keep reports arriving:
+
+```bash
+python -m sentinel_simulator backfill --days 63
+```
+
+```bash
+python -m sentinel_simulator live
+```
+
+A 63-day backfill posts about 10,000 reports. Live mode posts at the simulated
+real-time rate, around 1,100 reports a week across the country: about twenty an
+hour at a weekday's morning peak and about one an hour overnight, so it is quiet
+by design. `--seed N` makes a run repeatable; `--api-url`, or `SENTINEL_API_URL`,
+points it at another API.
+
+**4. Look at what arrived.**
+
+```bash
+curl "http://localhost:8080/api/reports?limit=5&district=KDY"
+```
+
+### API
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/facilities` | The facility registry; `?district=KDY` for one district. A location is null where it could not be verified. |
+| `POST /api/ingestion/reports` | Submits a report as the facility named in the `X-Facility-Code` header. Answers `202 Accepted` with the report's id. |
+| `GET /api/reports` | Recent reports, newest reported first; `?limit=` 1 to 500 (default 50), `?district=KDY` for one district. |
+
+A report as a facility might send it, identity included:
+
+```json
+{
+  "symptomGroup": "DENGUE_LIKE",
+  "reportedAt": "2026-09-27T09:40:00+05:30",
+  "age": 37,
+  "latitude": 7.2912345,
+  "longitude": 80.6337499,
+  "patientName": "SIMULATED patient 000001",
+  "nicNumber": "SIMULATED-000001",
+  "phoneNumber": "SIMULATED-0000000000",
+  "homeAddress": "SIMULATED address 000001, KDY"
+}
+```
+
+What is stored from it is the facility, its district, `DENGUE_LIKE`, the age band
+`30-39`, the location `7.291, 80.634` and the two timestamps. The symptom groups
+are `DENGUE_LIKE`, `INFLUENZA_LIKE`, `GASTROINTESTINAL` and `LEPTOSPIROSIS_LIKE`.
+`dateOfBirth` (`yyyy-mm-dd`) may stand in for `age`; the location is optional.
+Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details
+that name the field at fault and never repeat what was submitted in it.
+
+**Phase 1 has no authentication.** The header names a facility but does not prove
+it, and every endpoint is open, including report locations. Keep the API on your
+own machine until Phase 4 replaces the header with sign-in; see
+[ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
+
+### Backend checks
+
+| Command | Run from | What it does |
+|---|---|---|
+| `./mvnw verify` | `backend/api` | Formatting check, unit tests, and integration tests against a real PostgreSQL started by Testcontainers (needs Docker) |
+| `./mvnw spotless:apply` | `backend/api` | Format the Java sources |
+| `pip install -r requirements-dev.txt` | `backend/simulator` | Install pytest, Ruff and Black |
+| `pytest` · `ruff check .` · `black .` | `backend/simulator` or `scripts/facility-registry` | Test, lint and format either Python project |
+
 ## Repository layout
 
 ```
