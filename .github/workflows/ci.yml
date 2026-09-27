@@ -67,3 +67,35 @@ jobs:
       # PostgreSQL that Testcontainers starts on the runner's Docker.
       - name: Verify
         run: ./mvnw -B -ntp verify
+
+  python:
+    name: Python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/simulator/requirements-dev.txt
+
+      - name: Install tools
+        run: pip install -r backend/simulator/requirements-dev.txt
+
+      # Each project is checked from its own directory so that Ruff and Black
+      # read that project's pyproject.toml.
+      - name: Simulator
+        working-directory: backend/simulator
+        run: |
+          ruff check .
+          black --check .
+          pytest
+
+      - name: Facility registry build
+        working-directory: scripts/facility-registry
+        run: |
+          ruff check .
+          black --check .
+          pytest
