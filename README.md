@@ -229,8 +229,8 @@ python -m sentinel_detector run
 
 `run` checks once; `watch` checks at a minute past every hour until stopped. A
 check refuses to run until reports reach back 63 days, which the backfill
-provides. Alerts are written to the `alerts` table, numbered from `A-1001`; the
-alert list arrives with the dashboards in Phase 3.
+provides. Alerts are written to the `alerts` table, numbered from `A-1001`, and
+appear in the dashboard's alert list within one poll.
 
 ### Injecting an outbreak
 
@@ -271,6 +271,10 @@ Checked 100 series for the 7 days to 2026-09-27 16:00 UTC: 1 above threshold
 | `GET /api/facilities` | The facility registry; `?district=KDY` for one district. A location is null where it could not be verified. |
 | `POST /api/ingestion/reports` | Submits a report as the facility named in the `X-Facility-Code` header. Answers `202 Accepted` with the report's id. |
 | `GET /api/reports` | Recent reports, newest reported first; `?limit=` 1 to 500 (default 50), `?district=KDY` for one district. |
+| `GET /api/reports/locations` | Reports with a location from the last `?days=` 1 to 63 (default 7), newest first, at most 5,000; `?district=KDY` for one district. The map's dots. |
+| `GET /api/reports/weekly-counts` | Reports per symptom group in each of the last nine seven-day weeks up to now, oldest first, bucketed as the detector buckets them; `?district=KDY` for one district, the whole country without. |
+| `GET /api/districts` | All 25 districts alphabetically, each with its reports over the last seven days and its open alerts. |
+| `GET /api/alerts` | Alerts, most recently detected first; `?limit=` 1 to 200 (default 50), `?district=KDY` for one district. `open` is true while an alert is not closed and was detected within the last 24 hours. |
 
 A report as a facility might send it, identity included:
 
