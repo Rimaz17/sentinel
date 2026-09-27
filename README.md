@@ -212,6 +212,54 @@ points it at another API.
 curl "http://localhost:8080/api/reports?limit=5&district=KDY"
 ```
 
+**5. Run the detector.** It needs pandas and psycopg, and reads the same database
+settings as the API, from `.env`. From `backend/detector`:
+
+```bash
+pip install -r requirements.txt
+```
+
+```bash
+python -m sentinel_detector run
+```
+
+`run` checks once; `watch` checks at a minute past every hour until stopped. A
+check refuses to run until reports reach back 63 days, which the backfill
+provides. Alerts are written to the `alerts` table, numbered from `A-1001`; the
+alert list arrives with the dashboards in Phase 3.
+
+### Injecting an outbreak
+
+`--outbreak` adds an outbreak on top of the simulated baseline, timed from now.
+To see the detector raise an alert, fill in history with an outbreak that began
+four days ago, then check. From `backend/simulator`, then `backend/detector`:
+
+```bash
+python -m sentinel_simulator --seed 2026 --outbreak district=KDY,group=DENGUE_LIKE,extra=60,start=-4d,profile=step backfill --days 63
+```
+
+```bash
+python -m sentinel_detector run
+```
+
+In a run of these commands, the check found that outbreak and nothing else:
+
+```
+Checked 100 series for the 7 days to 2026-09-27 16:00 UTC: 1 above threshold
+  A-1001   new      KDY DENGUE_LIKE         55 reports, 5.2 sd above baseline
+```
+
+| Setting | Meaning |
+|---|---|
+| `district`, `group` | Where, as a district code such as `KDY` and a symptom group such as `DENGUE_LIKE` (required) |
+| `extra` | Extra reports a week at the outbreak's peak (required) |
+| `start` | Offset from now, such as `-4d` or `12h` (default: now) |
+| `days` | How long it lasts (default: 14) |
+| `profile` | `ramp` rises to its peak halfway through and falls; `step` is at full strength throughout (default: `ramp`) |
+| `spread` | `point` bunches patients within about 2 km of one spot, seen by the nearest few facilities; `wave` spreads them across the district (default: `point`) |
+
+`--outbreak` can be repeated, and works with `live` as well as `backfill`.
+
 ### API
 
 | Endpoint | What it does |
@@ -256,6 +304,9 @@ own machine until Phase 4 replaces the header with sign-in; see
 | `./mvnw spotless:apply` | `backend/api` | Format the Java sources |
 | `pip install -r requirements-dev.txt` | `backend/simulator` | Install pytest, Ruff and Black |
 | `pytest` · `ruff check .` · `black .` | `backend/simulator` or `scripts/facility-registry` | Test, lint and format either Python project |
+| `pip install -r requirements-dev.txt` | `backend/detector` | Install the detector's packages with pytest, Ruff, Black and Testcontainers |
+| `pytest` · `ruff check .` · `black .` | `backend/detector` | Test (the integration tests need Docker), lint and format |
+| `python -m sentinel_detector evaluate` | `backend/detector` | Measure detection against simulated outbreaks, as in [Measured detection](#measured-detection); `--seed N` for another run |
 
 ## Repository layout
 
@@ -264,7 +315,8 @@ sentinel/
 ├── backend/
 │   ├── api/               Spring Boot: facility registry, ingestion, reports
 │   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
-│   └── simulator/         Python: simulated reports, backfill and live modes
+│   ├── detector/          Python: hourly z-score check, alerts, evaluation
+│   └── simulator/         Python: simulated reports and outbreaks, backfill and live modes
 ├── frontend/
 │   └── src/assets/        Shipped WebP figures, several widths each
 ├── infra/
