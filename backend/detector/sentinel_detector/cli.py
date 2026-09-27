@@ -3,11 +3,13 @@
 python -m sentinel_detector run
 python -m sentinel_detector run --at 2026-09-27T12:00+05:30
 python -m sentinel_detector watch
+python -m sentinel_detector evaluate
 """
 
 from __future__ import annotations
 
 import argparse
+import random
 import sys
 import time
 from collections.abc import Callable
@@ -40,6 +42,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="check as of this ISO 8601 time with an offset (default: now)",
     )
     watch = commands.add_parser("watch", help="check at the top of every hour until interrupted")
+    evaluate = commands.add_parser(
+        "evaluate", help="measure detection against simulated outbreaks; needs no database"
+    )
+    evaluate.add_argument("--seed", type=int, default=2026, help="random seed (default: 2026)")
+    evaluate.add_argument(
+        "--quiet-weeks",
+        type=int,
+        default=52,
+        help="weeks without outbreaks for the false-alarm rate (default: 52)",
+    )
     for command in (run, watch):
         command.add_argument(
             "--threshold",
@@ -102,8 +114,21 @@ def watch(
         sleep((next_check + WATCH_DELAY - now).total_seconds())
 
 
+def evaluate(seed: int, quiet_weeks: int) -> str:
+    # Imported here: only evaluation needs the simulator alongside the detector.
+    from sentinel_detector import evaluation
+
+    rng = random.Random(seed)
+    trials = evaluation.outbreak_trials(rng)
+    false_alarms = evaluation.false_alarms_per_week(rng, quiet_weeks)
+    return evaluation.report(trials, false_alarms, seed, quiet_weeks)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.command == "evaluate":
+        print(evaluate(args.seed, args.quiet_weeks), end="")
+        return 0
     try:
         settings = connection_settings()
         if args.command == "run":
