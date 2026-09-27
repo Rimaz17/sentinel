@@ -212,8 +212,14 @@ own machine until Phase 4 replaces the header with sign-in; see
 
 ```
 sentinel/
+├── backend/
+│   ├── api/               Spring Boot: facility registry, ingestion, reports
+│   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
+│   └── simulator/         Python: simulated reports, backfill and live modes
 ├── frontend/
 │   └── src/assets/        Shipped WebP figures, several widths each
+├── infra/
+│   └── docker-compose.yml Local PostgreSQL
 ├── docs/
 │   ├── adr/               Architecture decision records
 │   └── design/
@@ -222,7 +228,9 @@ sentinel/
 │       └── source-images/ Full-resolution originals (archived, not shipped)
 ├── scripts/
 │   ├── build-images.py    Regenerates frontend/src/assets from the originals
+│   ├── facility-registry/ Builds the registry seed from the Ministry of Health list
 │   └── git-hooks/         commit-msg hook
+├── .env.example           Local settings, dummy values; copy to .env
 └── README.md
 ```
 
@@ -237,9 +245,6 @@ python scripts/build-images.py
 
 Needs Pillow (`pip install Pillow`). It reads `docs/design/source-images/` and
 writes `frontend/src/assets/`.
-
-`backend/` and `infra/` are not scaffolded yet; they arrive with the phase that
-needs them.
 
 ## Contributing to this repository
 
