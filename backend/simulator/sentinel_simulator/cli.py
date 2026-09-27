@@ -1,0 +1,122 @@
+"""Command line: fill in history, or keep reports flowing in real time.
+
+    python -m sentinel_simulator backfill --days 63
+    python -m sentinel_simulator live
+
+Detection compares the last 7 days with the 8 weeks before them, so a 63-day
+backfill gives it a full window on first run.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import random
+import sys
+import time
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
+
+from sentinel_simulator.client import ApiError, SentinelClient
+from sentinel_simulator.generator import Generator
+
+DEFAULT_API_URL = "http://localhost:8080"
+PROGRESS_EVERY = 1000
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        prog="python -m sentinel_simulator",
+        description="Post simulated symptom reports to the Sentinel ingestion API.",
+    )
+    parser.add_argument(
+        "--api-url",
+        default=os.environ.get("SENTINEL_API_URL", DEFAULT_API_URL),
+        help="API base URL (default: $SENTINEL_API_URL, else %(default)s)",
+    )
+    parser.add_argument("--seed", type=int, help="random seed, for a repeatable run")
+    parser.add_argument(
+        "--spread-km",
+        type=float,
+        default=2.0,
+        help="how far patients live from their facility, as a standard deviation (default: 2)",
+    )
+    commands = parser.add_subparsers(dest="command", required=True)
+
+    backfill = commands.add_parser("backfill", help="post reports for the past N days, then stop")
+    backfill.add_argument("--days", type=int, default=63, help="days of history (default: 63)")
+
+    live = commands.add_parser("live", help="post reports as they happen, until interrupted")
+    live.add_argument(
+        "--interval", type=float, default=60.0, help="seconds between batches (default: 60)"
+    )
+    return parser.parse_args(argv)
+
+
+def backfill(client, generator: Generator, days: int, now: datetime) -> int:
+    start = now - timedelta(days=days)
+    posted = 0
+    began = time.monotonic()
+    for report in generator.reports(start, now):
+        client.submit(report)
+        posted += 1
+        if posted % PROGRESS_EVERY == 0:
+            print(f"  {posted:,} reports posted", flush=True)
+    elapsed = time.monotonic() - began
+    rate = posted / elapsed if elapsed > 0 else 0.0
+    print(
+        f"Backfill complete: {posted:,} reports over {days} days"
+        f" in {elapsed:.1f} s ({rate:.0f}/s)"
+    )
+    return posted
+
+
+def live(
+    client,
+    generator: Generator,
+    interval: float,
+    clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+    sleep: Callable[[float], None] = time.sleep,
+    batches: int | None = None,
+) -> int:
+    """Post each interval's reports at the end of it. `batches` bounds the loop for testing."""
+    posted = 0
+    since = clock()
+    done = 0
+    while batches is None or done < batches:
+        sleep(interval)
+        now = clock()
+        batch = 0
+        for report in generator.reports(since, now):
+            client.submit(report)
+            batch += 1
+        posted += batch
+        done += 1
+        print(f"{now:%H:%M:%S} UTC  {batch} reports  ({posted:,} this run)", flush=True)
+        since = now
+    return posted
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    rng = random.Random(args.seed)
+    try:
+        with SentinelClient(args.api_url) as client:
+            facilities = client.facilities()
+            generator = Generator(facilities, rng, spread_km=args.spread_km)
+            located = sum(1 for f in facilities if f.latitude is not None)
+            print(f"{len(facilities):,} facilities in the registry, {located:,} with a location")
+            if args.command == "backfill":
+                backfill(client, generator, args.days, datetime.now(UTC))
+            else:
+                print(f"Posting live every {args.interval:g} s; Ctrl+C to stop", flush=True)
+                live(client, generator, args.interval)
+    except KeyboardInterrupt:
+        print("Stopped.")
+    except ApiError as error:
+        print(f"The API refused a request: {error}", file=sys.stderr)
+        return 1
+    except OSError as error:
+        print(f"Could not reach the API at {args.api_url}: {error}", file=sys.stderr)
+        return 1
+    return 0
