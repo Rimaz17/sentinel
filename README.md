@@ -331,12 +331,17 @@ own machine until Phase 4 replaces the header with sign-in; see
 ```
 sentinel/
 ├── backend/
-│   ├── api/               Spring Boot: facility registry, ingestion, reports
+│   ├── api/               Spring Boot: facility registry, ingestion, reports, districts, alerts
 │   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
 │   ├── detector/          Python: hourly z-score check, alerts, evaluation
 │   └── simulator/         Python: simulated reports and outbreaks, backfill and live modes
 ├── frontend/
-│   └── src/assets/        Shipped WebP figures, several widths each
+│   └── src/
+│       ├── assets/        Shipped WebP figures, several widths each
+│       └── features/
+│           ├── landing/   The public landing page at /
+│           └── dashboard/ The internal dashboard at /app: api client, alert and
+│                          district lists, Leaflet map, weekly chart
 ├── infra/
 │   ├── docker-compose.yml Local PostgreSQL
 │   └── .env.example       Local settings, dummy values; copy to .env at the root
@@ -405,8 +410,18 @@ These are documented on purpose and are not defects.
   1,505. See [ADR 0006](docs/adr/0006-facility-locations-verified-before-use.md)
   and [the registry's README](scripts/facility-registry/README.md).
 - **No authentication until Phase 4.** A facility names itself in a request
-  header, and every endpoint is open. See
+  header, and every endpoint is open, including the internal dashboard at `/app`
+  with its report positions and unpublished alerts. The dashboard says so on
+  screen. See
   [ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
+- **No public dashboard yet.** `/dashboard`, the reduced public view of shaded
+  districts, arrives with accounts and roles in Phase 4; `/app` is the internal
+  view and must not be exposed publicly.
+- **Map tiles depend on OpenStreetMap's tile server,** whose usage policy suits a
+  demonstration but not production traffic. See
+  [ADR 0010](docs/adr/0010-openstreetmap-tiles.md).
+- **The dashboard polls rather than being pushed to.** A new report appears
+  within 30 seconds; alerts are pushed over WebSocket from Phase 5.
 - **Small or gradual outbreaks are caught late or not at all.** At the shipped
   3 sd, an outbreak adding half again to a district's usual week is detected
   28% of the time, and the median time to detect across all injected outbreaks
