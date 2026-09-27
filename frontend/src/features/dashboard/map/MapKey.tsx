@@ -1,5 +1,5 @@
 import { cx, labelSm, tnum } from '@/styles/recipes'
-import { SYMPTOM_GROUPS, type Facility, type LocatedReport } from '../api/types'
+import { SYMPTOM_GROUPS, type Facility, type LocatedReport, type SymptomGroup } from '../api/types'
 import { formatCount } from '../format'
 import { SYMPTOM_GROUP_STYLES } from '../symptomGroups'
 import { countByGroup, MAP_LIMIT } from './counts'
@@ -10,14 +10,29 @@ type MapKeyProps = {
   reportsInArea: number
   facilities: Facility[]
   areaName: string
+  /** Groups the reader has taken off the map. */
+  hidden: ReadonlySet<SymptomGroup>
+  onToggle: (group: SymptomGroup) => void
 }
 
 /**
  * The map in words, and its key. A screen reader user, or anyone who cannot
  * tell the group colours apart, gets the same counts the dots show, and the
  * key says what is not drawn and why.
+ *
+ * Each group can be taken off the map. Two pairs of the fixed group hues sit
+ * close together (gastrointestinal and leptospirosis-like for everyone,
+ * dengue-like and influenza-like with red-green colour blindness), so the key
+ * gives a second way to tell them apart: show one group at a time.
  */
-export function MapKey({ reports, reportsInArea, facilities, areaName }: MapKeyProps) {
+export function MapKey({
+  reports,
+  reportsInArea,
+  facilities,
+  areaName,
+  hidden,
+  onToggle,
+}: MapKeyProps) {
   const byGroup = countByGroup(reports)
   const unlocated = Math.max(0, reportsInArea - reports.length)
   const located = facilities.filter((facility) => facility.latitude !== null)
@@ -33,9 +48,19 @@ export function MapKey({ reports, reportsInArea, facilities, areaName }: MapKeyP
         {reports.length >= MAP_LIMIT ? ` Only the newest ${formatCount(MAP_LIMIT)} are drawn.` : ''}
       </p>
 
-      <ul aria-label="Map key" className="flex flex-wrap gap-x-md gap-y-3xs">
+      <fieldset className="m-0 flex flex-wrap gap-x-md gap-y-3xs border-0 p-0">
+        <legend className="sr-only">Show on the map</legend>
         {SYMPTOM_GROUPS.map((group) => (
-          <li key={group} className="inline-flex items-center gap-[0.4rem] text-small">
+          <label
+            key={group}
+            className="inline-flex cursor-pointer items-center gap-[0.4rem] text-small"
+          >
+            <input
+              type="checkbox"
+              checked={!hidden.has(group)}
+              onChange={() => onToggle(group)}
+              className="m-0 size-[0.85rem] cursor-pointer"
+            />
             <span
               aria-hidden="true"
               className={cx(
@@ -45,10 +70,10 @@ export function MapKey({ reports, reportsInArea, facilities, areaName }: MapKeyP
             />
             {SYMPTOM_GROUP_STYLES[group].label}
             <span className={cx(labelSm, 'text-ink-70', tnum)}>{formatCount(byGroup[group])}</span>
-          </li>
+          </label>
         ))}
         {facilities.length > 0 ? (
-          <li className="inline-flex items-center gap-[0.4rem] text-small">
+          <p className="inline-flex items-center gap-[0.4rem] text-small">
             <span
               aria-hidden="true"
               className="inline-block size-[0.75rem] rounded-full border-[1.5px] border-ink"
@@ -57,9 +82,9 @@ export function MapKey({ reports, reportsInArea, facilities, areaName }: MapKeyP
             <span className={cx(labelSm, 'text-ink-70', tnum)}>
               {formatCount(located.length)} of {formatCount(facilities.length)} located
             </span>
-          </li>
+          </p>
         ) : null}
-      </ul>
+      </fieldset>
     </div>
   )
 }
