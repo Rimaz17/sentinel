@@ -124,14 +124,16 @@ and are measured when Kafka arrives in Phase 5.
 | Event stream | Kafka |
 | Database | PostgreSQL + PostGIS, Flyway |
 | Live counters | Redis |
-| Frontend | React + TypeScript + Vite |
-| Maps | Leaflet with OpenStreetMap / CARTO tiles |
+| Frontend | React + TypeScript + Vite, Tailwind CSS, TanStack Query |
+| Maps | Leaflet with OpenStreetMap tiles |
 | Local stack | Docker Compose |
 | CI | GitHub Actions |
 
 Google Maps is not used anywhere. Its terms forbid using its tiles outside its own
-SDK, which is why it requires billing. Leaflet with free OSM/CARTO tiles needs no
-API key and no billing, and PostGIS handles all spatial queries.
+SDK, which is why it requires billing. Leaflet with free OpenStreetMap tiles needs
+no API key and no billing, and PostGIS handles all spatial queries. CARTO's
+basemaps were the first choice but now stamp "API key required" on keyless tiles;
+see [ADR 0010](docs/adr/0010-openstreetmap-tiles.md).
 
 ## Running the frontend
 
@@ -147,6 +149,14 @@ The dev server prints a local URL, normally <http://localhost:5173>.
 
 The landing page is entirely static and makes no network requests; it does not
 need the backend running.
+
+The internal dashboard at <http://localhost:5173/app> needs the API (see
+[Running the backend](#running-the-backend)). The dev and preview servers pass
+every request under `/api` to <http://localhost:8080>, so the browser only ever
+talks to its own origin and the API needs no CORS setting; set
+`SENTINEL_API_URL` before `npm run dev` to point them elsewhere. `/app` shows the
+whole country and `/app/districts/KDY` one district. Every panel polls every 30
+seconds while the tab is visible, and **Refresh now** asks at once.
 
 ### Frontend scripts
 
