@@ -279,6 +279,15 @@ These are documented on purpose and are not defects.
   reused. A production system would add per-user verification.
 - **Facility data is from 2022.** Some facilities may since have opened, closed or
   been renamed.
+- **Only 817 of the 1,501 facilities have a location.** The source coordinates
+  were machine geocoded and many are wrong, so a location is kept only where it
+  passes verification. The registry holds 1,501 facilities rather than the 1,505
+  the project overview quotes, because no principled filter of the source gives
+  1,505. See [ADR 0006](docs/adr/0006-facility-locations-verified-before-use.md)
+  and [the registry's README](scripts/facility-registry/README.md).
+- **No authentication until Phase 4.** A facility names itself in a request
+  header, and every endpoint is open. See
+  [ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
 - **Detection assumes a stable baseline.** A prior year containing a real epidemic
   inflates "normal" and reduces future sensitivity. Periodic recalibration would be
   needed.
