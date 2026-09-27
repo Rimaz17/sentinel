@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { caps, cx, labelSm, tnum } from '@/styles/recipes'
 import type { Alert } from './api/types'
 import { formatAgo, formatDateTime, formatDecimal, formatSigma } from './format'
+import { districtPath } from './paths'
 import { EmptyState, LoadingRows, QueryView } from './QueryView'
 import { SYMPTOM_GROUP_STYLES } from './symptomGroups'
 
@@ -73,10 +74,7 @@ function AlertItem({
 
       <p className="flex flex-wrap items-center gap-x-xs text-small">
         {linkDistrict ? (
-          <Link
-            to={`/app/districts/${alert.districtCode}`}
-            className="font-medium text-ink underline"
-          >
+          <Link to={districtPath(alert.districtCode)} className="font-medium text-ink underline">
             {alert.districtName}
           </Link>
         ) : (
