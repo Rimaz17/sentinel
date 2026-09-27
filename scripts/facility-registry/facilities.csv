@@ -1,0 +1,1502 @@
+code,name,district_code,category,institution_type,latitude,longitude,location_status
+LAN0000034,Anuradhapura,ANU,HOSPITAL,Teaching,,,shared_point
+LAP0000059,Ampara,AMP,HOSPITAL,District General,7.298334,81.690841,verified
+LBC0000075,Batticoloa,BTC,HOSPITAL,Teaching,7.708032,81.690622,verified
+LBD0000083,Badulla,BDL,HOSPITAL,Provincial General,6.993369,81.055048,verified
+LCB0000018,National Hospital of Sri Lanka,CMB,HOSPITAL,Teaching,,,shared_point
+LCB0000117,"Infectious Diseases Hospital, Angoda",CMB,HOSPITAL,Base A,6.922551,79.918215,verified
+LCB0000125,Mulleriyawa,CMB,HOSPITAL,Base B,6.924893,79.942914,verified
+LCB0000133,"Prison Hospital, Watareka",CMB,HOSPITAL,Prison,6.858747,80.064364,verified
+LCB0000158,The National Institute for Nephrology Dialysis & Transplantation,CMB,HOSPITAL,Nephrology,6.932434,79.871571,verified
+LCB0000166,Castle Street Hospital for Women,CMB,HOSPITAL,Teaching,,,shared_point
+LCB0000174,Colombo South (Kalubovila),CMB,HOSPITAL,Teaching,,,shared_point
+LCB0000182,De Soysa Hospital for Women,CMB,HOSPITAL,Teaching,6.919981,79.870546,verified
+LCB0000190,National Eye Hospital,CMB,HOSPITAL,Teaching,6.918577,79.865198,verified
+LCB0000208,"Apeksha Hospital, Maharagama",CMB,HOSPITAL,Teaching,,,shared_point
+LCB0000216,Lady Ridgeway,CMB,HOSPITAL,Teaching,,,shared_point
+LCB0000224,National Dental Hospital,CMB,HOSPITAL,Teaching,6.917316,79.866110,verified
+LCB0000232,"National Institute for Mental Health, Angoda",CMB,HOSPITAL,Teaching,,,shared_point
+LCB0000240,Sri Jayawardenepura,CMB,HOSPITAL,Teaching,6.868546,79.925499,verified
+LCB0017210,"Prison Hospital, Welikada",CMB,HOSPITAL,Prison,6.920964,79.877937,verified
+LGL0000620,Karapitiya,GAL,HOSPITAL,Teaching,,,shared_point
+LGL0000638,Mahamodara,GAL,HOSPITAL,Teaching,6.039132,80.205512,verified
+LGL0005074,"Prison Hospital, Galle",GAL,HOSPITAL,Prison,6.034162,80.213317,verified
+LGL0017244,"Prison Hospital, Boosa",GAL,HOSPITAL,Prison,,,shared_point
+LGP0000679,Kandana,GMP,HOSPITAL,Divisional A,7.041002,79.902062,verified
+LGP0000687,"Leprosy Hospital, Hendala",GMP,HOSPITAL,Divisional B,,,shared_point
+LGP0000695,"Mental Hospital, Hendala (Kandana)",GMP,HOSPITAL,Mental,,,shared_point
+LGP0000703,Colombo North (Ragama),GMP,HOSPITAL,Teaching,7.028622,79.924252,verified
+LGP0000711,"National Hospital for Respiratory Diseases, (Chest Hospital, Welisara)",GMP,HOSPITAL,Teaching,7.024886,79.903527,verified
+LGP0000729,"Rehabilitation Hospital, Ragama",GMP,HOSPITAL,Teaching,7.022961,79.924111,verified
+LGP0001263,"Prison Hospital, Mahara",GMP,HOSPITAL,Prison,,,shared_point
+LGP0001271,Vijaya Kumaratunga Memorial Hospital,GMP,HOSPITAL,Divisional A,7.126335,79.877841,verified
+LHT0000760,Hambantota,HMB,HOSPITAL,District General,6.126763,81.122582,verified
+LJF0000786,Jaffna,JAF,HOSPITAL,Teaching,,,shared_point
+LJF0017251,"Prison Hospital, Jaffna",JAF,HOSPITAL,Prison,9.667300,80.002784,verified
+LKE0000810,Kegalle,KEG,HOSPITAL,District General,7.247767,80.345253,verified
+LKG0000828,Kurunegala,KUR,HOSPITAL,Provincial General,7.479122,80.359115,verified
+LKL0000844,Akkaraipattu (Elawatuwan),AMP,HOSPITAL,Base A,7.227393,81.850915,verified
+LKL0000851,Kalmunai North,AMP,HOSPITAL,Base A,7.420034,81.822320,verified
+LKL0000869,Kalmunai South (Ashroff Memorial Hospital),AMP,HOSPITAL,Base A,7.403172,81.831146,verified
+LKN0000877,Jayapuram,KIL,HOSPITAL,PMCU,,,shared_point
+LKT0000885,Beruwala,KLT,HOSPITAL,Base B,6.472087,79.983492,verified
+LKT0000893,Kalutara,KLT,HOSPITAL,District General,,,shared_point
+LKT0000901,Aluthgamweediya (Darga Town),KLT,HOSPITAL,Divisional B,6.442182,80.018081,verified
+LKT0000919,Aluthgama,KLT,HOSPITAL,Divisional C,,,shared_point
+LKT0000927,Beruwala,KLT,MOH_OFFICE,MOH,6.437559,79.999356,verified
+LKT0000935,Kalutara,KLT,MOH_OFFICE,MOH,,,shared_point
+LKT0017236,"Prison Hospital, Kaluthara",KLT,HOSPITAL,Prison,6.610791,79.974625,verified
+LKY0000984,Gampola,KDY,HOSPITAL,Base B,7.156139,80.565055,verified
+LKY0000992,"Dental Institute, Peradeniya",KDY,HOSPITAL,Dental,7.266543,80.599364,verified
+LKY0001008,Kandy,KDY,HOSPITAL,Teaching,,,shared_point
+LKY0001016,Peradeniya,KDY,HOSPITAL,Teaching,7.266279,80.597654,verified
+LKY0001024,"Sirimavo Bandaranayake Specialised Children's Hospital, Peradeniya",KDY,HOSPITAL,Teaching,7.267425,80.597098,verified
+LMG0001065,Monaragala,MON,HOSPITAL,District General,,,shared_point
+LMR0001073,Matara,MTR,HOSPITAL,District General,5.947904,80.549685,verified
+LNE0001099,Nuwara Eliya,NEL,HOSPITAL,District General,6.974103,80.780151,verified
+LPN0001115,Polonnaruwa,POL,HOSPITAL,District General,7.943206,81.009552,verified
+LPT0001123,Chilaw,PTM,HOSPITAL,District General,7.571570,79.797103,verified
+LPT0017228,"Prison Hospital, Negambo",PTM,HOSPITAL,Prison,,,wrong_district
+LRP0001149,Rathnapura,RAT,HOSPITAL,Provincial General,6.686824,80.393088,verified
+LTM0001172,Kantalai,TRC,HOSPITAL,Base A,8.366638,81.004746,verified
+LTM0001180,Trincomalee,TRC,HOSPITAL,District General,,,shared_point
+PAN0001347,Thambuttegama,ANU,HOSPITAL,Base A,8.153709,80.293697,verified
+PAN0001354,Kahatagasdigiliya,ANU,HOSPITAL,Base B,8.434465,80.698791,verified
+PAN0001362,Kebitigollewa,ANU,HOSPITAL,Base B,8.642117,80.667962,verified
+PAN0001370,Kekirawa,ANU,HOSPITAL,Base B,8.043833,80.595900,verified
+PAN0001388,Medawachchiya,ANU,HOSPITAL,Base B,8.540998,80.491346,verified
+PAN0001396,Padaviya,ANU,HOSPITAL,Base B,8.832301,80.769017,verified
+PAN0001404,Nochchiyagama,ANU,HOSPITAL,Divisional A,,,shared_point
+PAN0001412,Elayapattuwa,ANU,HOSPITAL,Divisional B,,,shared_point
+PAN0001420,Eppawala,ANU,HOSPITAL,Divisional B,8.146169,80.411562,verified
+PAN0001438,Galenbindunuwewa,ANU,HOSPITAL,Divisional B,8.288420,80.716969,verified
+PAN0001446,Galnewa,ANU,HOSPITAL,Divisional B,8.036735,80.478136,verified
+PAN0001453,Horowpathana,ANU,HOSPITAL,Divisional B,,,shared_point
+PAN0001461,Huruluwewa,ANU,HOSPITAL,Divisional B,8.219300,80.702840,verified
+PAN0001479,Maradankadawala,ANU,HOSPITAL,Divisional B,8.126467,80.564423,verified
+PAN0001487,Mihintale,ANU,HOSPITAL,Divisional B,8.355050,80.509287,verified
+PAN0001495,Talawa,ANU,HOSPITAL,Divisional B,8.233797,80.348381,verified
+PAN0001503,Thantirimale,ANU,HOSPITAL,Divisional B,8.579069,80.257696,verified
+PAN0001511,Andiyagala,ANU,HOSPITAL,Divisional C,7.900891,80.522546,verified
+PAN0001529,Galkeriyagama,ANU,HOSPITAL,Divisional C,,,shared_point
+PAN0001537,Habarana,ANU,HOSPITAL,Divisional C,8.038522,80.756182,verified
+PAN0001545,Kalawewa,ANU,HOSPITAL,Divisional C,7.997612,80.536147,verified
+PAN0001552,Kallanchiya,ANU,HOSPITAL,Divisional C,,,shared_point
+PAN0001560,Kapugollewa,ANU,HOSPITAL,Divisional C,,,shared_point
+PAN0001578,Katiyawa,ANU,HOSPITAL,Divisional C,8.101942,80.383179,verified
+PAN0001586,Mahawilachchiya,ANU,HOSPITAL,Divisional C,8.494303,80.186519,verified
+PAN0001594,Nachchaduwa,ANU,HOSPITAL,Divisional C,8.246228,80.458697,verified
+PAN0001602,Negampaha,ANU,HOSPITAL,Divisional C,7.998915,80.461899,verified
+PAN0001610,Nelubewa,ANU,HOSPITAL,Divisional C,8.280358,80.391957,verified
+PAN0001628,Pairamaduwa,ANU,HOSPITAL,Divisional C,8.260546,80.600767,verified
+PAN0001636,Parasangaswewa,ANU,HOSPITAL,Divisional C,8.440977,80.433836,verified
+PAN0001644,Rajanganaya Tr 11,ANU,HOSPITAL,Divisional C,8.198831,80.152655,verified
+PAN0001651,Rajanganaya Tr 5,ANU,HOSPITAL,Divisional C,8.165821,80.213789,verified
+PAN0001669,Rambewa,ANU,HOSPITAL,Divisional C,8.438832,80.503598,verified
+PAN0001677,Ranorawa,ANU,HOSPITAL,Divisional C,8.362260,80.238358,verified
+PAN0001685,Ratmalgahawewa,ANU,HOSPITAL,Divisional C,8.532239,80.672961,verified
+PAN0001693,Senapura,ANU,HOSPITAL,Divisional C,8.092265,80.470433,verified
+PAN0001701,Thammennawa,ANU,HOSPITAL,Divisional C,8.374902,80.597745,verified
+PAN0001719,Wahalkada,ANU,HOSPITAL,Divisional C,,,shared_point
+PAN0001727,"Prison Hospital, Anuradhapura",ANU,HOSPITAL,Prison,,,shared_point
+PAN0001735,Devanampiyatissapura,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001743,Ethakada,ANU,HOSPITAL,PMCU,8.614527,80.566730,verified
+PAN0001750,Galadivulwewa,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001768,Galkulama,ANU,HOSPITAL,PMCU,8.270776,80.501314,verified
+PAN0001776,Gambirigaswewa,ANU,HOSPITAL,PMCU,8.481699,80.384172,verified
+PAN0001784,Jayawewa,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001792,Kendewa,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001800,Koonwewa,ANU,HOSPITAL,PMCU,8.398623,80.747474,verified
+PAN0001818,Kunchikulama,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001826,Labunoruwa,ANU,HOSPITAL,PMCU,8.171657,80.613900,verified
+PAN0001834,Madatugama,ANU,HOSPITAL,PMCU,7.944973,80.628836,verified
+PAN0001842,Mahailluppallama,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001859,Mahasenpura,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001867,Padavi-Parakramapura,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001875,Poonewa,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001883,Pubudupura,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001891,Puliyankulama,ANU,HOSPITAL,PMCU,8.384282,80.430949,verified
+PAN0001909,Ranajayapura,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001917,Sacred City,ANU,HOSPITAL,PMCU,8.353779,80.399167,verified
+PAN0001925,Tittagonewa,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001933,Vijayapura,ANU,HOSPITAL,PMCU,,,shared_point
+PAN0001941,Galenbindunuwewa,ANU,MOH_OFFICE,MOH,8.292134,80.717284,verified
+PAN0001958,Galkiriyagama (Palagala),ANU,MOH_OFFICE,MOH,7.926347,80.571877,verified
+PAN0001966,Galnewa,ANU,MOH_OFFICE,MOH,8.033947,80.481165,verified
+PAN0001974,Horowpothana,ANU,MOH_OFFICE,MOH,,,shared_point
+PAN0001982,Ipalogama,ANU,MOH_OFFICE,MOH,,,wrong_district
+PAN0001990,Kahatagasdigiliya,ANU,MOH_OFFICE,MOH,8.427329,80.689909,verified
+PAN0002006,Kebithigollewa,ANU,MOH_OFFICE,MOH,,,shared_point
+PAN0002014,Kekirawa,ANU,MOH_OFFICE,MOH,8.043485,80.596034,verified
+PAN0002022,Medawachchiya,ANU,MOH_OFFICE,MOH,8.541003,80.490012,verified
+PAN0002030,Mihinthale,ANU,MOH_OFFICE,MOH,8.357708,80.509018,verified
+PAN0002048,Nachchiyadoowa,ANU,MOH_OFFICE,MOH,,,shared_point
+PAN0002055,Nochchiyagama,ANU,MOH_OFFICE,MOH,,,shared_point
+PAN0002063,Nuwaragam Palatha Central,ANU,MOH_OFFICE,MOH,8.341215,80.374096,verified
+PAN0002071,Nuwaragam Palatha East,ANU,MOH_OFFICE,MOH,8.324809,80.412262,verified
+PAN0002089,Padaviya,ANU,MOH_OFFICE,MOH,8.833153,80.768474,verified
+PAN0002097,Palugaswewa,ANU,MOH_OFFICE,MOH,8.065940,80.703255,verified
+PAN0002105,Rajanganaya,ANU,MOH_OFFICE,MOH,8.165264,80.213870,verified
+PAN0002113,Rambewa,ANU,MOH_OFFICE,MOH,8.438263,80.504725,verified
+PAN0002121,Thalawa,ANU,MOH_OFFICE,MOH,,,shared_point
+PAN0002139,Thambuttegama,ANU,MOH_OFFICE,MOH,,,shared_point
+PAN0002147,Thirappane,ANU,MOH_OFFICE,MOH,8.222740,80.520301,verified
+PAN0002154,Wilachchiya,ANU,MOH_OFFICE,MOH,,,shared_point
+PAP0002246,Dehiattakandiya,AMP,HOSPITAL,Base B,7.672907,81.043374,verified
+PAP0002253,Mahaoya,AMP,HOSPITAL,Base B,7.530796,81.355549,verified
+PAP0002261,Padiyatalawa,AMP,HOSPITAL,Divisional B,7.409811,81.242493,verified
+PAP0002279,Damana,AMP,HOSPITAL,Divisional C,7.200636,81.656029,verified
+PAP0002287,Lahugala,AMP,HOSPITAL,Divisional C,6.877996,81.718422,verified
+PAP0002295,Panama,AMP,HOSPITAL,Divisional C,6.756084,81.804473,verified
+PAP0002303,Senarathpura,AMP,HOSPITAL,Divisional C,7.449327,81.626258,verified
+PAP0002311,Thottama,AMP,HOSPITAL,Divisional C,7.119456,81.688745,verified
+PAP0002329,Wadinagala,AMP,HOSPITAL,Divisional C,7.129095,81.571711,verified
+PAP0002337,Ambagahawella,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002345,Koknahara,AMP,HOSPITAL,PMCU,,,wrong_district
+PAP0002352,Kolomanthalawa,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002360,Lihiniyagama,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002378,Madawalalanda,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002386,Mangalagama,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002394,Mawanawela,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002402,Muwangala,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002410,Namaloya,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002428,Nawamadagama,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002436,Pannalgama,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002444,Paragahakella,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002451,Sadunpura,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002469,Tampitiya,AMP,HOSPITAL,PMCU,,,wrong_district
+PAP0002477,Uhana,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002485,Weeragoda,AMP,HOSPITAL,PMCU,,,shared_point
+PAP0002493,Ampara,AMP,MOH_OFFICE,MOH,7.296412,81.689717,verified
+PAP0002501,Damana,AMP,MOH_OFFICE,MOH,7.197982,81.655380,verified
+PAP0002519,Dehiattakandiya,AMP,MOH_OFFICE,MOH,,,shared_point
+PAP0002527,Lahugala,AMP,MOH_OFFICE,MOH,6.880658,81.765015,verified
+PAP0002535,Maha Oya,AMP,MOH_OFFICE,MOH,7.530116,81.354519,verified
+PAP0002543,Padiyatalawa,AMP,MOH_OFFICE,MOH,7.410629,81.244250,verified
+PAP0002550,Uhana,AMP,MOH_OFFICE,MOH,7.366110,81.635657,verified
+PBC0002576,Kaluwanchikudy,BTC,HOSPITAL,Base A,7.517240,81.785184,verified
+PBC0002584,Valachchanai,BTC,HOSPITAL,Base A,,,shared_point
+PBC0002592,Eravur,BTC,HOSPITAL,Base B,7.783168,81.605999,verified
+PBC0002600,Kattankudy,BTC,HOSPITAL,Base B,7.685147,81.739078,verified
+PBC0002618,Araipattai (Arayampathy),BTC,HOSPITAL,Divisional A,7.672855,81.734070,verified
+PBC0002626,Periyakallar (Kellar),BTC,HOSPITAL,Divisional A,7.466773,81.811674,verified
+PBC0002634,Chengalady,BTC,HOSPITAL,Divisional B,7.783546,81.589961,verified
+PBC0002642,Karadiyanaru,BTC,HOSPITAL,Divisional B,7.700216,81.539779,verified
+PBC0002659,Vakarai,BTC,HOSPITAL,Divisional B,8.134552,81.435328,verified
+PBC0002667,Cheddipalayam,BTC,HOSPITAL,Divisional C,7.579797,81.780843,verified
+PBC0002675,Kathiravely,BTC,HOSPITAL,Divisional C,,,shared_point
+PBC0002683,Kokkodicholai (Mahiladithivu),BTC,HOSPITAL,Divisional C,7.623207,81.718327,verified
+PBC0002691,Mandapathady,BTC,HOSPITAL,Divisional C,,,shared_point
+PBC0002709,Mandur,BTC,HOSPITAL,Divisional C,7.478787,81.754695,verified
+PBC0002717,Mavadi Vambu (Vantharamoolai),BTC,HOSPITAL,Divisional C,,,shared_point
+PBC0002725,Meeravodai,BTC,HOSPITAL,Divisional C,7.901266,81.523243,verified
+PBC0002733,Nawalkadu,BTC,HOSPITAL,Divisional C,,,shared_point
+PBC0002741,Palamenamadu,BTC,HOSPITAL,Divisional C,,,shared_point
+PBC0002758,Palamunai,BTC,HOSPITAL,Divisional C,,,shared_point
+PBC0002766,Palugamam,BTC,HOSPITAL,Divisional C,7.543988,81.757324,verified
+PBC0002774,Santhively,BTC,HOSPITAL,Divisional C,,,shared_point
+PBC0002782,Bakkiella,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002790,Kaluthawalai,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002808,Kangeyannoddi (Kanyanodi),BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002816,Kawattamunai,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002824,Koddaimunai,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002832,Mahilavedduvan,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002840,Mahiloor,BTC,HOSPITAL,PMCU,7.534854,81.701751,verified
+PBC0002857,Mankerney,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002865,Meerakeney,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002873,Navalady,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002881,Palayadivaddai,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002899,Pullumalai,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002907,Rethithanai,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002915,Thiraimadu,BTC,HOSPITAL,PMCU,7.749017,81.671387,verified
+PBC0002923,Thuraineelavanai,BTC,HOSPITAL,Divisional C,7.442228,81.800413,verified
+PBC0002931,Unnichchi,BTC,HOSPITAL,PMCU,,,shared_point
+PBC0002949,"Leprosy Hospital, Manthivu",BTC,HOSPITAL,Leprosy,,,wrong_district
+PBC0002956,Arayampathy,BTC,MOH_OFFICE,MOH,7.672862,81.735019,verified
+PBC0002964,Batticoloa,BTC,MOH_OFFICE,MOH,,,shared_point
+PBC0002972,Chenkalady,BTC,MOH_OFFICE,MOH,7.783599,81.593367,verified
+PBC0002980,Eravur,BTC,MOH_OFFICE,MOH,7.783664,81.605626,verified
+PBC0002998,Kalawanchikudy,BTC,MOH_OFFICE,MOH,,,shared_point
+PBC0003004,Katankudy,BTC,MOH_OFFICE,MOH,7.683586,81.730767,verified
+PBC0003012,Kiran,BTC,MOH_OFFICE,MOH,,,shared_point
+PBC0003020,Koralaipattu Central,BTC,MOH_OFFICE,MOH,7.922594,81.530138,verified
+PBC0003038,Oddamavadi,BTC,MOH_OFFICE,MOH,7.909622,81.524396,verified
+PBC0003046,Paddipallai,BTC,MOH_OFFICE,MOH,,,shared_point
+PBC0003053,Vakarai,BTC,MOH_OFFICE,MOH,,,shared_point
+PBC0003061,Valaichcheni,BTC,MOH_OFFICE,MOH,,,shared_point
+PBC0003079,Vavunativu,BTC,MOH_OFFICE,MOH,7.697276,81.654676,verified
+PBC0003087,Vellavelly,BTC,MOH_OFFICE,MOH,,,shared_point
+PBC0017343,"Prison Hospital, Batticalo",BTC,HOSPITAL,Prison,,,shared_point
+PBD0003145,Diyatalawa,BDL,HOSPITAL,Base A,6.805550,80.956366,verified
+PBD0003152,Mahiyanganaya,BDL,HOSPITAL,Base A,7.325479,80.990943,verified
+PBD0003160,Welimada,BDL,HOSPITAL,Base B,6.908905,80.909194,verified
+PBD0003178,Bandarawela,BDL,HOSPITAL,Divisional A,6.840045,80.984863,verified
+PBD0003186,Passara,BDL,HOSPITAL,Divisional A,6.933517,81.152592,verified
+PBD0003194,Girandurukotte,BDL,HOSPITAL,Divisional B,7.469386,81.019097,verified
+PBD0003202,Haputale,BDL,HOSPITAL,Divisional B,6.772723,80.956317,verified
+PBD0003210,Koslanda,BDL,HOSPITAL,Divisional B,6.728933,81.028358,verified
+PBD0003228,Lunugala,BDL,HOSPITAL,Divisional B,7.037666,81.200780,verified
+PBD0003236,Meegahakiula,BDL,HOSPITAL,Divisional B,7.138335,81.049034,verified
+PBD0003244,Metigahatenna,BDL,HOSPITAL,Divisional B,7.069706,81.161974,verified
+PBD0003251,Uraniya,BDL,HOSPITAL,Divisional B,7.236065,81.108309,verified
+PBD0003269,Uva Paranagama,BDL,HOSPITAL,Divisional B,,,shared_point
+PBD0003277,Bibilegama,BDL,HOSPITAL,Divisional C,6.896173,81.140290,verified
+PBD0003285,Bogahakumbura,BDL,HOSPITAL,Divisional C,6.862306,80.875527,verified
+PBD0003293,Boralanda,BDL,HOSPITAL,Divisional C,6.829560,80.895480,verified
+PBD0003301,Dambana,BDL,HOSPITAL,Divisional C,7.396058,81.121672,verified
+PBD0003319,Dambetenna,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003327,Demodara,BDL,HOSPITAL,Divisional C,6.900561,81.057232,verified
+PBD0003335,Downside,BDL,HOSPITAL,Divisional C,6.933681,80.923683,verified
+PBD0003343,Ekeriyankumbura,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003350,Ettampitiya,BDL,HOSPITAL,Divisional C,6.925633,80.985642,verified
+PBD0003368,Galauda,BDL,HOSPITAL,Divisional C,7.045020,80.982575,verified
+PBD0003376,Glanmore,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003384,Haggala,BDL,HOSPITAL,Divisional C,,,wrong_district
+PBD0003392,Haldumulla,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003400,Hopton,BDL,HOSPITAL,Divisional C,6.984911,81.197950,verified
+PBD0003418,Kahataruppa,BDL,HOSPITAL,Divisional C,7.023790,81.116022,verified
+PBD0003426,Kanawerella,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003434,Kandagolla,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003442,Kandegedara,BDL,HOSPITAL,Divisional C,7.016761,81.016368,verified
+PBD0003459,Kandeketiya,BDL,HOSPITAL,Divisional B,7.171564,81.005534,verified
+PBD0003467,Kirkeels,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003475,Mahadowa,BDL,HOSPITAL,Divisional C,7.015288,81.167786,verified
+PBD0003483,"Mental Health Center, Meedunpitiya",BDL,HOSPITAL,Divisional C,,,wrong_district
+PBD0003491,Mirahawatta,BDL,HOSPITAL,Divisional C,6.868717,80.951527,verified
+PBD0003509,Nadumgamuwa,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003517,Poonagala,BDL,HOSPITAL,Divisional C,6.757552,81.043201,verified
+PBD0003525,Roeberry,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003533,Sarniya,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003541,Spring Valley (Baddagama),BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003558,Telbedda,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003566,Udaweriya,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003574,Unugolla,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003582,Ury,BDL,HOSPITAL,Divisional C,6.942560,81.126231,verified
+PBD0003590,Uva Highland,BDL,HOSPITAL,Divisional C,,,shared_point
+PBD0003608,Wewegama,BDL,HOSPITAL,Divisional C,7.009741,80.953560,verified
+PBD0003616,Ballaketuwa,BDL,HOSPITAL,PMCU,6.863122,81.093528,verified
+PBD0003624,Batalayaya,BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003632,Ella,BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003640,Hali-Ela,BDL,HOSPITAL,PMCU,6.950066,81.037391,verified
+PBD0003657,Hebarawa,BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003665,Hela-Halpe,BDL,HOSPITAL,PMCU,6.886935,81.040528,verified
+PBD0003673,Hevena Kumbura,BDL,HOSPITAL,PMCU,,,wrong_district
+PBD0003681,Keppetipola,BDL,HOSPITAL,PMCU,6.896336,80.874454,verified
+PBD0003699,Liyangahawela,BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003707,Lunuwatta (Pannalawela),BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003715,Namunukula,BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003723,Relpola (Madagama),BDL,HOSPITAL,PMCU,,,wrong_district
+PBD0003731,Silmiyapura,BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003749,Tennepanguva,BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003756,Thaldena,BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003764,Uvatissapura (Nagadeepa/Mapakadawewa),BDL,HOSPITAL,PMCU,,,shared_point
+PBD0003772,Badulla,BDL,MOH_OFFICE,MOH,6.988429,81.053225,verified
+PBD0003780,Bandarawela,BDL,MOH_OFFICE,MOH,6.841272,80.984820,verified
+PBD0003798,Ella,BDL,MOH_OFFICE,MOH,6.875423,81.047234,verified
+PBD0003806,Girandurukotte,BDL,MOH_OFFICE,MOH,7.462917,81.017492,verified
+PBD0003814,Haldummulla,BDL,MOH_OFFICE,MOH,6.761089,80.876292,verified
+PBD0003822,Hali-Ela,BDL,MOH_OFFICE,MOH,6.962439,81.036061,verified
+PBD0003830,Haputale,BDL,MOH_OFFICE,MOH,6.779645,80.964114,verified
+PBD0003848,Kandaketiya,BDL,MOH_OFFICE,MOH,7.138814,81.050128,verified
+PBD0003855,Lunugala,BDL,MOH_OFFICE,MOH,7.030667,81.198770,verified
+PBD0003863,Mahiyanganaya,BDL,MOH_OFFICE,MOH,,,shared_point
+PBD0003871,Meegahakivula,BDL,MOH_OFFICE,MOH,7.138672,81.049956,verified
+PBD0003889,Passara,BDL,MOH_OFFICE,MOH,6.934254,81.151823,verified
+PBD0003897,Rideemaliyadda,BDL,MOH_OFFICE,MOH,7.236705,81.107802,verified
+PBD0003905,Soranathota,BDL,MOH_OFFICE,MOH,7.016675,81.055490,verified
+PBD0003913,Uva Paranagama,BDL,MOH_OFFICE,MOH,6.927934,80.896475,verified
+PBD0003921,Welimada,BDL,MOH_OFFICE,MOH,6.905525,80.909716,verified
+PBD0017269,"Prison Hospital, Badulla",BDL,HOSPITAL,Prison,6.989942,81.058791,verified
+PBD0017368,"Prison Hospital, Thaldena",BDL,HOSPITAL,Prison,7.061998,81.054766,verified
+PCB0003996,Avissawella,CMB,HOSPITAL,Base A,6.957085,80.207381,verified
+PCB0004002,Homagama,CMB,HOSPITAL,Base A,,,shared_point
+PCB0004010,Wetara,CMB,HOSPITAL,Divisional A,6.784525,79.975724,verified
+PCB0004028,Moratuwa,CMB,HOSPITAL,Divisional B,6.793449,79.887383,verified
+PCB0004036,Nawagamuwa,CMB,HOSPITAL,Divisional B,,,shared_point
+PCB0004044,Padukka,CMB,HOSPITAL,Divisional B,6.839946,80.089634,verified
+PCB0004051,Piliyandala,CMB,HOSPITAL,Divisional B,6.803939,79.922627,verified
+PCB0004069,Thalangama,CMB,HOSPITAL,Divisional B,,,shared_point
+PCB0004077,Aturugiriya,CMB,HOSPITAL,Divisional C,6.881160,79.992300,verified
+PCB0004085,"Colombo Central, Maligawatta",CMB,HOSPITAL,Divisional C,6.933837,79.871912,verified
+PCB0004093,Kosgama,CMB,HOSPITAL,Divisional C,,,shared_point
+PCB0004101,Angampitiya (Etul Kotte),CMB,HOSPITAL,PMCU,6.886655,79.902354,verified
+PCB0004119,Angoda,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004127,Bandaranayake Mawatha,CMB,HOSPITAL,PMCU,6.939898,79.864653,verified
+PCB0004135,Borelesgamuwa,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004143,Brahmanagama,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004150,Dedigamuwa,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004168,Dematagoda,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004176,Folk Art Centre,CMB,HOSPITAL,PMCU,6.889514,79.923311,verified
+PCB0004184,Gangodawila (Delkada),CMB,HOSPITAL,PMCU,6.865091,79.886082,verified
+PCB0004192,Hanwella,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004200,Kaduwela,CMB,HOSPITAL,PMCU,,,wrong_district
+PCB0004218,Kirula,CMB,HOSPITAL,PMCU,6.893403,79.874308,verified
+PCB0004226,Kolonnawa,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004234,Koralawella,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004242,Madiwela,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004259,Maligawatta,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004267,Meegoda,CMB,HOSPITAL,PMCU,6.855352,80.058260,verified
+PCB0004275,Mirihana,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004283,Modara,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004291,New Bazaar,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004309,Nugegoda,CMB,HOSPITAL,PMCU,6.868188,79.886420,verified
+PCB0004317,Obeyasekerapura,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004325,Pannipitiya,CMB,HOSPITAL,PMCU,6.847056,79.952033,verified
+PCB0004333,Parliamentary Complex,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004341,Pinnawala,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004358,"Railway Workshop, Ratmalana",CMB,HOSPITAL,PMCU,6.810912,79.877983,verified
+PCB0004366,Ratmalana,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004374,Rukmalgama,CMB,HOSPITAL,PMCU,6.855995,79.986682,verified
+PCB0004382,Sedawatta,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004390,Thunmodara,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004408,Waga,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004416,Wellampitiya,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004424,Weragala,CMB,HOSPITAL,PMCU,,,shared_point
+PCB0004432,Baththaramulla,CMB,MOH_OFFICE,MOH,,,shared_point
+PCB0004440,Boralesgamuwa,CMB,MOH_OFFICE,MOH,,,shared_point
+PCB0004457,Colombo,CMB,MOH_OFFICE,MOH,6.943258,79.859238,verified
+PCB0004465,Dehiwala,CMB,MOH_OFFICE,MOH,6.861346,79.865943,verified
+PCB0004473,Hanwella,CMB,MOH_OFFICE,MOH,6.940136,80.153033,verified
+PCB0004481,Homagama,CMB,MOH_OFFICE,MOH,6.846934,79.992686,verified
+PCB0004499,Kaduwela,CMB,MOH_OFFICE,MOH,6.934127,79.984398,verified
+PCB0004507,Kahathuduwa,CMB,MOH_OFFICE,MOH,6.800801,79.978239,verified
+PCB0004515,Kolonnawa,CMB,MOH_OFFICE,MOH,,,shared_point
+PCB0004523,Maharagama,CMB,MOH_OFFICE,MOH,,,shared_point
+PCB0004531,Moratuwa,CMB,MOH_OFFICE,MOH,6.788131,79.883651,verified
+PCB0004549,Nugegoda,CMB,MOH_OFFICE,MOH,6.862775,79.901065,verified
+PCB0004556,Padukka,CMB,MOH_OFFICE,MOH,6.840164,80.093288,verified
+PCB0004564,Piliyandala (Kesbewa),CMB,MOH_OFFICE,MOH,6.793437,79.936266,verified
+PCB0004572,Pitakotte (Kotte),CMB,MOH_OFFICE,MOH,6.885731,79.908328,verified
+PCB0004580,Rathmalana,CMB,MOH_OFFICE,MOH,6.827115,79.878359,verified
+PGL0004846,Balapitiya,GAL,HOSPITAL,Base A,6.260591,80.038146,verified
+PGL0004853,Elpitiya,GAL,HOSPITAL,Base A,6.293300,80.164066,verified
+PGL0004861,Udugama,GAL,HOSPITAL,Base B,6.188088,80.340700,verified
+PGL0004879,Ambalangoda,GAL,HOSPITAL,Divisional A,6.248748,80.062540,verified
+PGL0004887,Baddegama,GAL,HOSPITAL,Divisional A,,,shared_point
+PGL0004895,Batapola,GAL,HOSPITAL,Divisional B,6.224148,80.126044,verified
+PGL0004903,Bentota,GAL,HOSPITAL,Divisional B,6.423585,79.999502,verified
+PGL0004911,Borakanda (Karandeniya),GAL,HOSPITAL,Divisional B,6.268889,80.099116,verified
+PGL0004929,Hikkaduwa,GAL,HOSPITAL,Divisional B,,,shared_point
+PGL0004937,Hiniduma,GAL,HOSPITAL,Divisional B,6.331781,80.322493,verified
+PGL0004945,Imaduwa,GAL,HOSPITAL,Divisional B,,,wrong_district
+PGL0004952,Neluwa,GAL,HOSPITAL,Divisional B,,,shared_point
+PGL0004960,Unawatuna,GAL,HOSPITAL,Divisional B,6.020489,80.246978,verified
+PGL0004978,Ahangama,GAL,HOSPITAL,Divisional C,5.998857,80.378662,verified
+PGL0004986,Habaraduwa,GAL,HOSPITAL,Divisional C,5.993720,80.306233,verified
+PGL0004994,Induruwa,GAL,HOSPITAL,Divisional C,6.381814,80.023797,verified
+PGL0005009,Madampagama,GAL,HOSPITAL,Divisional C,6.212986,80.064257,verified
+PGL0005017,Nagoda,GAL,HOSPITAL,Divisional C,,,shared_point
+PGL0005025,Niyagama,GAL,HOSPITAL,Divisional C,6.245059,80.267907,verified
+PGL0005033,Opatha,GAL,HOSPITAL,Divisional C,6.264949,80.414556,verified
+PGL0005041,Ratgama,GAL,HOSPITAL,Divisional C,6.090644,80.147681,verified
+PGL0005058,Thalapitiya,GAL,HOSPITAL,Divisional C,6.044599,80.221393,verified
+PGL0005066,Uragahasmandiya,GAL,HOSPITAL,Divisional C,,,shared_point
+PGL0005082,Agaliya,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005090,Ahangama,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005108,Ahungalla,GAL,HOSPITAL,PMCU,6.316336,80.034075,verified
+PGL0005116,Aluttanayamgoda,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005124,Ambalangoda,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005132,Amugoda,GAL,HOSPITAL,PMCU,6.324116,80.218548,verified
+PGL0005140,Gintota,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005157,Haburugala,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005165,Halvitigala,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005173,Hammaliya,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005181,Hikkaduwa,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005199,Hipankanda,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005207,Kahaduwa,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005215,Kirindiela,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005223,Kosgoda,GAL,HOSPITAL,PMCU,6.339051,80.030348,verified
+PGL0005231,Lankagama,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005249,Mahainduruwa,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005256,Matthaka,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005264,Nakiyadeniya,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005272,Omattha,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005280,Pilana,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005298,Pitigala,GAL,HOSPITAL,PMCU,6.339375,80.223039,verified
+PGL0005306,Thelikada,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005314,Wanduramba,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005322,Yakkalamulla,GAL,HOSPITAL,PMCU,,,shared_point
+PGL0005330,Akmeemana,GAL,MOH_OFFICE,MOH,6.051559,80.257222,verified
+PGL0005348,Ambalangoda,GAL,MOH_OFFICE,MOH,6.248477,80.062905,verified
+PGL0005355,Baddegama,GAL,MOH_OFFICE,MOH,6.168855,80.179404,verified
+PGL0005363,Balapitiya,GAL,MOH_OFFICE,MOH,6.311814,80.034551,verified
+PGL0005371,Bentota (Induruwa),GAL,MOH_OFFICE,MOH,6.382120,80.023339,verified
+PGL0005389,Bope - Poddala,GAL,MOH_OFFICE,MOH,6.079556,80.221347,verified
+PGL0005397,Elpitiya,GAL,MOH_OFFICE,MOH,,,shared_point
+PGL0005405,Galle MC,GAL,MOH_OFFICE,MOH,6.032591,80.212651,verified
+PGL0005413,Gonapinuwala,GAL,MOH_OFFICE,MOH,,,shared_point
+PGL0005421,Habaraduwa,GAL,MOH_OFFICE,MOH,6.011722,80.306686,verified
+PGL0005439,Hikkaduwa,GAL,MOH_OFFICE,MOH,,,shared_point
+PGL0005447,Imaduwa,GAL,MOH_OFFICE,MOH,6.030554,80.389371,verified
+PGL0005454,Karandeniya,GAL,MOH_OFFICE,MOH,6.268939,80.099876,verified
+PGL0005462,Nagoda (Udugama),GAL,MOH_OFFICE,MOH,6.188033,80.340193,verified
+PGL0005470,Neluwa,GAL,MOH_OFFICE,MOH,6.353856,80.367747,verified
+PGL0005488,Niyagama,GAL,MOH_OFFICE,MOH,,,shared_point
+PGL0005496,Rathganga,GAL,MOH_OFFICE,MOH,,,shared_point
+PGL0005504,Thawalama,GAL,MOH_OFFICE,MOH,,,shared_point
+PGL0005512,Walivitiya (Divithura),GAL,MOH_OFFICE,MOH,6.210107,80.184052,verified
+PGL0005520,Yakkalamulla,GAL,MOH_OFFICE,MOH,6.104586,80.342204,verified
+PGP0005652,Watupitiwela,GMP,HOSPITAL,Base A,7.123557,80.109706,verified
+PGP0005660,Kiribathgoda,GMP,HOSPITAL,Base B,6.983515,79.928889,verified
+PGP0005678,Meerigama,GMP,HOSPITAL,Base B,,,shared_point
+PGP0005686,Minuwangoda,GMP,HOSPITAL,Base B,7.172257,79.956152,verified
+PGP0005694,Gampaha,GMP,HOSPITAL,District General,7.091360,80.000709,verified
+PGP0005702,Negombo,GMP,HOSPITAL,District General,7.212565,79.848506,verified
+PGP0005710,Divulapitiya,GMP,HOSPITAL,Divisional A,7.216885,80.013229,verified
+PGP0005728,Dompe,GMP,HOSPITAL,Divisional A,6.949169,80.059601,verified
+PGP0005736,Radawana,GMP,HOSPITAL,Divisional B,,,wrong_district
+PGP0005744,Akaragama,GMP,HOSPITAL,Divisional C,7.268877,79.954957,verified
+PGP0005751,Biyagama,GMP,HOSPITAL,Divisional C,6.946578,79.993947,verified
+PGP0005769,Bokalagama,GMP,HOSPITAL,Divisional C,7.215321,80.102926,verified
+PGP0005777,Ja-Ela,GMP,HOSPITAL,Divisional C,,,shared_point
+PGP0005785,Malwathuhiripitiya,GMP,HOSPITAL,Divisional C,7.056364,80.068558,verified
+PGP0005793,Pamunugama,GMP,HOSPITAL,Divisional C,7.093624,79.850175,verified
+PGP0005801,Udupila,GMP,HOSPITAL,Divisional C,,,shared_point
+PGP0005819,Alawala,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005827,Ambepussa,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005835,Andiambalama,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005843,Anuragoda,GMP,HOSPITAL,PMCU,7.007867,80.112627,verified
+PGP0005850,Badalgama,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005868,Bemmulla,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005876,Devalapola,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005884,Dunagaha,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005892,Ganemulla,GMP,HOSPITAL,PMCU,7.066820,79.961061,verified
+PGP0005900,Halpe - Katana,GMP,HOSPITAL,PMCU,7.252860,79.910353,verified
+PGP0005918,Halpe - Mirigama,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005926,Handala,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005934,Hunupitiya,GMP,HOSPITAL,PMCU,6.959796,79.881291,verified
+PGP0005942,Kadawata,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005959,Kalagedihena,GMP,HOSPITAL,PMCU,7.115403,80.055232,verified
+PGP0005967,Kal-Eliya,GMP,HOSPITAL,PMCU,7.197393,80.094227,verified
+PGP0005975,Kandawala (Katana),GMP,HOSPITAL,PMCU,,,shared_point
+PGP0005983,Katunayake (BOI),GMP,HOSPITAL,PMCU,7.165393,79.882796,verified
+PGP0005991,Kochchikade,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006007,Korase,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006015,Kotadeniyawa,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006023,Madawala-Minu,GMP,HOSPITAL,PMCU,,,wrong_district
+PGP0006031,Madelgamuwa,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006049,Maladeniya,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006056,Maligatenna,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006064,Meetirigala,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006072,Mendawela,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006080,Muddaragama,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006098,"Muslim Orphanage, Malwana",GMP,HOSPITAL,PMCU,6.978235,79.940214,verified
+PGP0006106,Nambuluwa,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006114,Pallewela,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006122,Pasyala,GMP,HOSPITAL,PMCU,7.166190,80.124702,verified
+PGP0006130,Peliyagoda,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006148,Pugoda,GMP,HOSPITAL,PMCU,6.976474,80.117586,verified
+PGP0006155,Raddolugama,GMP,HOSPITAL,PMCU,7.141006,79.900771,verified
+PGP0006163,Seeduwa,GMP,HOSPITAL,PMCU,7.138747,79.875072,verified
+PGP0006171,Sinharamulla,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006189,Talahena/Pitipana,GMP,HOSPITAL,PMCU,,,wrong_district
+PGP0006197,Thihariya,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006205,Urapola,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006213,Uswetakeiyawa,GMP,HOSPITAL,PMCU,7.032724,79.861435,verified
+PGP0006221,Veyangoda,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006239,Wekada,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006247,Weliweriya,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006254,Weweldeniya,GMP,HOSPITAL,PMCU,,,shared_point
+PGP0006262,Attanagalla,GMP,MOH_OFFICE,MOH,7.154005,80.062741,verified
+PGP0006270,Biyagama,GMP,MOH_OFFICE,MOH,6.970338,79.976891,verified
+PGP0006288,Divulapitiya,GMP,MOH_OFFICE,MOH,7.215486,80.013606,verified
+PGP0006296,Gampaha,GMP,MOH_OFFICE,MOH,7.090643,80.002094,verified
+PGP0006304,Ja-Ela,GMP,MOH_OFFICE,MOH,7.075242,79.894026,verified
+PGP0006312,Katana,GMP,MOH_OFFICE,MOH,7.224360,79.882710,verified
+PGP0006320,Katunayake (BOI),GMP,MOH_OFFICE,MOH,,,shared_point
+PGP0006338,Kelaniya,GMP,MOH_OFFICE,MOH,6.954929,79.919118,verified
+PGP0006346,Mahara,GMP,MOH_OFFICE,MOH,7.020847,79.973677,verified
+PGP0006353,Minuwangoda,GMP,MOH_OFFICE,MOH,7.172264,79.956823,verified
+PGP0006361,Mirigama,GMP,MOH_OFFICE,MOH,7.256795,80.135158,verified
+PGP0006379,Negombo,GMP,MOH_OFFICE,MOH,7.205717,79.852334,verified
+PGP0006387,Pugoda (Dompe),GMP,MOH_OFFICE,MOH,6.976767,80.117422,verified
+PGP0006395,Ragama,GMP,MOH_OFFICE,MOH,7.027386,79.920232,verified
+PGP0006403,Seeduwa,GMP,MOH_OFFICE,MOH,,,shared_point
+PGP0006411,Wattala,GMP,MOH_OFFICE,MOH,6.996645,79.885441,verified
+PHT0006510,Tangalle,HMB,HOSPITAL,Base A,6.022706,80.797476,verified
+PHT0006528,Tissamaharama,HMB,HOSPITAL,Base B,6.285272,81.268571,verified
+PHT0006536,Walasmulla,HMB,HOSPITAL,Base B,6.146633,80.698452,verified
+PHT0006544,Ambalantota,HMB,HOSPITAL,Divisional B,6.114477,81.022205,verified
+PHT0006551,Angunukolapelessa,HMB,HOSPITAL,Divisional B,6.165249,80.899914,verified
+PHT0006569,Beliatte,HMB,HOSPITAL,Divisional B,6.050705,80.737761,verified
+PHT0006577,Kariyamaditta,HMB,HOSPITAL,Divisional B,,,shared_point
+PHT0006585,Katuwana,HMB,HOSPITAL,Divisional B,6.267235,80.697498,verified
+PHT0006593,Kirinda,HMB,HOSPITAL,Divisional B,6.216441,81.328572,verified
+PHT0006601,Lunugamwehera,HMB,HOSPITAL,Divisional B,6.346521,81.196711,verified
+PHT0006619,Sooriyawewa,HMB,HOSPITAL,Divisional B,6.304811,81.003727,verified
+PHT0006627,Weeraketiya,HMB,HOSPITAL,Divisional B,6.145044,80.765375,verified
+PHT0006635,Beligalla (Upper),HMB,HOSPITAL,Divisional C,6.088645,80.743670,verified
+PHT0006643,Beragama,HMB,HOSPITAL,Divisional C,6.171950,81.034516,verified
+PHT0006650,Gonadeniya,HMB,HOSPITAL,Divisional C,,,shared_point
+PHT0006668,Hakuruwela,HMB,HOSPITAL,Divisional C,6.143824,80.833653,verified
+PHT0006676,Kirama,HMB,HOSPITAL,Divisional C,,,shared_point
+PHT0006684,Middeniya,HMB,HOSPITAL,Divisional C,6.259131,80.763822,verified
+PHT0006692,Nakulugamuwa,HMB,HOSPITAL,Divisional C,,,shared_point
+PHT0006700,Ranna,HMB,HOSPITAL,Divisional C,,,outside_sri_lanka
+PHT0006718,Abesekaragama,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006726,Bandagiriya,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006734,Beralihera,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006742,Ella,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006759,Galpoththayaya,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006767,Getamanna,HMB,HOSPITAL,PMCU,6.041562,80.679009,verified
+PHT0006775,Matthala,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006783,Palathuduwa,HMB,HOSPITAL,PMCU,6.328179,81.057247,verified
+PHT0006791,Ridiyagama,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006809,Samadigama,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006817,Uduwila,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006825,Vitharandeniya,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006833,Warapitiya,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006841,Wilemulla,HMB,HOSPITAL,PMCU,,,shared_point
+PHT0006858,"Mental Rehabilitation, Ruhunusuwa Niwahana",HMB,HOSPITAL,Rehabilitation,,,wrong_district
+PHT0006866,Ambalanthota,HMB,MOH_OFFICE,MOH,6.122761,81.005885,verified
+PHT0006874,Angunakolapelessa,HMB,MOH_OFFICE,MOH,6.164691,80.898963,verified
+PHT0006882,Beliatta,HMB,MOH_OFFICE,MOH,6.051828,80.741735,verified
+PHT0006890,Hambantota,HMB,MOH_OFFICE,MOH,6.171162,81.127000,verified
+PHT0006908,Katuwana,HMB,MOH_OFFICE,MOH,6.266328,80.693836,verified
+PHT0006916,Lunugamvehera,HMB,MOH_OFFICE,MOH,6.346093,81.196978,verified
+PHT0006924,Okewela,HMB,MOH_OFFICE,MOH,6.107953,80.715987,verified
+PHT0006932,Sooriyawewa,HMB,MOH_OFFICE,MOH,6.304862,81.004768,verified
+PHT0006940,Tangalle,HMB,MOH_OFFICE,MOH,6.023626,80.795791,verified
+PHT0006957,Thissamaharama,HMB,MOH_OFFICE,MOH,6.286601,81.261282,verified
+PHT0006965,Walasmulla,HMB,MOH_OFFICE,MOH,,,shared_point
+PHT0006973,Weeraketiya,HMB,MOH_OFFICE,MOH,6.144703,80.765287,verified
+PHT0017319,"Prison Hospital, Weeravila",HMB,HOSPITAL,Prison,,,shared_point
+PJF0007047,Point Pedro,JAF,HOSPITAL,Base A,9.805622,80.224774,verified
+PJF0007054,Tellipallai,JAF,HOSPITAL,Base A,,,shared_point
+PJF0007062,Chavakachcheri,JAF,HOSPITAL,Base B,9.661539,80.166807,verified
+PJF0007070,Kayts,JAF,HOSPITAL,Base B,9.693036,79.868685,verified
+PJF0007088,Atchuveli,JAF,HOSPITAL,Divisional B,,,shared_point
+PJF0007096,Chankanni,JAF,HOSPITAL,Divisional B,,,shared_point
+PJF0007104,Kopay,JAF,HOSPITAL,Divisional B,9.706309,80.065227,verified
+PJF0007112,Velvetiturai,JAF,HOSPITAL,Divisional B,9.826120,80.178896,verified
+PJF0007120,Alaveddy,JAF,HOSPITAL,Divisional C,9.768902,80.007215,verified
+PJF0007138,Ampan,JAF,HOSPITAL,Divisional C,9.715378,80.283400,verified
+PJF0007146,Analativu,JAF,HOSPITAL,Divisional C,9.670120,79.780212,verified
+PJF0007153,Delft,JAF,HOSPITAL,Divisional C,9.526667,79.699660,verified
+PJF0007161,Gurunagar,JAF,HOSPITAL,Divisional C,9.652511,80.019520,verified
+PJF0007179,Ilavalai,JAF,HOSPITAL,Divisional C,9.799125,79.994266,verified
+PJF0007187,Karaiyanagar,JAF,HOSPITAL,Divisional C,,,shared_point
+PJF0007195,Karaveddi,JAF,HOSPITAL,Divisional C,9.793328,80.203827,verified
+PJF0007203,Kodikamam,JAF,HOSPITAL,Divisional C,9.677996,80.236612,verified
+PJF0007211,Kondavil,JAF,HOSPITAL,Divisional C,9.705841,80.030061,verified
+PJF0007229,Mandaitivu,JAF,HOSPITAL,Divisional C,,,shared_point
+PJF0007237,Manipay,JAF,HOSPITAL,Divisional C,9.702965,79.992561,verified
+PJF0007245,Maruthankerney,JAF,HOSPITAL,Divisional C,,,shared_point
+PJF0007252,Nainativu,JAF,HOSPITAL,Divisional C,,,shared_point
+PJF0007260,Pandatheripu,JAF,HOSPITAL,Divisional C,,,shared_point
+PJF0007278,Pungudutivu,JAF,HOSPITAL,Divisional C,,,wrong_district
+PJF0007286,Vaddukoddai,JAF,HOSPITAL,Divisional C,,,shared_point
+PJF0007294,Varany,JAF,HOSPITAL,Divisional C,9.729580,80.226108,verified
+PJF0007302,Velanai,JAF,HOSPITAL,Divisional C,9.636789,79.903605,verified
+PJF0007310,Chunakkam,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007328,Eluwaitivu,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007336,Erlalai,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007344,Inuvil,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007351,Jaffna (Thirunelveley),JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007369,Kaithady,JAF,HOSPITAL,PMCU,9.669847,80.090392,verified
+PJF0007377,Kankesanthurai,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007385,Kokuvil,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007393,Mulliyan,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007401,Mulliyan,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007419,Palaly (Kurumpasiddy),JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007427,Point Pedro,JAF,HOSPITAL,PMCU,9.823461,80.238552,verified
+PJF0007435,Punnalai - Kadduvan,JAF,HOSPITAL,PMCU,9.750499,80.058066,verified
+PJF0007443,Puttur,JAF,HOSPITAL,PMCU,9.744452,80.107428,verified
+PJF0007450,Tholpuram,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007468,Uduvil,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007476,Urumpirai,JAF,HOSPITAL,PMCU,9.720346,80.045873,verified
+PJF0007484,Vaddukoddai,JAF,HOSPITAL,PMCU,,,shared_point
+PJF0007492,Ampan (Point Pedro),JAF,MOH_OFFICE,MOH,9.805763,80.222952,verified
+PJF0007500,Chankanai - Walikamam West,JAF,MOH_OFFICE,MOH,,,shared_point
+PJF0007518,Chavakachchari,JAF,MOH_OFFICE,MOH,,,shared_point
+PJF0007526,Jaffna,JAF,MOH_OFFICE,MOH,9.673947,80.027736,verified
+PJF0007534,Karaveddy,JAF,MOH_OFFICE,MOH,9.792126,80.201799,verified
+PJF0007542,Kayts,JAF,MOH_OFFICE,MOH,9.697759,79.866366,verified
+PJF0007559,Kopay,JAF,MOH_OFFICE,MOH,9.706729,80.065433,verified
+PJF0007567,Nallur,JAF,MOH_OFFICE,MOH,9.706019,80.029964,verified
+PJF0007575,Sandilipay,JAF,MOH_OFFICE,MOH,9.725097,79.997720,verified
+PJF0007583,Telippalai,JAF,MOH_OFFICE,MOH,9.785272,80.032899,verified
+PJF0007591,Uduvil,JAF,MOH_OFFICE,MOH,9.742938,80.035132,verified
+PJF0007609,Velanai (Island South),JAF,MOH_OFFICE,MOH,9.636317,79.903777,verified
+PKE0001297,"Prison Hospital, Kegalle",KEG,HOSPITAL,Prison,7.255499,80.353148,verified
+PKE0007641,Karawanella,KEG,HOSPITAL,Base B,7.024530,80.261752,verified
+PKE0007658,Mawanella,KEG,HOSPITAL,Base B,7.253527,80.446142,verified
+PKE0007666,Warakapola,KEG,HOSPITAL,Base B,7.225269,80.196093,verified
+PKE0007674,Aranayaka,KEG,HOSPITAL,Divisional A,7.177105,80.458556,verified
+PKE0007682,Deraniyagala,KEG,HOSPITAL,Divisional A,,,shared_point
+PKE0007690,Hemmathagama,KEG,HOSPITAL,Divisional A,7.173459,80.501397,verified
+PKE0007708,Kitulgala,KEG,HOSPITAL,Divisional A,,,shared_point
+PKE0007716,Rambukkana,KEG,HOSPITAL,Divisional A,7.327348,80.395439,verified
+PKE0007724,Udugoda,KEG,HOSPITAL,Divisional A,7.140406,80.349761,verified
+PKE0007732,Amithirigala,KEG,HOSPITAL,Divisional B,7.029547,80.184944,verified
+PKE0007740,Beligala,KEG,HOSPITAL,Divisional B,7.262517,80.271533,verified
+PKE0007757,Mahapallegama,KEG,HOSPITAL,Divisional B,7.177584,80.262594,verified
+PKE0007765,Amanawala,KEG,HOSPITAL,Divisional C,,,shared_point
+PKE0007773,Dedugala,KEG,HOSPITAL,Divisional C,7.097617,80.403358,verified
+PKE0007781,Gantuna,KEG,HOSPITAL,Divisional C,7.133494,80.400543,verified
+PKE0007799,Gonagaldeniya,KEG,HOSPITAL,Divisional C,7.073211,80.200513,verified
+PKE0007807,Halgolla Watta,KEG,HOSPITAL,Divisional C,7.042593,80.366456,verified
+PKE0007815,Hinguralakanda,KEG,HOSPITAL,Divisional C,6.915658,80.299791,verified
+PKE0007823,Kiriporuwa Watta,KEG,HOSPITAL,Divisional C,,,shared_point
+PKE0007831,"Mental Rehabilitation Centre, Dematanpitiya",KEG,HOSPITAL,Divisional C,,,wrong_district
+PKE0007849,Pindeniya,KEG,HOSPITAL,Divisional C,7.175033,80.293362,verified
+PKE0007856,Sapumalkanda,KEG,HOSPITAL,Divisional C,,,shared_point
+PKE0007864,Algama,KEG,HOSPITAL,PMCU,7.156298,80.165934,verified
+PKE0007872,Atala,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007880,Basnagala,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007898,Beddewela,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007906,Bolagama,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007914,Boralankada,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007922,Bulathkohupitiya,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007930,Dewalegama,KEG,HOSPITAL,PMCU,7.283806,80.322894,verified
+PKE0007948,Galapitamada,KEG,HOSPITAL,PMCU,,,wrong_district
+PKE0007955,Karadupona,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007963,Kehelwatte,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007971,Minuwangamuwa,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007989,Narangoda,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0007997,Nelundeniya,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0008003,Niyadurupola,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0008011,Pothdenikanda,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0008029,Rahala,KEG,HOSPITAL,PMCU,7.149665,80.464983,verified
+PKE0008037,Uyanwatta,KEG,HOSPITAL,PMCU,,,wrong_district
+PKE0008045,Wakirigala,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0008052,Wattegedara,KEG,HOSPITAL,PMCU,,,shared_point
+PKE0008060,Yatiyanthota,KEG,HOSPITAL,PMCU,6.944904,80.401305,verified
+PKE0008078,Aranayaka,KEG,MOH_OFFICE,MOH,7.177291,80.458000,verified
+PKE0008086,Bulathkohupitiya,KEG,MOH_OFFICE,MOH,7.109127,80.334565,verified
+PKE0008094,Dehiovita,KEG,MOH_OFFICE,MOH,6.963267,80.264183,verified
+PKE0008102,Deraniyagala,KEG,MOH_OFFICE,MOH,6.932204,80.337684,verified
+PKE0008110,Galigamuwa,KEG,MOH_OFFICE,MOH,7.240448,80.300505,verified
+PKE0008128,Kegalle,KEG,MOH_OFFICE,MOH,,,shared_point
+PKE0008136,Mawanella,KEG,MOH_OFFICE,MOH,7.253248,80.445610,verified
+PKE0008144,Rambukkana,KEG,MOH_OFFICE,MOH,7.327307,80.394886,verified
+PKE0008151,Ruwanwella,KEG,MOH_OFFICE,MOH,7.023407,80.262082,verified
+PKE0008169,Warakapola,KEG,MOH_OFFICE,MOH,7.226501,80.197818,verified
+PKE0008177,Yatiyanthota,KEG,MOH_OFFICE,MOH,7.027500,80.301658,verified
+PKE0017350,"Prison Hospital, Ambepussa",KEG,HOSPITAL,Prison,,,shared_point
+PKG0008219,Kuliyapitiya,KUR,HOSPITAL,Base A,7.472045,80.044605,verified
+PKG0008227,Dambadeniya,KUR,HOSPITAL,Base B,7.348635,80.137315,verified
+PKG0008235,Galgamuwa,KUR,HOSPITAL,Base B,8.001204,80.277235,verified
+PKG0008243,Nikaweratiya,KUR,HOSPITAL,Base B,7.747476,80.114446,verified
+PKG0008250,Polpitigama,KUR,HOSPITAL,Base B,7.815255,80.405072,verified
+PKG0008268,Alawwa,KUR,HOSPITAL,Divisional A,,,shared_point
+PKG0008276,Gokarella,KUR,HOSPITAL,Divisional A,7.585624,80.475057,verified
+PKG0008284,Hiripitiya,KUR,HOSPITAL,Divisional A,7.655660,80.367501,verified
+PKG0008292,Maho,KUR,HOSPITAL,Divisional A,,,wrong_district
+PKG0008300,Mawathagama,KUR,HOSPITAL,Divisional A,7.440255,80.448306,verified
+PKG0008318,Ridigama,KUR,HOSPITAL,Divisional A,7.548756,80.491481,verified
+PKG0008326,Sandalankawa,KUR,HOSPITAL,Divisional A,,,shared_point
+PKG0008334,Wariyapola,KUR,HOSPITAL,Divisional A,7.616275,80.249731,verified
+PKG0008342,Ambanpola,KUR,HOSPITAL,Divisional B,7.916847,80.242069,verified
+PKG0008359,Bingiriya,KUR,HOSPITAL,Divisional B,7.598636,79.931983,verified
+PKG0008367,Hettipola,KUR,HOSPITAL,Divisional B,,,shared_point
+PKG0008375,Kandanegedara,KUR,HOSPITAL,Divisional B,,,shared_point
+PKG0008383,Katupotha,KUR,HOSPITAL,Divisional B,7.533750,80.186595,verified
+PKG0008391,Meegalewa,KUR,HOSPITAL,Divisional B,,,shared_point
+PKG0008409,Narammala,KUR,HOSPITAL,Divisional B,7.431122,80.206423,verified
+PKG0008417,Nikawewa,KUR,HOSPITAL,Divisional B,7.881599,80.416047,verified
+PKG0008425,Pahalagiribawa,KUR,HOSPITAL,Divisional B,8.116711,80.193358,verified
+PKG0008433,Polgahawela,KUR,HOSPITAL,Divisional B,7.337523,80.303822,verified
+PKG0008441,Thalampitiya,KUR,HOSPITAL,Divisional B,7.412219,80.364472,verified
+PKG0008458,Ataragalla,KUR,HOSPITAL,Divisional C,7.936084,80.286937,verified
+PKG0008466,Delwita,KUR,HOSPITAL,Divisional C,,,shared_point
+PKG0008474,Dunakadeniya,KUR,HOSPITAL,Divisional C,,,shared_point
+PKG0008482,Ehetuwewa,KUR,HOSPITAL,Divisional C,7.936418,80.346994,verified
+PKG0008490,Weerabugedara (Gonawa),KUR,HOSPITAL,Divisional C,7.476373,80.244736,verified
+PKG0008508,Gonigoda,KUR,HOSPITAL,Divisional C,7.446970,80.518666,verified
+PKG0008516,Indulgodakanda,KUR,HOSPITAL,Divisional C,7.418331,80.402160,verified
+PKG0008524,Karambe,KUR,HOSPITAL,Divisional C,7.790386,80.339890,verified
+PKG0008532,Kobeigane,KUR,HOSPITAL,Divisional C,7.656904,80.124052,verified
+PKG0008540,Koshena,KUR,HOSPITAL,Divisional C,,,shared_point
+PKG0008557,Kotawehera,KUR,HOSPITAL,Divisional C,7.806989,80.078808,verified
+PKG0008565,Mahagirilla,KUR,HOSPITAL,Divisional C,7.829235,80.137530,verified
+PKG0008573,Mahamukalanyaya,KUR,HOSPITAL,Divisional C,7.561564,80.424189,verified
+PKG0008581,Mahananneriya,KUR,HOSPITAL,Divisional C,7.998660,80.175557,verified
+PKG0008599,Muwanhela,KUR,HOSPITAL,Divisional C,,,shared_point
+PKG0008607,Nagollagama,KUR,HOSPITAL,Divisional C,7.751826,80.303136,verified
+PKG0008615,Nawatalwatta,KUR,HOSPITAL,Divisional C,7.291867,80.185879,verified
+PKG0008623,Rajangane,KUR,HOSPITAL,Divisional C,,,wrong_district
+PKG0008631,Uhumeeya,KUR,HOSPITAL,Divisional C,7.519004,80.266982,verified
+PKG0008649,Weerapokuna,KUR,HOSPITAL,Divisional C,7.652115,79.989105,verified
+PKG0008656,Wellawa,KUR,HOSPITAL,Divisional C,7.556922,80.369188,verified
+PKG0008664,Balalla,KUR,HOSPITAL,PMCU,7.802960,80.250238,verified
+PKG0008672,Bandarakoswatta,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008680,Batalagoda,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008698,Bihalpola,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008706,Bopitiya,KUR,HOSPITAL,PMCU,,,wrong_district
+PKG0008714,Boraluwewa,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008722,Boyawalana,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008730,Buluwala,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008748,Digampitiya,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008755,Divullegoda,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008763,Divurumpola,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008771,Dodangaslanda,KUR,HOSPITAL,PMCU,7.572777,80.524576,verified
+PKG0008789,Dothalla,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008797,Elabodagama,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008805,Ethanawatte,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008813,Gonagama,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008821,Hiruwalpola,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008839,Horathapola,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008847,Inguruwatte,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008854,Kadigawa,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008862,Kahapathwala,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008870,Kalegama,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008888,Kalugalla,KUR,HOSPITAL,PMCU,,,wrong_district
+PKG0008896,Kattimahana,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008904,Kekunagalla,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008912,Kimbulwanaoya,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008920,Kolambagama,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008938,Kosdeniya,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008946,Kudagalgamuwa,KUR,HOSPITAL,PMCU,7.558732,80.341105,verified
+PKG0008953,Kumbukwewa,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008961,Madahapola,KUR,HOSPITAL,PMCU,7.707803,80.507644,verified
+PKG0008979,Makulpotha,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008987,Malsiripura,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0008995,Masapotha,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009001,Minuwangete,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009019,Mohottuwagoda,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009027,Munamaldeniya,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009035,Narangoda,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009043,Netiya,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009050,Pothuhera,KUR,HOSPITAL,PMCU,7.420403,80.326254,verified
+PKG0009068,Pothuvila,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009076,Rasnayakapura,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009084,Siyambalangamuwa,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009092,Tarana-udawela,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009100,Thalakalawewa,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009118,Thalawa/ Moragollagama,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009126,Tisogama,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009134,Udabaddawa,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009142,Udapolawatta,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009159,Udumulla,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009167,Uhumeeya,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009175,Usgala (Siyabalangamuwa),KUR,HOSPITAL,PMCU,8.085462,80.305314,verified
+PKG0009183,Wadakada,KUR,HOSPITAL,PMCU,7.400751,80.265628,verified
+PKG0009191,Welikera,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009209,Weuda,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009217,Wewagama,KUR,HOSPITAL,PMCU,,,shared_point
+PKG0009225,Alawwa,KUR,MOH_OFFICE,MOH,7.297374,80.230459,verified
+PKG0009233,Ambanpola,KUR,MOH_OFFICE,MOH,7.919774,80.239233,verified
+PKG0009241,Bamunukotuwa,KUR,MOH_OFFICE,MOH,7.573285,80.248104,verified
+PKG0009258,Bingiriya,KUR,MOH_OFFICE,MOH,7.596893,79.948073,verified
+PKG0009266,Galgamuwa,KUR,MOH_OFFICE,MOH,8.005512,80.284741,verified
+PKG0009274,Ganewatta,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009282,Giribawa,KUR,MOH_OFFICE,MOH,8.117306,80.194863,verified
+PKG0009290,Ibbagamuwa (Gokarella),KUR,MOH_OFFICE,MOH,7.586416,80.475098,verified
+PKG0009308,Kobeigane,KUR,MOH_OFFICE,MOH,7.656825,80.123579,verified
+PKG0009316,Kotawehera,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009324,Kuliyapitiya East,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009332,Kuliyapitiya West,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009340,Kurunegala,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009357,Kurunegala MC,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009365,Maho,KUR,MOH_OFFICE,MOH,7.822228,80.282233,verified
+PKG0009373,Mallawapitiya,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009381,Maspotha,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009399,Mawathagama,KUR,MOH_OFFICE,MOH,7.436219,80.447447,verified
+PKG0009407,Narammala,KUR,MOH_OFFICE,MOH,7.432560,80.212494,verified
+PKG0009415,Nikaweratiya,KUR,MOH_OFFICE,MOH,7.748319,80.113110,verified
+PKG0009423,Paduwasnuwara West,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009431,Panduwasnuwara East,KUR,MOH_OFFICE,MOH,,,shared_point
+PKG0009449,Pannala,KUR,MOH_OFFICE,MOH,7.360684,80.033187,verified
+PKG0009456,Polgahawela,KUR,MOH_OFFICE,MOH,7.330938,80.294840,verified
+PKG0009464,Polpithigama,KUR,MOH_OFFICE,MOH,7.810013,80.403479,verified
+PKG0009472,Rasnayakapura,KUR,MOH_OFFICE,MOH,7.775788,80.017595,verified
+PKG0009480,Rideegama,KUR,MOH_OFFICE,MOH,7.547681,80.491796,verified
+PKG0009498,Udubaddawa,KUR,MOH_OFFICE,MOH,7.489026,79.922352,verified
+PKG0009506,Wariyapola,KUR,MOH_OFFICE,MOH,7.621332,80.249568,verified
+PKG0009514,Weerabugedara,KUR,MOH_OFFICE,MOH,7.447885,80.258372,verified
+PKG0017277,"Prison Hospital, Wariyapola",KUR,HOSPITAL,Prison,7.602182,80.270748,verified
+PKG0017335,"Prison Hospital, Hangilipola",KUR,HOSPITAL,Prison,,,shared_point
+PKL0009621,Potuvil,AMP,HOSPITAL,Base B,6.876098,81.830463,verified
+PKL0009639,Sammanthurai,AMP,HOSPITAL,Base B,7.368355,81.813042,verified
+PKL0009647,Akkaraipattu (Central),AMP,HOSPITAL,Divisional B,7.218760,81.843762,verified
+PKL0009654,Maruthamunai,AMP,HOSPITAL,Divisional B,7.433251,81.811008,verified
+PKL0009662,Nintavur,AMP,HOSPITAL,Base B,7.353369,81.856910,verified
+PKL0009670,Sainthamaruthu,AMP,HOSPITAL,Divisional B,7.387261,81.836513,verified
+PKL0009688,Thirukovil,AMP,HOSPITAL,Base B,,,wrong_district
+PKL0009696,Addalachchenai,AMP,HOSPITAL,Divisional C,,,shared_point
+PKL0009704,Central Camp,AMP,HOSPITAL,Divisional C,7.415005,81.735198,verified
+PKL0009712,Deegawapiya,AMP,HOSPITAL,Divisional C,7.241626,81.764790,verified
+PKL0009720,Eragama (Irakkamam),AMP,HOSPITAL,Divisional C,7.249889,81.713623,verified
+PKL0009738,Karaitivu,AMP,HOSPITAL,Divisional C,,,shared_point
+PKL0009746,Oluvil,AMP,HOSPITAL,Divisional C,7.289964,81.858124,verified
+PKL0009753,Palamunai,AMP,HOSPITAL,Divisional C,,,shared_point
+PKL0009761,Alamkulam,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009779,Annamalai,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009787,Chenaikudiruppu,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009795,Komari,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009803,Malwatta,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009811,Mawadipalli,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009829,Muhamathiyapuram,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009837,Panankadu,AMP,HOSPITAL,PMCU,7.186912,81.845450,verified
+PKL0009845,Periyaneelawanai,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009852,Sennelkiramam,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009860,Sorikalmunai,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009878,Ullai,AMP,HOSPITAL,PMCU,,,shared_point
+PKL0009886,Addalachchenai,AMP,MOH_OFFICE,MOH,,,shared_point
+PKL0009894,Akkaraipathu,AMP,MOH_OFFICE,MOH,7.228070,81.851112,verified
+PKL0009902,Alayadivembu,AMP,MOH_OFFICE,MOH,7.209725,81.844643,verified
+PKL0009910,Irakkamam,AMP,MOH_OFFICE,MOH,7.249181,81.714114,verified
+PKL0009928,Kalmunai North,AMP,MOH_OFFICE,MOH,,,shared_point
+PKL0009936,Kalmunai South,AMP,MOH_OFFICE,MOH,,,shared_point
+PKL0009944,Karaitivu,AMP,MOH_OFFICE,MOH,7.377712,81.838796,verified
+PKL0009951,Navithanveli,AMP,MOH_OFFICE,MOH,,,shared_point
+PKL0009969,Ninthavur,AMP,MOH_OFFICE,MOH,,,shared_point
+PKL0009977,Pottuvil,AMP,MOH_OFFICE,MOH,6.877076,81.828969,verified
+PKL0009985,Sainthamaruthu,AMP,MOH_OFFICE,MOH,7.389968,81.834099,verified
+PKL0009993,Sammanthurai,AMP,MOH_OFFICE,MOH,7.369579,81.812313,verified
+PKL0010009,Thirukkovil,AMP,MOH_OFFICE,MOH,7.111627,81.852984,verified
+PKN0010082,Mulankavil,KIL,HOSPITAL,Base B,9.243423,80.143894,verified
+PKN0010090,Kilinochchi,KIL,HOSPITAL,District General,9.372728,80.411786,verified
+PKN0010108,Akkarayan Kulam,KIL,HOSPITAL,Divisional B,9.311903,80.314855,verified
+PKN0010116,Pallai,KIL,HOSPITAL,Divisional C,9.614155,80.324910,verified
+PKN0010124,Poonakery (Poonaryn),KIL,HOSPITAL,Divisional C,,,wrong_district
+PKN0010132,Tharmapuram,KIL,HOSPITAL,Divisional C,9.410370,80.517504,verified
+PKN0010140,Uruthirapuram,KIL,HOSPITAL,Divisional C,9.392953,80.358289,verified
+PKN0010157,Vaddakachchi,KIL,HOSPITAL,Divisional C,,,shared_point
+PKN0010165,Veravil,KIL,HOSPITAL,Divisional C,9.350917,80.078773,verified
+PKN0010173,Elephantpass (Piramanthanaru),KIL,HOSPITAL,PMCU,,,shared_point
+PKN0010181,Jeyapuram,KIL,HOSPITAL,PMCU,,,shared_point
+PKN0010199,Kandawalai,KIL,HOSPITAL,PMCU,,,shared_point
+PKN0010207,Pallali,KIL,HOSPITAL,PMCU,,,wrong_district
+PKN0010215,Vannerikulam,KIL,HOSPITAL,PMCU,,,shared_point
+PKN0010223,Kandawalai,KIL,MOH_OFFICE,MOH,9.410961,80.516458,verified
+PKN0010231,Karachchi (Kilinochchci),KIL,MOH_OFFICE,MOH,,,shared_point
+PKN0010249,Pallai,KIL,MOH_OFFICE,MOH,,,shared_point
+PKN0010256,Poonakery,KIL,MOH_OFFICE,MOH,,,shared_point
+PKT0010272,Horana,KLT,HOSPITAL,Base A,6.710644,80.066589,verified
+PKT0010280,Panadura,KLT,HOSPITAL,Base A,,,shared_point
+PKT0010298,Pimbura,KLT,HOSPITAL,Base B,6.575949,80.158371,verified
+PKT0010306,Ingiriya,KLT,HOSPITAL,Divisional A,6.741114,80.162065,verified
+PKT0010314,Matugama,KLT,HOSPITAL,Divisional A,6.523099,80.125218,verified
+PKT0010322,Baduraliya,KLT,HOSPITAL,Divisional B,6.514727,80.232731,verified
+PKT0010330,Bandaragama,KLT,HOSPITAL,Divisional B,6.716162,79.991484,verified
+PKT0010348,Bulathsinghala,KLT,HOSPITAL,Divisional B,,,shared_point
+PKT0010355,Galpatha,KLT,HOSPITAL,Divisional B,,,shared_point
+PKT0010363,Ittapana,KLT,HOSPITAL,Divisional B,,,shared_point
+PKT0010371,Meegahatenna,KLT,HOSPITAL,Divisional B,,,shared_point
+PKT0010389,Dodangoda,KLT,HOSPITAL,Divisional C,6.540961,80.036553,verified
+PKT0010397,Gonaduwa,KLT,HOSPITAL,Divisional C,6.671445,79.972598,verified
+PKT0010405,Haltota,KLT,HOSPITAL,Divisional C,6.691829,80.034457,verified
+PKT0010413,Katugahahena,KLT,HOSPITAL,Divisional C,6.489328,80.084710,verified
+PKT0010421,Naboda,KLT,HOSPITAL,Divisional C,,,shared_point
+PKT0010439,Newchatal,KLT,HOSPITAL,Divisional C,6.625328,80.070421,verified
+PKT0010447,Panapitiya,KLT,HOSPITAL,Divisional C,,,shared_point
+PKT0010454,Wadduwa,KLT,HOSPITAL,Divisional C,6.665159,79.929636,verified
+PKT0010462,Warakagoda,KLT,HOSPITAL,Divisional C,,,shared_point
+PKT0010470,Bellana,KLT,HOSPITAL,PMCU,6.525961,80.170567,verified
+PKT0010488,Geekiyanakanda,KLT,HOSPITAL,PMCU,,,shared_point
+PKT0010496,Horawala,KLT,HOSPITAL,PMCU,,,wrong_district
+PKT0010504,Keselwatta,KLT,HOSPITAL,PMCU,6.706849,79.946907,verified
+PKT0010512,Thiniyawala,KLT,HOSPITAL,PMCU,,,shared_point
+PKT0010520,Agalawatta,KLT,MOH_OFFICE,MOH,6.532932,80.146832,verified
+PKT0010538,Bandaragama,KLT,MOH_OFFICE,MOH,6.713351,79.991671,verified
+PKT0010546,Bulathsinhala,KLT,MOH_OFFICE,MOH,6.644775,80.179878,verified
+PKT0010553,Dodangoda,KLT,MOH_OFFICE,MOH,6.540312,80.036609,verified
+PKT0010561,Horana,KLT,MOH_OFFICE,MOH,,,shared_point
+PKT0010579,Ingiriya,KLT,MOH_OFFICE,MOH,6.743070,80.166216,verified
+PKT0010587,Madurawala,KLT,MOH_OFFICE,MOH,6.654814,80.057811,verified
+PKT0010595,Mathugama,KLT,MOH_OFFICE,MOH,,,shared_point
+PKT0010603,Millaniya,KLT,MOH_OFFICE,MOH,6.692208,80.033932,verified
+PKT0010611,Palindanuwara,KLT,MOH_OFFICE,MOH,,,shared_point
+PKT0010629,Panadura,KLT,MOH_OFFICE,MOH,6.724224,79.907284,verified
+PKT0010637,Wadduwa,KLT,MOH_OFFICE,MOH,6.666563,79.928633,verified
+PKT0010645,Walallawita,KLT,MOH_OFFICE,MOH,,,shared_point
+PKY0010751,Teldeniya,KDY,HOSPITAL,Base B,7.307131,80.764293,verified
+PKY0010769,Nawalapitiya,KDY,HOSPITAL,District General,7.053021,80.535173,verified
+PKY0010777,Akurana (Zia Memorial Hospital),KDY,HOSPITAL,Divisional A,7.363609,80.618836,verified
+PKY0010785,Ankumbura,KDY,HOSPITAL,Divisional A,7.440538,80.570106,verified
+PKY0010793,Deltota,KDY,HOSPITAL,Divisional A,7.170633,80.700071,verified
+PKY0010801,Galagedara,KDY,HOSPITAL,Divisional A,7.372081,80.524257,verified
+PKY0010819,Kadugannawa,KDY,HOSPITAL,Divisional A,7.261261,80.533753,verified
+PKY0010827,Katugastota,KDY,HOSPITAL,Divisional A,,,shared_point
+PKY0010835,Madulkele,KDY,HOSPITAL,Divisional A,7.398005,80.733186,verified
+PKY0010843,Mampitiya,KDY,HOSPITAL,Divisional A,,,shared_point
+PKY0010850,Marassana,KDY,HOSPITAL,Divisional A,7.220399,80.736426,verified
+PKY0010868,Menikhinna,KDY,HOSPITAL,Divisional A,7.312720,80.704931,verified
+PKY0010876,Pussellawa,KDY,HOSPITAL,Divisional A,7.116254,80.624931,verified
+PKY0010884,Thittapajjala (Jayawickrama Hospital),KDY,HOSPITAL,Divisional A,,,shared_point
+PKY0010892,Udadumbara,KDY,HOSPITAL,Divisional A,7.319254,80.878456,verified
+PKY0010900,Wattegama,KDY,HOSPITAL,Divisional A,7.358181,80.680506,verified
+PKY0010918,Alutgama (Jambugaspitiya),KDY,HOSPITAL,Divisional B,,,shared_point
+PKY0010926,Ambagahapelessa,KDY,HOSPITAL,Divisional B,,,shared_point
+PKY0010934,Bambaradeniya,KDY,HOSPITAL,Divisional B,,,shared_point
+PKY0010942,Batumulla,KDY,HOSPITAL,Divisional C,,,shared_point
+PKY0010959,Bokkawela,KDY,HOSPITAL,Divisional B,7.392954,80.553155,verified
+PKY0010967,Dolosbage,KDY,HOSPITAL,Divisional A,7.081840,80.471236,verified
+PKY0010975,Dunhinna,KDY,HOSPITAL,Divisional C,7.347953,80.755246,verified
+PKY0010983,Galaha,KDY,HOSPITAL,Divisional B,7.194806,80.676080,verified
+PKY0010991,Galpihilla,KDY,HOSPITAL,Divisional B,7.346470,80.705495,verified
+PKY0011007,Gelioya,KDY,HOSPITAL,Divisional B,7.213195,80.593047,verified
+PKY0011015,Hasalaka,KDY,HOSPITAL,Divisional A,7.354721,80.952190,verified
+PKY0011023,Hataraliyadda,KDY,HOSPITAL,Divisional B,7.342827,80.477031,verified
+PKY0011031,Kahawatta,KDY,HOSPITAL,Divisional C,,,shared_point
+PKY0011049,Kolongoda,KDY,HOSPITAL,Divisional B,7.471379,80.948553,verified
+PKY0011056,Kotaligoda,KDY,HOSPITAL,Divisional B,7.289186,80.513174,verified
+PKY0011064,Kurunduwatta,KDY,HOSPITAL,Divisional B,,,shared_point
+PKY0011072,Medamahanuwara,KDY,HOSPITAL,Divisional B,7.289570,80.814957,verified
+PKY0011080,Medawala,KDY,HOSPITAL,Divisional B,7.357965,80.566378,verified
+PKY0011098,Minipe,KDY,HOSPITAL,Divisional C,7.220749,80.998941,verified
+PKY0011106,Morahena (Pannwillathanne),KDY,HOSPITAL,Divisional B,7.160157,80.669544,verified
+PKY0011114,Murutalawa,KDY,HOSPITAL,Divisional C,7.289051,80.577770,verified
+PKY0011122,Naranpanawa,KDY,HOSPITAL,Divisional C,7.343740,80.732490,verified
+PKY0011130,Pamunuwa,KDY,HOSPITAL,Divisional B,,,shared_point
+PKY0011148,Panwilatenna,KDY,HOSPITAL,Divisional B,,,shared_point
+PKY0011155,Pattiyagama (Pallegama),KDY,HOSPITAL,Divisional C,,,shared_point
+PKY0011163,Sangarajapura,KDY,HOSPITAL,Divisional B,7.325785,80.505783,verified
+PKY0011171,Talatuoya,KDY,HOSPITAL,Divisional B,7.249252,80.690766,verified
+PKY0011189,Udagama Atabage,KDY,HOSPITAL,Divisional C,7.141172,80.622010,verified
+PKY0011197,Uduwela,KDY,HOSPITAL,Divisional B,7.259951,80.651336,verified
+PKY0011205,Ulapane,KDY,HOSPITAL,Divisional C,7.106682,80.564736,verified
+PKY0011213,Wattappola (Panabokka),KDY,HOSPITAL,Divisional C,,,shared_point
+PKY0011221,Westhall,KDY,HOSPITAL,Divisional C,,,shared_point
+PKY0011239,Yakgahapitiya,KDY,HOSPITAL,Divisional C,7.298831,80.667431,verified
+PKY0011247,Prison Hospital - Kandy (Bogambara/Dumbara),KDY,HOSPITAL,Prison,,,shared_point
+PKY0011254,Prison Hospital - Kundasale (Pallekele),KDY,HOSPITAL,Prison,7.271954,80.705181,verified
+PKY0011262,Alawatugoda,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011270,Dedunupitiya,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011288,Digana - Rajawella,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011296,Dodamwela,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011304,Elamaldeniya,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011312,Galhinna,KDY,HOSPITAL,PMCU,7.419234,80.567483,verified
+PKY0011320,Girihagama,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011338,Godahena,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011346,Gohagoda,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011353,Kalugamuwa,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011361,Kotikambe,KDY,HOSPITAL,PMCU,7.325060,80.459593,verified
+PKY0011379,Kurugoda,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011387,Madawala Bazzar,KDY,HOSPITAL,PMCU,7.333940,80.674144,verified
+PKY0011395,Mahakanda,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011403,Mailapitiya,KDY,HOSPITAL,PMCU,7.231084,80.748187,verified
+PKY0011411,Makuldeniya (Rangala),KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011429,Mapakanda,KDY,HOSPITAL,PMCU,7.016635,80.531553,verified
+PKY0011437,Mawatura,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011445,Meemure,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011452,Poojapitiya,KDY,HOSPITAL,PMCU,7.380961,80.590691,verified
+PKY0011460,Rambuke-Ela,KDY,HOSPITAL,PMCU,7.428579,80.593703,verified
+PKY0011478,Rambukewela,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011486,Sandasiri (Dunuwila),KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011494,Suduhumpola,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011502,Thapalpolawatha (Balana),KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011510,Udathalawinna,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011528,Welamboda,KDY,HOSPITAL,PMCU,7.201512,80.544456,verified
+PKY0011536,Yahalatenna,KDY,HOSPITAL,PMCU,,,shared_point
+PKY0011544,"Mental Rehabilitation, Sisila Deltota",KDY,HOSPITAL,Rehabilitation,7.155781,80.705973,verified
+PKY0011551,"Rehabilitation Hospital, Digana Rajawella",KDY,HOSPITAL,Rehabilitation,7.296058,80.730827,verified
+PKY0011569,Akurana,KDY,MOH_OFFICE,MOH,7.410219,80.609669,verified
+PKY0011577,Bambaradeniya,KDY,MOH_OFFICE,MOH,7.204212,80.565400,verified
+PKY0011585,Doluwa,KDY,MOH_OFFICE,MOH,7.183635,80.602303,verified
+PKY0011593,Galagedara,KDY,MOH_OFFICE,MOH,7.369984,80.532853,verified
+PKY0011601,Galaha,KDY,MOH_OFFICE,MOH,7.194784,80.676351,verified
+PKY0011619,Gampola (Udapalatha),KDY,MOH_OFFICE,MOH,7.161397,80.574281,verified
+PKY0011627,Gangawata Korale,KDY,MOH_OFFICE,MOH,7.279390,80.666711,verified
+PKY0011635,Hasalaka,KDY,MOH_OFFICE,MOH,,,shared_point
+PKY0011643,Hatharaliyadda,KDY,MOH_OFFICE,MOH,7.338116,80.472617,verified
+PKY0011650,Kandy MC,KDY,MOH_OFFICE,MOH,7.298756,80.637493,verified
+PKY0011668,Kundasale,KDY,MOH_OFFICE,MOH,7.293728,80.735331,verified
+PKY0011676,Kurunduwaththa (Gangaihala),KDY,MOH_OFFICE,MOH,7.128817,80.531296,verified
+PKY0011684,Medadumbara (Medamahanuwara),KDY,MOH_OFFICE,MOH,7.285022,80.813652,verified
+PKY0011692,Menikhinna,KDY,MOH_OFFICE,MOH,7.312738,80.705287,verified
+PKY0011700,Panvila,KDY,MOH_OFFICE,MOH,7.362443,80.712704,verified
+PKY0011718,Pasbage (Nawalapitiya),KDY,MOH_OFFICE,MOH,7.052979,80.534317,verified
+PKY0011726,Poojapitiya,KDY,MOH_OFFICE,MOH,7.380799,80.590512,verified
+PKY0011734,Thalathuoya,KDY,MOH_OFFICE,MOH,7.249577,80.691105,verified
+PKY0011742,Udadumbara,KDY,MOH_OFFICE,MOH,7.319351,80.878041,verified
+PKY0011759,Udunuwara,KDY,MOH_OFFICE,MOH,7.243366,80.579726,verified
+PKY0011767,Waththegama (Pathadumbara),KDY,MOH_OFFICE,MOH,7.345640,80.678551,verified
+PKY0011775,Werellagama (Harispattuwa),KDY,MOH_OFFICE,MOH,7.328540,80.582148,verified
+PKY0011783,Yatinuwara (Kadugannawa),KDY,MOH_OFFICE,MOH,7.261486,80.533248,verified
+PMG0011866,Bibile,MON,HOSPITAL,Base B,7.163978,81.225205,verified
+PMG0011874,Siyambalanduwa,MON,HOSPITAL,Base B,6.905933,81.548590,verified
+PMG0011882,Wellawaya,MON,HOSPITAL,Base B,6.731125,81.098400,verified
+PMG0011890,Buttala,MON,HOSPITAL,Divisional A,6.757810,81.239724,verified
+PMG0011908,Badalkumbura,MON,HOSPITAL,Divisional B,6.894592,81.232190,verified
+PMG0011916,Inginiyagala,MON,HOSPITAL,Divisional B,7.226634,81.542347,verified
+PMG0011924,Kataragama,MON,HOSPITAL,Divisional B,6.412556,81.338872,verified
+PMG0011932,Medagama,MON,HOSPITAL,Divisional B,7.039181,81.274962,verified
+PMG0011940,Thanamalwila,MON,HOSPITAL,Divisional B,6.435630,81.130428,verified
+PMG0011957,Dambagalla,MON,HOSPITAL,Divisional C,6.980154,81.375506,verified
+PMG0011965,Ethimale,MON,HOSPITAL,Divisional C,,,wrong_district
+PMG0011973,Hambegamuwa,MON,HOSPITAL,Divisional C,6.539798,80.949738,verified
+PMG0011981,Handapanagala,MON,HOSPITAL,Divisional C,6.653706,81.116157,verified
+PMG0011999,Hingurukaduwa,MON,HOSPITAL,Divisional C,6.826983,81.163246,verified
+PMG0012005,Okkampitiya,MON,HOSPITAL,Divisional C,6.755368,81.300225,verified
+PMG0012013,Pitakumbura,MON,HOSPITAL,Divisional C,7.181205,81.294161,verified
+PMG0012021,Sevanagala,MON,HOSPITAL,Divisional C,6.358989,80.920556,verified
+PMG0012039,Bakinigahawela,MON,HOSPITAL,PMCU,,,shared_point
+PMG0012047,Buddama,MON,HOSPITAL,PMCU,,,shared_point
+PMG0012054,Deliwa,MON,HOSPITAL,PMCU,,,shared_point
+PMG0012062,Devathura,MON,HOSPITAL,PMCU,,,shared_point
+PMG0012070,Dombagahawela,MON,HOSPITAL,PMCU,,,shared_point
+PMG0012088,Godigamuwa,MON,HOSPITAL,PMCU,,,wrong_district
+PMG0012096,Kotagama,MON,HOSPITAL,PMCU,,,shared_point
+PMG0012104,Kotiyagala,MON,HOSPITAL,PMCU,,,shared_point
+PMG0012112,Nannapurawa,MON,HOSPITAL,PMCU,7.042146,81.388210,verified
+PMG0012120,Ratmalgahaella,MON,HOSPITAL,PMCU,,,shared_point
+PMG0012138,Badalkumbura,MON,MOH_OFFICE,MOH,6.897931,81.240765,verified
+PMG0012146,Bibile,MON,MOH_OFFICE,MOH,7.164736,81.225328,verified
+PMG0012153,Buttala,MON,MOH_OFFICE,MOH,6.756933,81.237762,verified
+PMG0012161,Kataragama,MON,MOH_OFFICE,MOH,6.412063,81.337847,verified
+PMG0012179,Madulla,MON,MOH_OFFICE,MOH,6.980456,81.375777,verified
+PMG0012187,Medagama,MON,MOH_OFFICE,MOH,7.039812,81.275274,verified
+PMG0012195,Moneragala,MON,MOH_OFFICE,MOH,6.863814,81.339087,verified
+PMG0012203,Sevanagala,MON,MOH_OFFICE,MOH,6.359583,80.920368,verified
+PMG0012211,Siyambalanduwa,MON,MOH_OFFICE,MOH,6.927377,81.553772,verified
+PMG0012229,Thanamalwila,MON,MOH_OFFICE,MOH,6.436333,81.130579,verified
+PMG0012237,Wellawaya,MON,MOH_OFFICE,MOH,6.734518,81.100191,verified
+PMG0017293,"Prison Hospital, Monaragala",MON,HOSPITAL,Prison,,,shared_point
+PML0012278,Mallavi,MUL,HOSPITAL,Base A,9.134704,80.308726,verified
+PML0012286,Mankulam,MUL,HOSPITAL,Base B,9.127820,80.447093,verified
+PML0012294,Mullaitivu,MUL,HOSPITAL,District General,9.226907,80.800490,verified
+PML0012302,Puthukkudyiruppu,MUL,HOSPITAL,Divisional A,,,shared_point
+PML0012310,Sampathnuwara,MUL,HOSPITAL,Divisional A,8.980450,80.772558,verified
+PML0012328,Nandankanndal,MUL,HOSPITAL,Divisional A,,,shared_point
+PML0012336,Oddusuddan,MUL,HOSPITAL,Divisional B,9.162942,80.660301,verified
+PML0012344,Alampil,MUL,HOSPITAL,Divisional C,9.163618,80.854160,verified
+PML0012351,Kokkilai,MUL,HOSPITAL,Divisional C,8.998035,80.951593,verified
+PML0012369,Moonkilaru,MUL,HOSPITAL,Divisional C,9.359283,80.591193,verified
+PML0012377,Unnapulavu,MUL,HOSPITAL,Divisional C,,,shared_point
+PML0012385,Ampalavanpokkanai,MUL,HOSPITAL,PMCU,,,shared_point
+PML0012393,Eththawetinuwara,MUL,HOSPITAL,PMCU,,,shared_point
+PML0012401,Iyankankulam,MUL,HOSPITAL,PMCU,,,shared_point
+PML0012419,Karippaddamurippu,MUL,HOSPITAL,PMCU,,,shared_point
+PML0012427,Kiribanwewa,MUL,HOSPITAL,PMCU,,,shared_point
+PML0012435,Kumulamunai,MUL,HOSPITAL,PMCU,,,shared_point
+PML0012443,Mulliyawalai,MUL,HOSPITAL,PMCU,9.225061,80.775756,verified
+PML0012450,Thevipuram,MUL,HOSPITAL,PMCU,,,shared_point
+PML0012468,Thunukkai,MUL,HOSPITAL,PMCU,9.209453,80.330229,verified
+PML0012476,Mallavi,MUL,MOH_OFFICE,MOH,9.136526,80.307948,verified
+PML0012484,Manthai East,MUL,MOH_OFFICE,MOH,,,shared_point
+PML0012492,Mullaitivu,MUL,MOH_OFFICE,MOH,9.224944,80.775953,verified
+PML0012500,Oddusudan,MUL,MOH_OFFICE,MOH,9.162816,80.661584,verified
+PML0012518,Puthukkudyiruppu,MUL,MOH_OFFICE,MOH,,,shared_point
+PML0012526,Welioya,MUL,MOH_OFFICE,MOH,8.981105,80.771742,verified
+PMN0012542,Mannar,MNR,HOSPITAL,District General,8.981662,79.904574,verified
+PMN0012559,Adampan,MNR,HOSPITAL,Divisional B,8.942935,79.996551,verified
+PMN0012567,Murunkan,MNR,HOSPITAL,Divisional B,8.836678,80.038164,verified
+PMN0012575,Thalaimannar,MNR,HOSPITAL,Divisional B,9.088864,79.727326,verified
+PMN0012583,Vidathaltivu,MNR,HOSPITAL,Divisional B,9.011301,80.064894,verified
+PMN0012591,Chilavaturai,MNR,HOSPITAL,Divisional C,,,shared_point
+PMN0012609,Erukalampiddy,MNR,HOSPITAL,Divisional C,9.034273,79.877177,verified
+PMN0012617,Nanattan,MNR,HOSPITAL,Divisional C,,,shared_point
+PMN0012625,Periyapandivirichan,MNR,HOSPITAL,Divisional C,,,shared_point
+PMN0012633,Pesalai,MNR,HOSPITAL,Divisional C,9.085480,79.819536,verified
+PMN0012641,Vankalai,MNR,HOSPITAL,Divisional C,8.892351,79.934954,verified
+PMN0012658,Iranai illuppaikulam,MNR,HOSPITAL,PMCU,,,shared_point
+PMN0012666,Marichchikaddy,MNR,HOSPITAL,PMCU,,,shared_point
+PMN0012674,Pandaraveli,MNR,HOSPITAL,PMCU,,,shared_point
+PMN0012682,Periyamadhu,MNR,HOSPITAL,PMCU,,,shared_point
+PMN0012690,Tharapuram,MNR,HOSPITAL,PMCU,,,shared_point
+PMN0012708,Thiruketheeswaram,MNR,HOSPITAL,PMCU,,,shared_point
+PMN0012716,Uyilankulam,MNR,HOSPITAL,PMCU,,,missing
+PMN0012724,Vellankulam,MNR,HOSPITAL,PMCU,,,shared_point
+PMN0012732,Vepankulam,MNR,HOSPITAL,PMCU,,,shared_point
+PMN0012740,Adampan,MNR,MOH_OFFICE,MOH,8.944842,79.996862,verified
+PMN0012757,Madhu,MNR,MOH_OFFICE,MOH,,,shared_point
+PMN0012765,Mannar,MNR,MOH_OFFICE,MOH,8.979156,79.913910,verified
+PMN0012773,Murunkan,MNR,MOH_OFFICE,MOH,8.836611,80.036129,verified
+PMN0012781,Musali,MNR,MOH_OFFICE,MOH,,,shared_point
+PMR0012849,Kamburupitiya,MTR,HOSPITAL,Base A,6.084910,80.565832,verified
+PMR0012856,Deniyaya,MTR,HOSPITAL,Base B,6.357625,80.568028,verified
+PMR0012864,Akuressa,MTR,HOSPITAL,Divisional A,6.087746,80.472856,verified
+PMR0012872,Mawarala,MTR,HOSPITAL,Divisional A,6.201813,80.592109,verified
+PMR0012880,Weligama,MTR,HOSPITAL,Divisional A,5.974751,80.418916,verified
+PMR0012898,Deiyandara,MTR,HOSPITAL,Divisional B,6.154029,80.600812,verified
+PMR0012906,Dickwella,MTR,HOSPITAL,Divisional B,5.962438,80.677995,verified
+PMR0012914,Gangodagama,MTR,HOSPITAL,Divisional B,6.077479,80.676661,verified
+PMR0012922,Morawaka,MTR,HOSPITAL,Divisional B,6.263949,80.484183,verified
+PMR0012930,Narawelpita,MTR,HOSPITAL,Divisional B,,,shared_point
+PMR0012948,Urubokka,MTR,HOSPITAL,Divisional B,6.282538,80.633265,verified
+PMR0012955,Kirinda-Puhulwella,MTR,HOSPITAL,Divisional C,6.046395,80.632422,verified
+PMR0012963,Pallegama,MTR,HOSPITAL,Divisional C,,,shared_point
+PMR0012971,Ruhunugama,MTR,HOSPITAL,Divisional C,6.065270,80.539699,verified
+PMR0012989,Talalla,MTR,HOSPITAL,Divisional C,5.948720,80.613615,verified
+PMR0012997,Urugamuwa,MTR,HOSPITAL,Divisional C,,,shared_point
+PMR0013003,Beralapanatara,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013011,Dehigaspe,MTR,HOSPITAL,PMCU,6.177568,80.478367,verified
+PMR0013029,Denipitiya,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013037,Derangala,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013045,Devundara (Devunuwara),MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013052,Galbokka,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013060,Hakmana,MTR,HOSPITAL,PMCU,6.080879,80.642517,verified
+PMR0013078,Horagoda,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013086,Kamburugamuwa,MTR,HOSPITAL,PMCU,5.951175,80.495904,verified
+PMR0013094,Kapugama Pallawela,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013102,Kekanadura,MTR,HOSPITAL,PMCU,5.963638,80.601969,verified
+PMR0013110,Kotapola (Kosmodara),MTR,HOSPITAL,PMCU,6.291182,80.558865,verified
+PMR0013128,Makandura,MTR,HOSPITAL,PMCU,,,wrong_district
+PMR0013136,Maramba,MTR,HOSPITAL,PMCU,6.142017,80.480030,verified
+PMR0013144,Midigama,MTR,HOSPITAL,PMCU,,,wrong_district
+PMR0013151,Mirissa,MTR,HOSPITAL,PMCU,5.953166,80.453847,verified
+PMR0013169,Rotamba,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013177,Tellijjawila,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013185,Thihagoda,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013193,Yatiyana,MTR,HOSPITAL,PMCU,,,shared_point
+PMR0013201,Akuressa,MTR,MOH_OFFICE,MOH,6.087504,80.474472,verified
+PMR0013219,Athuraliya,MTR,MOH_OFFICE,MOH,6.096437,80.479606,verified
+PMR0013227,Deniyaya (Kotapola),MTR,MOH_OFFICE,MOH,6.327334,80.556547,verified
+PMR0013235,Devinuwara,MTR,MOH_OFFICE,MOH,5.925891,80.586473,verified
+PMR0013243,Dickwella,MTR,MOH_OFFICE,MOH,5.965922,80.689228,verified
+PMR0013250,Hakmana,MTR,MOH_OFFICE,MOH,6.081379,80.641425,verified
+PMR0013268,Kamburupitiya,MTR,MOH_OFFICE,MOH,6.065540,80.565998,verified
+PMR0013276,Kirinda-Puhulwella,MTR,MOH_OFFICE,MOH,,,shared_point
+PMR0013284,Malimbada,MTR,MOH_OFFICE,MOH,6.056356,80.509189,verified
+PMR0013292,Matara MC,MTR,MOH_OFFICE,MOH,5.951892,80.538607,verified
+PMR0013300,Matara PS Kekanadura,MTR,MOH_OFFICE,MOH,5.963638,80.602012,verified
+PMR0013318,Morawaka,MTR,MOH_OFFICE,MOH,6.243466,80.493022,verified
+PMR0013326,Mulatiyana,MTR,MOH_OFFICE,MOH,6.143871,80.563060,verified
+PMR0013334,Pasgoda (Urubokka),MTR,MOH_OFFICE,MOH,6.282729,80.633611,verified
+PMR0013342,Thihagoda,MTR,MOH_OFFICE,MOH,5.996687,80.556331,verified
+PMR0013359,Weligama,MTR,MOH_OFFICE,MOH,5.974860,80.419739,verified
+PMR0013367,Welipitiya,MTR,MOH_OFFICE,MOH,6.006046,80.444414,verified
+PMT0013409,Dambulla,MTL,HOSPITAL,Base A,7.872635,80.650600,verified
+PMT0013417,Matale,MTL,HOSPITAL,District General,,,shared_point
+PMT0013425,Galewela,MTL,HOSPITAL,Divisional B,7.760542,80.571552,verified
+PMT0013433,Madipola,MTL,HOSPITAL,Divisional B,7.685835,80.576848,verified
+PMT0013441,Rattota,MTL,HOSPITAL,Divisional B,,,shared_point
+PMT0013458,Gammaduwa,MTL,HOSPITAL,Divisional C,,,shared_point
+PMT0013466,Handungamuwa,MTL,HOSPITAL,Divisional C,7.631848,80.927985,verified
+PMT0013474,Hattota-Amuna,MTL,HOSPITAL,Divisional C,7.630570,80.821679,verified
+PMT0013482,Hettipola,MTL,HOSPITAL,Divisional C,,,shared_point
+PMT0013490,Illukkumbura,MTL,HOSPITAL,Divisional C,,,shared_point
+PMT0013508,Kimbissa (Sigiriya),MTL,HOSPITAL,Divisional C,7.941692,80.732185,verified
+PMT0013516,Kongahawela,MTL,HOSPITAL,Divisional C,7.678281,80.693493,verified
+PMT0013524,Laggala Pallegama,MTL,HOSPITAL,Divisional C,,,shared_point
+PMT0013532,Leliambe - Rehabilitation,MTL,HOSPITAL,Divisional C,,,shared_point
+PMT0013540,Lenadora,MTL,HOSPITAL,Divisional C,7.756403,80.664887,verified
+PMT0013557,Maraka,MTL,HOSPITAL,Divisional C,7.587030,80.957633,verified
+PMT0013565,Muwandeniya,MTL,HOSPITAL,Divisional C,7.465384,80.663775,verified
+PMT0013573,Nalanda,MTL,HOSPITAL,Divisional C,7.664927,80.636821,verified
+PMT0013581,Owilikanda,MTL,HOSPITAL,Divisional C,7.460789,80.587399,verified
+PMT0013599,Yatawatta,MTL,HOSPITAL,Divisional C,7.562803,80.588247,verified
+PMT0013607,Aluthwewa,MTL,HOSPITAL,PMCU,7.788251,80.519493,verified
+PMT0013615,Aluwihara,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013623,Bandarapola (Kandenuwara),MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013631,Devahuwa,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013649,Dullewa,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013656,Elkaduwa,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013664,Gurubebila,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013672,Kalundawa,MTL,HOSPITAL,PMCU,,,missing
+PMT0013680,Madawalaulpatha,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013698,Opalgala,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013706,Paldeniya,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013714,Pallepola,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013722,Ukuwela,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013730,Wahakotte,MTL,HOSPITAL,PMCU,,,shared_point
+PMT0013748,Wewalawewa,MTL,HOSPITAL,PMCU,7.874190,80.767993,verified
+PMT0013755,Ambanganga Korale,MTL,MOH_OFFICE,MOH,7.542355,80.673281,verified
+PMT0013763,Dambulla,MTL,MOH_OFFICE,MOH,,,shared_point
+PMT0013771,Dambulla MC,MTL,MOH_OFFICE,MOH,,,shared_point
+PMT0013789,Galewela,MTL,MOH_OFFICE,MOH,7.760791,80.571896,verified
+PMT0013797,Laggala-Pallegama,MTL,MOH_OFFICE,MOH,7.592298,80.843221,verified
+PMT0013805,Matale,MTL,MOH_OFFICE,MOH,,,shared_point
+PMT0013813,Matale MC,MTL,MOH_OFFICE,MOH,,,shared_point
+PMT0013821,Naula,MTL,MOH_OFFICE,MOH,7.705020,80.651700,verified
+PMT0013839,Pallepola,MTL,MOH_OFFICE,MOH,7.627842,80.605297,verified
+PMT0013847,Rattota,MTL,MOH_OFFICE,MOH,,,shared_point
+PMT0013854,Ukuwela,MTL,MOH_OFFICE,MOH,7.450497,80.629618,verified
+PMT0013862,Wilgamuwa,MTL,MOH_OFFICE,MOH,7.539982,80.915581,verified
+PMT0013870,Yatawatta,MTL,MOH_OFFICE,MOH,,,shared_point
+PNE0013920,Dickoya,NEL,HOSPITAL,Base A,6.855357,80.600951,verified
+PNE0013938,Rikillagaskada,NEL,HOSPITAL,Base B,7.145327,80.782574,verified
+PNE0013946,Maskeliya,NEL,HOSPITAL,Divisional A,,,shared_point
+PNE0013953,Walapane,NEL,HOSPITAL,Divisional A,7.102424,80.858882,verified
+PNE0013961,Bagawantalawa,NEL,HOSPITAL,Divisional B,6.794789,80.678358,verified
+PNE0013979,Kotagala,NEL,HOSPITAL,Divisional B,6.939125,80.625111,verified
+PNE0013987,Lindula,NEL,HOSPITAL,Divisional B,6.922125,80.686732,verified
+PNE0013995,Maldeniya,NEL,HOSPITAL,Divisional B,7.028179,80.647176,verified
+PNE0014001,Maturata,NEL,HOSPITAL,Divisional B,7.080539,80.801603,verified
+PNE0014019,Ramboda,NEL,HOSPITAL,Divisional B,7.062436,80.685675,verified
+PNE0014027,Udapussellewa,NEL,HOSPITAL,Divisional B,,,shared_point
+PNE0014035,Watawala,NEL,HOSPITAL,Divisional B,6.943081,80.540308,verified
+PNE0014043,Agarapatana,NEL,HOSPITAL,Divisional C,6.870023,80.685312,verified
+PNE0014050,Dayagama West,NEL,HOSPITAL,Divisional C,6.853593,80.757854,verified
+PNE0014068,Ginigathhena,NEL,HOSPITAL,Divisional C,6.990547,80.489340,verified
+PNE0014076,Gonagantenna,NEL,HOSPITAL,Divisional C,,,shared_point
+PNE0014084,Gonapitiya,NEL,HOSPITAL,Divisional C,7.053545,80.803235,verified
+PNE0014092,Hanguranketha,NEL,HOSPITAL,Divisional C,7.180073,80.772904,verified
+PNE0014100,High forest,NEL,HOSPITAL,Divisional C,7.066754,80.839970,verified
+PNE0014118,Laxapana,NEL,HOSPITAL,Divisional C,,,shared_point
+PNE0014126,Madulla,NEL,HOSPITAL,Divisional C,7.053699,80.926470,verified
+PNE0014134,Mandarannuwara,NEL,HOSPITAL,Divisional C,7.039216,80.782886,verified
+PNE0014142,Muloya,NEL,HOSPITAL,Divisional C,7.097178,80.750916,verified
+PNE0014159,Nildandahinna,NEL,HOSPITAL,Divisional C,7.078531,80.892629,verified
+PNE0014167,North Medakumbura,NEL,HOSPITAL,Divisional C,,,shared_point
+PNE0014175,Theripaha,NEL,HOSPITAL,Divisional C,7.120083,80.925866,verified
+PNE0014183,Ambewela,NEL,HOSPITAL,PMCU,,,wrong_district
+PNE0014191,Hangarapitiya,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014209,Hapugastalawa,NEL,HOSPITAL,PMCU,7.057579,80.571075,verified
+PNE0014217,Hatton,NEL,HOSPITAL,PMCU,6.895259,80.595274,verified
+PNE0014225,Kalaganwatta,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014233,Kandapola,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014241,Ketabula,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014258,Kirthibandarapura,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014266,Kurupanawela,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014274,Manakola,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014282,Morape (Maswela),NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014290,Munwatta,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014308,Nanuoya,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014316,Nawathispane,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014324,Proft,NEL,HOSPITAL,PMCU,7.084623,80.688164,verified
+PNE0014332,Pundaluoya,NEL,HOSPITAL,PMCU,7.012846,80.663618,verified
+PNE0014340,Ragala,NEL,HOSPITAL,PMCU,7.012763,80.857197,verified
+PNE0014357,Rupaha,NEL,HOSPITAL,PMCU,7.044158,80.903040,verified
+PNE0014365,Upcot,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014373,Widulipura (Nor.Br.),NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014381,Wijebahukanda,NEL,HOSPITAL,PMCU,,,shared_point
+PNE0014399,Ambagamuwa (Ginigathhena),NEL,MOH_OFFICE,MOH,6.991944,80.492211,verified
+PNE0014407,Bogawanthalawa,NEL,MOH_OFFICE,MOH,6.794760,80.678535,verified
+PNE0014415,Kotagala,NEL,MOH_OFFICE,MOH,6.939936,80.625056,verified
+PNE0014423,Kothmale,NEL,MOH_OFFICE,MOH,7.062013,80.685533,verified
+PNE0014431,Lidula (Thalawakale),NEL,MOH_OFFICE,MOH,6.922513,80.686195,verified
+PNE0014449,Maskeliya,NEL,MOH_OFFICE,MOH,6.834930,80.574267,verified
+PNE0014456,Maturata,NEL,MOH_OFFICE,MOH,7.041811,80.780700,verified
+PNE0014464,Nawathispane,NEL,MOH_OFFICE,MOH,,,shared_point
+PNE0014472,Nuwara Eliya,NEL,MOH_OFFICE,MOH,,,shared_point
+PNE0014480,Nuwara Eliya MC,NEL,MOH_OFFICE,MOH,,,shared_point
+PNE0014498,Ragala,NEL,MOH_OFFICE,MOH,7.013437,80.857493,verified
+PNE0014506,Rikillagaskada (Hanguranketha),NEL,MOH_OFFICE,MOH,7.144550,80.781437,verified
+PNE0014514,Walapane,NEL,MOH_OFFICE,MOH,7.102096,80.857825,verified
+PPN0014548,Medirigiriya,POL,HOSPITAL,Base A,8.143200,80.967127,verified
+PPN0014555,Hingurakgoda,POL,HOSPITAL,Base B,8.046060,80.964657,verified
+PPN0014563,Welikanda,POL,HOSPITAL,Base B,7.948117,81.246040,verified
+PPN0014571,Aralaganwila,POL,HOSPITAL,Divisional B,7.787918,81.187984,verified
+PPN0014589,Bakamuna,POL,HOSPITAL,Divisional B,7.775149,80.819941,verified
+PPN0014597,Dimbulagala (Mannampitiya),POL,HOSPITAL,Divisional B,7.904717,81.113251,verified
+PPN0014605,Pulastigama (BOP 400),POL,HOSPITAL,Divisional B,8.042783,81.078751,verified
+PPN0014613,Attanakadawala,POL,HOSPITAL,Divisional C,,,shared_point
+PPN0014621,Diyabeduma,POL,HOSPITAL,Divisional C,,,shared_point
+PPN0014639,Gal-ammuna,POL,HOSPITAL,Divisional C,,,shared_point
+PPN0014647,Jayanthipura,POL,HOSPITAL,Divisional C,,,shared_point
+PPN0014654,Ambagaswewa,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014662,Aselapura,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014670,Damminna,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014688,Divulankadawala,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014696,Ellewewa,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014704,Galoya Junction,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014712,Hatareskotuwa,POL,HOSPITAL,PMCU,8.144126,80.834226,verified
+PPN0014720,Kakulawela,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014738,Meegaswewa,POL,HOSPITAL,PMCU,8.181892,81.047883,verified
+PPN0014746,Nuwaragala,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014753,Onegama,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014761,PSS Colony (Parakrama Samudara),POL,HOSPITAL,PMCU,,,shared_point
+PPN0014779,Sevanapitiya,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014787,Singhapura,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014795,Siripura,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014803,Weheragala,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014811,Wijepura,POL,HOSPITAL,PMCU,,,shared_point
+PPN0014829,Bakamuna (Elahera),POL,MOH_OFFICE,MOH,7.775587,80.818526,verified
+PPN0014837,Dimbulagala,POL,MOH_OFFICE,MOH,7.787865,81.186925,verified
+PPN0014845,Hingurakgoda,POL,MOH_OFFICE,MOH,,,shared_point
+PPN0014852,Lankapura,POL,MOH_OFFICE,MOH,,,shared_point
+PPN0014860,Medirigiriya,POL,MOH_OFFICE,MOH,8.144647,80.965725,verified
+PPN0014878,Siripura,POL,MOH_OFFICE,MOH,,,shared_point
+PPN0014886,Thamankaduwa,POL,MOH_OFFICE,MOH,7.944439,81.007199,verified
+PPN0014894,Welikanda,POL,MOH_OFFICE,MOH,7.947728,81.244951,verified
+PPT0014951,Puttalam,PTM,HOSPITAL,Base A,8.027902,79.838740,verified
+PPT0014969,Anamaduwa,PTM,HOSPITAL,Base B,7.885089,80.002490,verified
+PPT0014977,Marawila,PTM,HOSPITAL,Base B,7.393813,79.831824,verified
+PPT0014985,Dankotuwa,PTM,HOSPITAL,Divisional A,,,shared_point
+PPT0014993,Kalpitiya,PTM,HOSPITAL,Divisional A,8.234040,79.766601,verified
+PPT0015008,Lunuwila,PTM,HOSPITAL,Divisional B,,,wrong_district
+PPT0015016,Mundalama,PTM,HOSPITAL,Divisional B,7.788971,79.827748,verified
+PPT0015024,Nawagaththegama,PTM,HOSPITAL,Divisional B,8.002882,80.106543,verified
+PPT0015032,Udappuwa,PTM,HOSPITAL,Divisional B,7.759670,79.789379,verified
+PPT0015040,Aluthgama,PTM,HOSPITAL,Divisional C,,,shared_point
+PPT0015057,Anawilludawa,PTM,HOSPITAL,Divisional C,7.700967,79.829107,verified
+PPT0015065,Galmuruwa,PTM,HOSPITAL,Divisional C,7.496180,79.880619,verified
+PPT0015073,Karativu,PTM,HOSPITAL,Divisional C,,,shared_point
+PPT0015081,Kottukachchiya,PTM,HOSPITAL,Divisional C,7.956584,79.943814,verified
+PPT0015099,Madampe,PTM,HOSPITAL,Divisional C,,,shared_point
+PPT0015107,Mahakumbukkadawala,PTM,HOSPITAL,Divisional C,7.847691,79.905782,verified
+PPT0015115,Mampoori,PTM,HOSPITAL,Divisional C,,,shared_point
+PPT0015123,Pulathiwayal,PTM,HOSPITAL,Divisional C,,,shared_point
+PPT0015131,Thabbowa,PTM,HOSPITAL,Divisional C,8.071645,79.925217,verified
+PPT0015149,Wanathavilluwa,PTM,HOSPITAL,Divisional C,8.189777,79.860029,verified
+PPT0015156,Al Kasim,PTM,HOSPITAL,PMCU,,,outside_sri_lanka
+PPT0015164,Alankuda,PTM,HOSPITAL,PMCU,8.062477,79.738082,verified
+PPT0015172,Hiddanagar,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015180,Kandakuda,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015198,Karabe,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015206,Kirimetiyana,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015214,Kokkawila,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015222,Koswatta,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015230,Kottantivu,PTM,HOSPITAL,PMCU,7.854918,79.791597,verified
+PPT0015248,Madawakkulama,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015255,Madurankuliya,PTM,HOSPITAL,PMCU,7.887819,79.817320,verified
+PPT0015263,Maningala,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015271,Mellawa,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015289,Mudalakkuliya,PTM,HOSPITAL,PMCU,7.968192,79.807462,verified
+PPT0015297,Nainamadama,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015305,Nattandiya,PTM,HOSPITAL,PMCU,7.414381,79.867135,verified
+PPT0015313,Pallama,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015321,Pothuwatawana,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015339,Talawila,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015347,Thambagalla,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015354,Thoduwawa,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015362,Walahapitiya,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015370,Wennappuwa,PTM,HOSPITAL,PMCU,7.339082,79.843417,verified
+PPT0015388,Weppanaduwa,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015396,Wijekatupotha,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015404,Willpotha,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015412,Yatakalanna,PTM,HOSPITAL,PMCU,,,shared_point
+PPT0015420,Anamaduwa,PTM,MOH_OFFICE,MOH,7.889992,80.010421,verified
+PPT0015438,Arachchikattuwa,PTM,MOH_OFFICE,MOH,7.668084,79.835000,verified
+PPT0015446,Chilaw,PTM,MOH_OFFICE,MOH,7.579361,79.800968,verified
+PPT0015453,Dankotuwa,PTM,MOH_OFFICE,MOH,7.297689,79.887708,verified
+PPT0015461,Kalpitiya,PTM,MOH_OFFICE,MOH,8.228618,79.761271,verified
+PPT0015479,Karuwalagaswewa,PTM,MOH_OFFICE,MOH,8.048660,79.928884,verified
+PPT0015487,Madampe,PTM,MOH_OFFICE,MOH,7.502211,79.839254,verified
+PPT0015495,Mahawewa,PTM,MOH_OFFICE,MOH,7.433164,79.834420,verified
+PPT0015503,Mundalama,PTM,MOH_OFFICE,MOH,7.788920,79.827510,verified
+PPT0015511,Nattandiya,PTM,MOH_OFFICE,MOH,7.385754,79.833106,verified
+PPT0015529,Nawagarththegama,PTM,MOH_OFFICE,MOH,,,shared_point
+PPT0015537,Pallama,PTM,MOH_OFFICE,MOH,7.696268,79.922552,verified
+PPT0015545,Puttalam,PTM,MOH_OFFICE,MOH,,,shared_point
+PPT0015552,Wanathawilluwa,PTM,MOH_OFFICE,MOH,,,shared_point
+PPT0015560,Wennappuwa,PTM,MOH_OFFICE,MOH,,,shared_point
+PRP0015602,Balangoda,RAT,HOSPITAL,Base B,6.658280,80.712444,verified
+PRP0015610,Kahawatta,RAT,HOSPITAL,Base B,,,shared_point
+PRP0015628,Kalawana,RAT,HOSPITAL,Base B,6.530060,80.397865,verified
+PRP0015636,Embilipitiya,RAT,HOSPITAL,District General,6.326216,80.841867,verified
+PRP0015644,Eheliyagoda,RAT,HOSPITAL,Divisional A,6.848163,80.264714,verified
+PRP0015651,Godakawela,RAT,HOSPITAL,Divisional A,6.502401,80.656162,verified
+PRP0015669,Kaltota,RAT,HOSPITAL,Divisional A,6.659399,80.885379,verified
+PRP0015677,Kiriella,RAT,HOSPITAL,Divisional A,,,shared_point
+PRP0015685,Kolonna,RAT,HOSPITAL,Divisional A,6.406701,80.690771,verified
+PRP0015693,Nivitigala,RAT,HOSPITAL,Divisional A,6.594829,80.452019,verified
+PRP0015701,Pallebedda,RAT,HOSPITAL,Divisional A,6.482740,80.706449,verified
+PRP0015719,Rakwana,RAT,HOSPITAL,Divisional A,6.471443,80.614479,verified
+PRP0015727,Ayagama,RAT,HOSPITAL,Divisional B,6.640075,80.309430,verified
+PRP0015735,Chandrikawewa,RAT,HOSPITAL,Divisional B,6.257331,80.912132,verified
+PRP0015743,Eratna,RAT,HOSPITAL,Divisional B,6.834169,80.407812,verified
+PRP0015750,Gilimale,RAT,HOSPITAL,Divisional B,6.751939,80.426704,verified
+PRP0015768,Marathenna,RAT,HOSPITAL,Divisional B,,,shared_point
+PRP0015776,Pothupitiya,RAT,HOSPITAL,Divisional B,6.430043,80.511611,verified
+PRP0015784,Weligepola,RAT,HOSPITAL,Divisional B,6.578241,80.705765,verified
+PRP0015792,Alupola,RAT,HOSPITAL,Divisional C,6.710576,80.575433,verified
+PRP0015800,Belihuloya,RAT,HOSPITAL,Divisional C,,,shared_point
+PRP0015818,Dumbara,RAT,HOSPITAL,Divisional C,6.724406,80.212658,verified
+PRP0015826,Endana,RAT,HOSPITAL,Divisional C,6.531279,80.532632,verified
+PRP0015834,Gallella,RAT,HOSPITAL,Divisional C,6.709147,80.485227,verified
+PRP0015842,Hunuwala,RAT,HOSPITAL,Divisional C,6.615459,80.605279,verified
+PRP0015859,Kiribathgala,RAT,HOSPITAL,Divisional C,,,shared_point
+PRP0015867,Kiriporuwa,RAT,HOSPITAL,Divisional C,,,shared_point
+PRP0015875,Madampe,RAT,HOSPITAL,Divisional C,,,shared_point
+PRP0015883,Mahawalatenna,RAT,HOSPITAL,Divisional C,,,shared_point
+PRP0015891,Omalpe,RAT,HOSPITAL,Divisional C,6.327612,80.705376,verified
+PRP0015909,Palamkotte,RAT,HOSPITAL,Divisional C,,,wrong_district
+PRP0015917,Pelmadulla,RAT,HOSPITAL,Divisional C,6.622272,80.542563,verified
+PRP0015925,Ranwala,RAT,HOSPITAL,Divisional C,6.542584,80.683712,verified
+PRP0015933,Rassagala,RAT,HOSPITAL,Divisional C,6.692301,80.638381,verified
+PRP0015941,Sooriyakanda,RAT,HOSPITAL,Divisional C,6.433540,80.638241,verified
+PRP0015958,Theppanewa,RAT,HOSPITAL,Divisional C,,,shared_point
+PRP0015966,Udawalawa,RAT,HOSPITAL,Divisional C,6.425419,80.816206,verified
+PRP0015974,"Prison Hospital, Kuruwita",RAT,HOSPITAL,Prison,,,shared_point
+PRP0015982,Atakalampanna,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0015990,Baranduwa,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016006,Buthkanda,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016014,Dellabada,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016022,Delwala,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016030,Dodampe,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016048,Ellagawa,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016055,Galpaya,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016063,Ganegoda,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016071,Kapugala,RAT,HOSPITAL,PMCU,6.647859,80.808741,verified
+PRP0016089,Keeragala,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016097,Kirimetithenna,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016105,Koonkatuwa,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016113,Kuruwita,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016121,Matuwagala,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016139,Moraketiya,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016147,Mullendiyawala,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016154,Napawala,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016162,Narissa,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016170,Pinnawala,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016188,Rathganga,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016196,Rathnapura Town,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016204,Thunkama,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016212,Udawela,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016220,Weragama,RAT,HOSPITAL,PMCU,,,shared_point
+PRP0016238,Ayagama,RAT,MOH_OFFICE,MOH,6.634742,80.314759,verified
+PRP0016246,Balangoda,RAT,MOH_OFFICE,MOH,6.649195,80.698245,verified
+PRP0016253,Eheliyagoda,RAT,MOH_OFFICE,MOH,6.848679,80.264764,verified
+PRP0016261,Elapatha,RAT,MOH_OFFICE,MOH,6.662472,80.385003,verified
+PRP0016279,Embilipitiya,RAT,MOH_OFFICE,MOH,6.326282,80.849254,verified
+PRP0016287,Godakawela,RAT,MOH_OFFICE,MOH,6.502102,80.656733,verified
+PRP0016295,Imbulpe,RAT,MOH_OFFICE,MOH,,,shared_point
+PRP0016303,Kahawatta,RAT,MOH_OFFICE,MOH,6.578587,80.574825,verified
+PRP0016311,Kalawana,RAT,MOH_OFFICE,MOH,6.530367,80.399039,verified
+PRP0016329,Kiriella,RAT,MOH_OFFICE,MOH,6.740333,80.268212,verified
+PRP0016337,Kolonna,RAT,MOH_OFFICE,MOH,6.406211,80.691442,verified
+PRP0016345,Kuruvita,RAT,MOH_OFFICE,MOH,6.780685,80.363096,verified
+PRP0016352,Nivithigala,RAT,MOH_OFFICE,MOH,6.583770,80.418170,verified
+PRP0016360,Openayaka,RAT,MOH_OFFICE,MOH,,,shared_point
+PRP0016378,Pelmadulla,RAT,MOH_OFFICE,MOH,6.622440,80.542389,verified
+PRP0016386,Rathnapura MC,RAT,MOH_OFFICE,MOH,,,shared_point
+PRP0016394,Ratnapura,RAT,MOH_OFFICE,MOH,,,shared_point
+PRP0016402,Weligepola,RAT,MOH_OFFICE,MOH,,,shared_point
+PRP0017285,"Prison Hospital, Kuruvita",RAT,HOSPITAL,Prison,,,shared_point
+PRP0017327,"Prison Hospital, Thunkama",RAT,HOSPITAL,Prison,,,shared_point
+PTM0016519,Kinniya,TRC,HOSPITAL,Base B,8.501539,81.187539,verified
+PTM0016527,Mutur,TRC,HOSPITAL,Base B,8.454534,81.263018,verified
+PTM0016535,Pulmodai,TRC,HOSPITAL,Base B,8.941204,80.983139,verified
+PTM0016543,Echchilampathai,TRC,HOSPITAL,Divisional C,,,shared_point
+PTM0016550,Gomarankadawela,TRC,HOSPITAL,Divisional C,,,shared_point
+PTM0016568,Kilivetty,TRC,HOSPITAL,Divisional C,,,shared_point
+PTM0016576,Kuchchaveli,TRC,HOSPITAL,Divisional C,8.814795,81.102358,verified
+PTM0016584,Mahadivulwewa,TRC,HOSPITAL,Divisional C,,,shared_point
+PTM0016592,Nilaveli,TRC,HOSPITAL,Divisional C,8.681035,81.193632,verified
+PTM0016600,Padavi Siripura,TRC,HOSPITAL,Divisional C,8.929308,80.813901,verified
+PTM0016618,Serunuwara,TRC,HOSPITAL,Divisional C,8.322964,81.299734,verified
+PTM0016626,Seruwila,TRC,HOSPITAL,Divisional C,8.371930,81.317244,verified
+PTM0016634,Thampalagamam,TRC,HOSPITAL,Divisional C,8.477589,81.108949,verified
+PTM0016642,Thoppur,TRC,HOSPITAL,Divisional C,,,outside_sri_lanka
+PTM0016659,Alankerny,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016667,Battukachchiya,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016675,Chenaiyoor,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016683,China Bay,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016691,Gantalawa,TRC,HOSPITAL,PMCU,8.432716,81.053477,verified
+PTM0016709,Kachchakodithivu,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016717,Kakkamunai,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016725,Kappalthurai,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016733,Kumburupitty,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016741,Manalchenai,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016758,Morawewa,TRC,HOSPITAL,PMCU,8.628090,81.043818,verified
+PTM0016766,Mullipothanai,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016774,Naduooth,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016782,Sampaltivu,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016790,Sampoor,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016808,Selvanayaganpuram,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016816,Thiriyai,TRC,HOSPITAL,PMCU,,,shared_point
+PTM0016824,Wan-Ela,TRC,HOSPITAL,PMCU,8.398267,81.097336,verified
+PTM0016832,Gomarankadavala,TRC,MOH_OFFICE,MOH,,,shared_point
+PTM0016840,Ichchilampathai,TRC,MOH_OFFICE,MOH,,,shared_point
+PTM0016857,Kantalai,TRC,MOH_OFFICE,MOH,8.363767,81.005869,verified
+PTM0016865,Kinniya,TRC,MOH_OFFICE,MOH,8.498696,81.179644,verified
+PTM0016873,Kuchchavelly,TRC,MOH_OFFICE,MOH,,,shared_point
+PTM0016881,Muthur,TRC,MOH_OFFICE,MOH,8.453916,81.264494,verified
+PTM0016899,Padavisripura,TRC,MOH_OFFICE,MOH,,,shared_point
+PTM0016907,Seruwila,TRC,MOH_OFFICE,MOH,,,shared_point
+PTM0016915,Thampalakamam,TRC,MOH_OFFICE,MOH,8.477061,81.109424,verified
+PTM0016923,Trincomalee,TRC,MOH_OFFICE,MOH,8.599018,81.217151,verified
+PTM0016931,Uppuveli,TRC,MOH_OFFICE,MOH,8.607961,81.216512,verified
+PTM0017301,"Prison Hospital, Trincomalee",TRC,HOSPITAL,Prison,8.569255,81.236618,verified
+PVN0017004,Cheddikulam,VAV,HOSPITAL,Base B,8.658887,80.312485,verified
+PVN0017012,Vavuniya,VAV,HOSPITAL,District General,8.760589,80.500051,verified
+PVN0017020,Nedunkerny,VAV,HOSPITAL,Divisional B,9.053598,80.652731,verified
+PVN0017038,Mamaduwa,VAV,HOSPITAL,Divisional C,,,shared_point
+PVN0017046,Neriyakulam,VAV,HOSPITAL,Divisional C,8.601246,80.370470,verified
+PVN0017053,Pavatkulam,VAV,HOSPITAL,Divisional C,8.705921,80.421061,verified
+PVN0017061,Poovarasankulam,VAV,HOSPITAL,Divisional C,8.752560,80.367279,verified
+PVN0017079,Puliyankulam,VAV,HOSPITAL,Divisional C,8.964638,80.525960,verified
+PVN0017087,Sithamparapuram,VAV,HOSPITAL,Divisional C,,,shared_point
+PVN0017095,Ulukulam,VAV,HOSPITAL,Divisional C,8.663401,80.405193,verified
+PVN0017103,Kalabogaswawa,VAV,HOSPITAL,PMCU,,,shared_point
+PVN0017111,Navvi,VAV,HOSPITAL,PMCU,,,shared_point
+PVN0017129,Omanthai,VAV,HOSPITAL,PMCU,,,shared_point
+PVN0017137,Sooduventhapulavu,VAV,HOSPITAL,PMCU,,,shared_point
+PVN0017145,Cheddikulam,VAV,MOH_OFFICE,MOH,8.657364,80.312516,verified
+PVN0017152,Vavuniya,VAV,MOH_OFFICE,MOH,,,shared_point
+PVN0017160,Vavuniya North,VAV,MOH_OFFICE,MOH,,,shared_point
+PVN0017178,Vavuniya South,VAV,MOH_OFFICE,MOH,8.757978,80.507724,verified
