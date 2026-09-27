@@ -7,14 +7,20 @@ import { type Bounds, SRI_LANKA } from './geometry'
 import { facilityLabel, reportLabel } from './labels'
 
 /*
- * CARTO's light basemap over OpenStreetMap data: free, no API key, no billing.
- * Its near-white ground and grey roads sit under the page's paper and ink
- * without competing with the report dots. Google Maps is not used anywhere in
- * this project; see the README.
+ * OpenStreetMap's own tiles: free, no API key, no billing, under the OSM Tile
+ * Usage Policy, which fits a demonstration's light use. CARTO's basemaps were
+ * the first choice, but by September 2026 they stamp "API key required" across
+ * every tile requested without a key. Google Maps is not used anywhere in this
+ * project; see the README.
+ *
+ * The standard OSM style is colourful, so the tile layer is drawn in greyscale
+ * and let into the paper ground beneath it: roads and coast stay legible, and
+ * the only colour on the map is the symptom groups'.
  */
-const TILES = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+const TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 const ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+const TILE_TREATMENT = 'grayscale opacity-60'
 
 /** Ink, for facility rings; matches --color-ink. */
 const INK = '#15222b'
@@ -54,7 +60,7 @@ export function ReportMap({ reports, facilities, bounds, frameKey }: ReportMapPr
       ]}
       className="h-full w-full bg-paper-sunk"
     >
-      <TileLayer url={TILES} attribution={ATTRIBUTION} subdomains="abcd" maxZoom={20} />
+      <TileLayer url={TILES} attribution={ATTRIBUTION} maxZoom={19} className={TILE_TREATMENT} />
       <Frame bounds={bounds} frameKey={frameKey} />
 
       {reports.map((report) => (

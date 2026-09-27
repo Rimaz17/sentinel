@@ -198,7 +198,7 @@ export function DashboardPage() {
       <footer className="border-t border-t-ink-14 py-md">
         <p className={cx(shell, 'text-label-sm text-ink-70')}>
           Facility registry derived from the Ministry of Health Institutions dataset published by
-          Team Watchdog. Map data © OpenStreetMap contributors, tiles © CARTO.
+          Team Watchdog. Map data and tiles © OpenStreetMap contributors.
         </p>
       </footer>
     </div>
