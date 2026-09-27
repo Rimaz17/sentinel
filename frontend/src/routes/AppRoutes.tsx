@@ -1,13 +1,15 @@
 import { Route, Routes } from 'react-router-dom'
+import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { LandingPage } from '@/features/landing/LandingPage'
 import { PlannedPage } from '@/features/planned/PlannedPage'
 
 /**
  * The route map from the project plan.
  *
- * Only the landing page is built. Every other route renders a page that says so
- * and names the build phase it belongs to, so a link from the front page is
- * never a dead end and never a mock-up presented as a product.
+ * The landing page and the internal dashboard are built. Every other route
+ * renders a page that says so and names the build phase it belongs to, so a
+ * link from the front page is never a dead end and never a mock-up presented
+ * as a product.
  */
 export function AppRoutes() {
   return (
@@ -79,17 +81,16 @@ export function AppRoutes() {
         }
       />
 
+      <Route path="/app" element={<DashboardPage />} />
+      <Route path="/app/districts/:code" element={<DashboardPage />} />
+
       <Route
-        path="/app/*"
+        path="/app/admin/*"
         element={
-          <PlannedPage title="The internal dashboard" phase="Phase 3 · Dashboard v1">
+          <PlannedPage title="Administration" phase="Phase 4 · Accounts and roles">
             <p>
-              The inspector’s view: individual report positions at roughly 100 m precision,
-              two-kilometre cluster rings, facility markers, per-area charts and the alert queue.
-            </p>
-            <p>
-              Access is scoped to the districts on your account, and that scope is enforced on every
-              query rather than by hiding things in the interface.
+              The facility registry, facility invite codes, and inspector accounts. Inspector
+              accounts are created here by a system administrator; there is no sign-up for them.
             </p>
           </PlannedPage>
         }
