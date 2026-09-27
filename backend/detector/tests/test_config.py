@@ -33,11 +33,11 @@ def test_the_environment_wins_over_the_file(tmp_path):
     assert settings["password"] == "from-env"
 
 
-def test_the_first_env_file_found_wins_over_later_ones(tmp_path):
+def test_a_later_env_file_wins_as_it_does_for_the_api(tmp_path):
     here, root = tmp_path / "here.env", tmp_path / "root.env"
-    here.write_text("SENTINEL_DB_PASSWORD=here", encoding="utf-8")
-    root.write_text("\n".join(f"{k}={v}" for k, v in ENV.items()), encoding="utf-8")
-    assert connection_settings({}, env_files=[here, root])["password"] == "here"
+    here.write_text("\n".join(f"{k}={v}" for k, v in ENV.items()), encoding="utf-8")
+    root.write_text("SENTINEL_DB_PASSWORD=root", encoding="utf-8")
+    assert connection_settings({}, env_files=[here, root])["password"] == "root"
 
 
 def test_quotes_around_a_value_are_removed(tmp_path):
