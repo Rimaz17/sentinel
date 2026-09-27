@@ -21,8 +21,8 @@ create table alerts (
     observed_count    integer not null,
     baseline_mean     numeric(8, 2) not null,
     baseline_sd       numeric(8, 2) not null,
-    z_score           numeric(6, 2) not null,
-    peak_z_score      numeric(6, 2) not null,
+    z_score           numeric(9, 2) not null,
+    peak_z_score      numeric(9, 2) not null,
     threshold         numeric(4, 2) not null,
     constraint alerts_symptom_group check (
         symptom_group in ('DENGUE_LIKE', 'INFLUENZA_LIKE', 'GASTROINTESTINAL', 'LEPTOSPIROSIS_LIKE')
