@@ -1,0 +1,5 @@
+# Development tools for the simulator and scripts/facility-registry.
+# The simulator itself needs nothing beyond the standard library.
+pytest==9.1.1
+ruff==0.16.9
+black==26.5.1

@@ -1,0 +1,22 @@
+[project]
+name = "sentinel-simulator"
+version = "0.1.0"
+description = "Generates simulated symptom reports and posts them to the Sentinel ingestion API"
+requires-python = ">=3.12"
+# Standard library only at runtime; development tools are in requirements-dev.txt.
+dependencies = []
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
