@@ -389,6 +389,11 @@ These are documented on purpose and are not defects.
 - **No authentication until Phase 4.** A facility names itself in a request
   header, and every endpoint is open. See
   [ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
+- **Small or gradual outbreaks are caught late or not at all.** At the shipped
+  3 sd, an outbreak adding half again to a district's usual week is detected
+  28% of the time, and the median time to detect across all injected outbreaks
+  is 140 hours, because a 7-day window only fills as an outbreak grows. See
+  [Measured detection](#measured-detection).
 - **Detection assumes a stable baseline.** A prior year containing a real epidemic
   inflates "normal" and reduces future sensitivity. Periodic recalibration would be
   needed.
