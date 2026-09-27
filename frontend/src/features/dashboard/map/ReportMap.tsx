@@ -97,6 +97,16 @@ export function ReportMap({ reports, facilities, bounds, frameKey }: ReportMapPr
 
 function Frame({ bounds, frameKey }: { bounds: Bounds; frameKey: string }) {
   const map = useMap()
+
+  // Leaflet measures its container once. Panels loading around the map can
+  // resize it afterwards, which would leave tiles missing and the frame off
+  // centre, so it measures again whenever the container changes size.
+  useEffect(() => {
+    const observer = new ResizeObserver(() => map.invalidateSize())
+    observer.observe(map.getContainer())
+    return () => observer.disconnect()
+  }, [map])
+
   useEffect(() => {
     map.fitBounds(bounds, { padding: [24, 24], maxZoom: 13 })
     // Deliberately keyed to the selection alone: see ReportMapProps.frameKey.
