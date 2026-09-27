@@ -2,12 +2,12 @@
 
     python -m sentinel_simulator backfill --days 63
     python -m sentinel_simulator live
-    python -m sentinel_simulator \
-        --outbreak district=KDY,group=DENGUE_LIKE,extra=40,start=-3d backfill
+    python -m sentinel_simulator --outbreak SETTINGS backfill
 
 Detection compares the last 7 days with the 8 weeks before them, so a 63-day
 backfill gives it a full window on first run. `--outbreak` injects an outbreak
-on top of the baseline, timed relative to now; see sentinel_simulator.outbreaks.
+on top of the baseline, timed relative to now, with SETTINGS such as
+district=KDY,group=DENGUE_LIKE,extra=40,start=-3d; see sentinel_simulator.outbreaks.
 """
 
 from __future__ import annotations
