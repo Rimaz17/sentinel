@@ -15,6 +15,15 @@ export class ApiError extends Error {
 
 type Params = Record<string, string | number | null | undefined>
 
+const UNREACHABLE = 'The API could not be reached. Check that it is running.'
+
+/*
+ * What a proxy or gateway answers when the API behind it is down or not
+ * started: the dev server's proxy, for one, answers 502. The API itself never
+ * sends these, so without a problem body they mean the API was not reached.
+ */
+const GATEWAY_STATUSES = new Set([502, 503, 504])
+
 /** A path under /api with its query string, leaving out empty parameters. */
 export function apiPath(path: string, params: Params = {}): string {
   const query = new URLSearchParams()
@@ -43,7 +52,7 @@ export async function getJson<T>(path: string, params?: Params, signal?: AbortSi
     if (cause instanceof DOMException && cause.name === 'AbortError') {
       throw cause
     }
-    throw new ApiError(0, 'The API could not be reached. Check that it is running.')
+    throw new ApiError(0, UNREACHABLE)
   }
 
   if (!response.ok) {
@@ -54,6 +63,9 @@ export async function getJson<T>(path: string, params?: Params, signal?: AbortSi
 }
 
 async function problemDetail(response: Response): Promise<string> {
+  const fallback = GATEWAY_STATUSES.has(response.status)
+    ? UNREACHABLE
+    : `The API answered ${response.status}.`
   try {
     const problem: unknown = await response.json()
     if (
@@ -67,5 +79,5 @@ async function problemDetail(response: Response): Promise<string> {
   } catch {
     // Not JSON: a proxy error page, for instance. Fall through to the status.
   }
-  return `The API answered ${response.status}.`
+  return fallback
 }

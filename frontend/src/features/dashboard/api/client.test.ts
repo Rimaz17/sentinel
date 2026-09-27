@@ -50,10 +50,22 @@ describe('getJson', () => {
   })
 
   it('names the status when an error response is not a problem', async () => {
-    stubFetch(new Response('<html>Bad gateway</html>', { status: 502 }))
+    stubFetch(new Response('<html>Server error</html>', { status: 500 }))
 
-    await expect(getJson('/alerts')).rejects.toThrow('The API answered 502.')
+    await expect(getJson('/alerts')).rejects.toThrow('The API answered 500.')
   })
+
+  it.each([502, 503, 504])(
+    'reads a bare %i from the proxy as the API not being reached',
+    async (status) => {
+      stubFetch(new Response('', { status }))
+
+      await expect(getJson('/alerts')).rejects.toMatchObject({
+        status,
+        message: 'The API could not be reached. Check that it is running.',
+      })
+    },
+  )
 
   it('says the API could not be reached when the request itself fails', async () => {
     stubFetch(new TypeError('Failed to fetch'))
