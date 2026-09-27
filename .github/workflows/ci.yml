@@ -99,3 +99,36 @@ jobs:
           ruff check .
           black --check .
           pytest
+
+  detector:
+    name: Detector
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/detector
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            backend/detector/requirements.txt
+            backend/detector/requirements-dev.txt
+
+      - name: Install
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Check formatting
+        run: black --check .
+
+      # Integration tests start PostgreSQL with Testcontainers on the runner's
+      # Docker, and build its schema from the API's Flyway migrations. The
+      # evaluation tests use the simulator from ../simulator.
+      - name: Test
+        run: pytest
