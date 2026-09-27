@@ -1,0 +1,28 @@
+# Local development services. Phase 1 needs only the database; the rest of the
+# stack joins this file in the phases that introduce it.
+#
+# Run from the repository root:
+#   docker compose --env-file .env -f infra/docker-compose.yml up -d
+
+name: sentinel
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports:
+      # Bound to loopback only; the database is never reachable from the network.
+      - "127.0.0.1:${SENTINEL_DB_PORT:?set SENTINEL_DB_PORT in .env}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:

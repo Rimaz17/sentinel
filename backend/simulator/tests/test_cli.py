@@ -1,0 +1,69 @@
+import random
+from datetime import UTC, datetime, timedelta
+
+from sentinel_simulator.baselines import WEEKLY_BASELINES
+from sentinel_simulator.cli import backfill, live, main, parse_args
+from sentinel_simulator.generator import Facility, Generator
+
+NOW = datetime(2026, 9, 27, 6, 0, tzinfo=UTC)
+
+
+class RecordingClient:
+    def __init__(self):
+        self.submitted = []
+
+    def submit(self, report):
+        self.submitted.append(report)
+        return {"reportId": "x"}
+
+
+def generator(seed=5):
+    facilities = [Facility(f"P{d}0000001", d, "Teaching", 7.0, 80.5) for d in WEEKLY_BASELINES]
+    return Generator(facilities, random.Random(seed))
+
+
+def test_backfill_posts_every_report_in_the_window(capsys):
+    client = RecordingClient()
+
+    posted = backfill(client, generator(), days=7, now=NOW)
+
+    assert posted == len(client.submitted) > 0
+    assert all(NOW - timedelta(days=7) <= r.reported_at < NOW for r in client.submitted)
+    assert "Backfill complete" in capsys.readouterr().out
+
+
+def test_live_posts_each_interval_as_it_ends(capsys):
+    client = RecordingClient()
+    moments = iter([NOW, NOW + timedelta(hours=1), NOW + timedelta(hours=2)])
+    slept = []
+
+    posted = live(
+        client,
+        generator(),
+        interval=3600,
+        clock=lambda: next(moments),
+        sleep=slept.append,
+        batches=2,
+    )
+
+    assert slept == [3600, 3600]
+    assert posted == len(client.submitted) > 0
+    assert all(NOW <= r.reported_at < NOW + timedelta(hours=2) for r in client.submitted)
+
+
+def test_the_api_url_comes_from_the_environment(monkeypatch):
+    monkeypatch.setenv("SENTINEL_API_URL", "http://api.example:9000")
+    assert parse_args(["backfill"]).api_url == "http://api.example:9000"
+
+
+def test_defaults(monkeypatch):
+    monkeypatch.delenv("SENTINEL_API_URL", raising=False)
+    args = parse_args(["backfill"])
+    assert (args.api_url, args.days, args.spread_km) == ("http://localhost:8080", 63, 2.0)
+    assert parse_args(["live"]).interval == 60.0
+
+
+def test_an_unreachable_api_exits_with_an_error(capsys):
+    # Port 9 (discard) on loopback is closed on any ordinary machine.
+    assert main(["--api-url", "http://127.0.0.1:9", "backfill", "--days", "1"]) == 1
+    assert "Could not reach the API" in capsys.readouterr().err

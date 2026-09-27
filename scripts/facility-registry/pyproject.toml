@@ -1,0 +1,19 @@
+[project]
+name = "sentinel-facility-registry"
+version = "0.1.0"
+description = "Builds the facility registry seed from the Ministry of Health institution list"
+requires-python = ">=3.12"
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

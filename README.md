@@ -41,7 +41,7 @@ spread evenly across a district suggests a wider seasonal wave.
 
 | Phase | Scope | State |
 |---|---|---|
-| 1 | Walking skeleton, facility registry, simulator, ingestion API, PostgreSQL | Not started |
+| 1 | Walking skeleton, facility registry, simulator, ingestion API, PostgreSQL | **Built** |
 | 2 | Detection v1, z-score baseline job writing alerts | Not started |
 | 3 | Dashboard v1, React + Leaflet, polling | Not started |
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | Not started |
@@ -50,8 +50,13 @@ spread evenly across a district suggests a wider seasonal wave.
 | 7 | Ship it, Docker Compose, CI, deployed demo | Not started |
 | n/a | **Landing page**, the public entry point at `/` | **Built** |
 
-The landing page is the one surface that exists today. Every other route renders a
-page stating which phase it belongs to and what will live there; see
+Phase 1 is the backend's walking skeleton: the facility registry seeded from
+Ministry of Health data, a Python simulator posting reports to a Spring Boot
+ingestion API, anonymised reports stored in PostgreSQL, and an endpoint listing
+recent reports. It has no user interface yet; the dashboards arrive in Phase 3.
+
+The landing page is the one browser surface that exists today. Every other route
+renders a page stating which phase it belongs to and what will live there; see
 [ADR 0002](docs/adr/0002-unbuilt-routes-render-placeholders.md).
 
 No detector metrics appear in this README yet, because the detector has not been
@@ -87,9 +92,8 @@ npm run dev
 
 The dev server prints a local URL, normally <http://localhost:5173>.
 
-There is **no backend to run yet**, the landing page is entirely static and makes
-no network requests. Phase 1 is the first phase that produces something to open in
-IntelliJ.
+The landing page is entirely static and makes no network requests; it does not
+need the backend running.
 
 ### Frontend scripts
 
@@ -105,12 +109,117 @@ IntelliJ.
 | `npm run test:watch` | Vitest, watch mode |
 | `npm run test:coverage` | Vitest with a v8 coverage report |
 
+## Running the backend
+
+Requires **Docker**, **Java 17** and, for the simulator, **Python 3.12 or later**.
+Maven is not needed; the Maven wrapper fetches it.
+
+**1. Start the database.** From the repository root, copy the example settings
+(and change the password in `.env`), then start PostgreSQL:
+
+```bash
+cp .env.example .env
+```
+
+```bash
+docker compose --env-file .env -f infra/docker-compose.yml up -d
+```
+
+It listens on `localhost:5433`, so it does not collide with a PostgreSQL already
+installed on the default port.
+
+**2. Start the API.** It reads the repository's `.env`, applies the database
+migrations and, on first start, seeds the facility registry. On Windows, use
+`mvnw.cmd`.
+
+```bash
+cd backend/api
+./mvnw spring-boot:run
+```
+
+The API listens on <http://localhost:8080>.
+
+**3. Feed it reports.** The simulator uses only Python's standard library. From
+`backend/simulator`, fill in nine weeks of history, which is what detection
+compares against, then keep reports arriving:
+
+```bash
+python -m sentinel_simulator backfill --days 63
+```
+
+```bash
+python -m sentinel_simulator live
+```
+
+A 63-day backfill posts about 10,000 reports. Live mode posts at the simulated
+real-time rate, around 1,100 reports a week across the country: about twenty an
+hour at a weekday's morning peak and about one an hour overnight, so it is quiet
+by design. `--seed N` makes a run repeatable; `--api-url`, or `SENTINEL_API_URL`,
+points it at another API.
+
+**4. Look at what arrived.**
+
+```bash
+curl "http://localhost:8080/api/reports?limit=5&district=KDY"
+```
+
+### API
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/facilities` | The facility registry; `?district=KDY` for one district. A location is null where it could not be verified. |
+| `POST /api/ingestion/reports` | Submits a report as the facility named in the `X-Facility-Code` header. Answers `202 Accepted` with the report's id. |
+| `GET /api/reports` | Recent reports, newest reported first; `?limit=` 1 to 500 (default 50), `?district=KDY` for one district. |
+
+A report as a facility might send it, identity included:
+
+```json
+{
+  "symptomGroup": "DENGUE_LIKE",
+  "reportedAt": "2026-09-27T09:40:00+05:30",
+  "age": 37,
+  "latitude": 7.2912345,
+  "longitude": 80.6337499,
+  "patientName": "SIMULATED patient 000001",
+  "nicNumber": "SIMULATED-000001",
+  "phoneNumber": "SIMULATED-0000000000",
+  "homeAddress": "SIMULATED address 000001, KDY"
+}
+```
+
+What is stored from it is the facility, its district, `DENGUE_LIKE`, the age band
+`30-39`, the location `7.291, 80.634` and the two timestamps. The symptom groups
+are `DENGUE_LIKE`, `INFLUENZA_LIKE`, `GASTROINTESTINAL` and `LEPTOSPIROSIS_LIKE`.
+`dateOfBirth` (`yyyy-mm-dd`) may stand in for `age`; the location is optional.
+Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details
+that name the field at fault and never repeat what was submitted in it.
+
+**Phase 1 has no authentication.** The header names a facility but does not prove
+it, and every endpoint is open, including report locations. Keep the API on your
+own machine until Phase 4 replaces the header with sign-in; see
+[ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
+
+### Backend checks
+
+| Command | Run from | What it does |
+|---|---|---|
+| `./mvnw verify` | `backend/api` | Formatting check, unit tests, and integration tests against a real PostgreSQL started by Testcontainers (needs Docker) |
+| `./mvnw spotless:apply` | `backend/api` | Format the Java sources |
+| `pip install -r requirements-dev.txt` | `backend/simulator` | Install pytest, Ruff and Black |
+| `pytest` · `ruff check .` · `black .` | `backend/simulator` or `scripts/facility-registry` | Test, lint and format either Python project |
+
 ## Repository layout
 
 ```
 sentinel/
+├── backend/
+│   ├── api/               Spring Boot: facility registry, ingestion, reports
+│   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
+│   └── simulator/         Python: simulated reports, backfill and live modes
 ├── frontend/
 │   └── src/assets/        Shipped WebP figures, several widths each
+├── infra/
+│   └── docker-compose.yml Local PostgreSQL
 ├── docs/
 │   ├── adr/               Architecture decision records
 │   └── design/
@@ -119,7 +228,9 @@ sentinel/
 │       └── source-images/ Full-resolution originals (archived, not shipped)
 ├── scripts/
 │   ├── build-images.py    Regenerates frontend/src/assets from the originals
+│   ├── facility-registry/ Builds the registry seed from the Ministry of Health list
 │   └── git-hooks/         commit-msg hook
+├── .env.example           Local settings, dummy values; copy to .env
 └── README.md
 ```
 
@@ -134,9 +245,6 @@ python scripts/build-images.py
 
 Needs Pillow (`pip install Pillow`). It reads `docs/design/source-images/` and
 writes `frontend/src/assets/`.
-
-`backend/` and `infra/` are not scaffolded yet; they arrive with the phase that
-needs them.
 
 ## Contributing to this repository
 
@@ -171,6 +279,15 @@ These are documented on purpose and are not defects.
   reused. A production system would add per-user verification.
 - **Facility data is from 2022.** Some facilities may since have opened, closed or
   been renamed.
+- **Only 817 of the 1,501 facilities have a location.** The source coordinates
+  were machine geocoded and many are wrong, so a location is kept only where it
+  passes verification. The registry holds 1,501 facilities rather than the 1,505
+  the project overview quotes, because no principled filter of the source gives
+  1,505. See [ADR 0006](docs/adr/0006-facility-locations-verified-before-use.md)
+  and [the registry's README](scripts/facility-registry/README.md).
+- **No authentication until Phase 4.** A facility names itself in a request
+  header, and every endpoint is open. See
+  [ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
 - **Detection assumes a stable baseline.** A prior year containing a real epidemic
   inflates "normal" and reduces future sensitivity. Periodic recalibration would be
   needed.
