@@ -15,6 +15,9 @@ interface AlertRepository extends JpaRepository<Alert, Long> {
   @EntityGraph(attributePaths = "district")
   Optional<Alert> findByCode(String code);
 
+  @EntityGraph(attributePaths = "district")
+  List<Alert> findByLastDetectedAtGreaterThanEqualOrderByLastDetectedAtDescIdDesc(Instant since);
+
   /**
    * Moves an alert from one status to another. Only the status column is written, so the detector's
    * concurrent updates to the figures are never overwritten; and only if the alert is still in the

@@ -98,6 +98,18 @@ public class AlertService {
         districtCodes, Limit.of(limit));
   }
 
+  /**
+   * The alerts the public may see that were last detected since {@code since}, most recent first:
+   * confirmed by an inspector, or unjudged and above the public threshold.
+   */
+  public List<Alert> publishedSince(Instant since) {
+    return alerts
+        .findByLastDetectedAtGreaterThanEqualOrderByLastDetectedAtDescIdDesc(since)
+        .stream()
+        .filter(alert -> alert.isPublic(publicThreshold))
+        .toList();
+  }
+
   /** How many alerts are open in each district right now. Districts with none are absent. */
   public Map<String, Long> openCountsByDistrict() {
     return alerts.countOpenByDistrict(now().minus(Alert.EPISODE_GAP)).stream()
