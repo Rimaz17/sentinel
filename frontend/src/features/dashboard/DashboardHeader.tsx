@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 import { SentinelWordmark } from '@/components/brand/SentinelWordmark'
+import { QuietButton } from '@/components/ui/QuietButton'
 import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
 import { cx, labelSm, shell } from '@/styles/recipes'
 import { POLL_INTERVAL_MS } from './api/queries'
 import { formatClock } from './format'
-import { QuietButton } from './QueryView'
 
 type DashboardHeaderProps = {
   /** When the newest figures on screen arrived, or null before any have. */
