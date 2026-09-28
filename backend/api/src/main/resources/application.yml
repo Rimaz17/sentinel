@@ -16,3 +16,9 @@ spring:
     hibernate:
       # Flyway migrations are the only schema authority.
       ddl-auto: validate
+
+sentinel:
+  auth:
+    # Left empty when unset, so startup fails with a message saying what to set.
+    jwt-secret: ${SENTINEL_JWT_SECRET:}
+    cookie-secure: ${SENTINEL_COOKIE_SECURE:true}
