@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { DISTRICTS, weeklyCounts } from '@/test/fixtures'
+import { resetSession } from '@/lib/api/session'
+import { DISTRICTS, inspectorSession, weeklyCounts } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import { AppRoutes } from './AppRoutes'
 
@@ -9,16 +10,19 @@ import { AppRoutes } from './AppRoutes'
 vi.mock('@/features/dashboard/map/ReportMap', () => ({ ReportMap: () => null }))
 
 beforeEach(() => {
+  resetSession()
   vi.stubGlobal(
     'fetch',
     vi.fn((url: string) =>
       Promise.resolve(
         Response.json(
-          url.startsWith('/api/districts')
-            ? DISTRICTS
-            : url.startsWith('/api/reports/weekly-counts')
-              ? weeklyCounts()
-              : [],
+          url === '/api/auth/refresh'
+            ? inspectorSession()
+            : url.startsWith('/api/districts')
+              ? DISTRICTS
+              : url.startsWith('/api/reports/weekly-counts')
+                ? weeklyCounts()
+                : [],
         ),
       ),
     ),
@@ -49,7 +53,6 @@ describe('AppRoutes', () => {
 
   it.each([
     ['/dashboard', /the public dashboard/i],
-    ['/signin', /sign in/i],
     ['/register', /facility registration/i],
     ['/submit', /submit a report/i],
     ['/app/admin', /administration/i],
@@ -60,20 +63,21 @@ describe('AppRoutes', () => {
   })
 
   it('marks every unbuilt route as not built yet rather than faking a product', () => {
-    for (const path of ['/dashboard', '/signin', '/register', '/submit', '/app/admin']) {
+    for (const path of ['/dashboard', '/register', '/submit', '/app/admin']) {
       const { unmount } = renderAt(path)
       expect(screen.getByText(/not built yet/i)).toBeInTheDocument()
       unmount()
     }
   })
 
-  it('tells an inspector without an account to contact an administrator', () => {
+  it('tells an inspector without an account to contact an administrator', async () => {
     renderAt('/signin')
-    expect(screen.getByText(/contact their district administrator/i)).toBeInTheDocument()
+    expect(await screen.findByText(/contact their district administrator/i)).toBeInTheDocument()
   })
 
-  it('offers no registration link on the sign-in page', () => {
+  it('offers no registration link on the sign-in page', async () => {
     renderAt('/signin')
+    await screen.findByRole('heading', { level: 1, name: 'Staff sign-in' })
     // PHI accounts are admin-provisioned, so sign-in must not hand anyone a
     // registration route they cannot use.
     expect(screen.queryByRole('link', { name: /register/i })).not.toBeInTheDocument()

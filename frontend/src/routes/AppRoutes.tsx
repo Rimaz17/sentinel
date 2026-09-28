@@ -1,5 +1,7 @@
-import { lazy, Suspense } from 'react'
+import { lazy, type ReactNode, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
+import { RequireRole } from '@/features/auth/RequireRole'
+import { SignInPage } from '@/features/auth/SignInPage'
 import { LandingPage } from '@/features/landing/LandingPage'
 import { PlannedPage } from '@/features/planned/PlannedPage'
 
@@ -27,6 +29,11 @@ function Dashboard() {
       <DashboardPage />
     </Suspense>
   )
+}
+
+/** The internal dashboard is for public health inspectors only. */
+function Inspector({ page }: { page: ReactNode }) {
+  return <RequireRole allow="PHI">{page}</RequireRole>
 }
 
 /**
@@ -59,22 +66,7 @@ export function AppRoutes() {
         }
       />
 
-      <Route
-        path="/signin"
-        element={
-          <PlannedPage title="Sign in" phase="Phase 4 · Accounts and roles">
-            <p>
-              One sign-in for both staff roles: healthcare data providers submitting reports on
-              behalf of a facility, and public health inspectors working the internal dashboard.
-            </p>
-            <p>
-              Inspector accounts are created by a system administrator and there is no sign-up route
-              for them. An inspector without an account should contact their district administrator
-              to request access.
-            </p>
-          </PlannedPage>
-        }
-      />
+      <Route path="/signin" element={<SignInPage />} />
 
       <Route
         path="/register"
@@ -107,8 +99,8 @@ export function AppRoutes() {
         }
       />
 
-      <Route path="/app" element={<Dashboard />} />
-      <Route path="/app/districts/:code" element={<Dashboard />} />
+      <Route path="/app" element={<Inspector page={<Dashboard />} />} />
+      <Route path="/app/districts/:code" element={<Inspector page={<Dashboard />} />} />
 
       <Route
         path="/app/admin/*"
