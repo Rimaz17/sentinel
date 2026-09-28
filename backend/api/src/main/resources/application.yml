@@ -25,6 +25,11 @@ sentinel:
   # The trusted report feed the simulator submits through. Unset switches it off.
   feed:
     key: ${SENTINEL_FEED_KEY:}
+  # Requests per minute: sign-in, registration and activation per client address,
+  # and report submissions per data provider account.
+  rate-limit:
+    auth-per-minute: 10
+    ingestion-per-minute: 120
   alerts:
     # How far above baseline, in standard deviations, an alert no inspector has
     # judged must peak to be published anyway. See docs/adr/0013-public-alerts.md.

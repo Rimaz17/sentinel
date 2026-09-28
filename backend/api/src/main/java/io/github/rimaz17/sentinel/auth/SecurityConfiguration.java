@@ -1,6 +1,7 @@
 package io.github.rimaz17.sentinel.auth;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,12 @@ class SecurityConfiguration {
   static final int MIN_FEED_KEY_BYTES = 32;
 
   @Bean
-  SecurityFilterChain api(HttpSecurity http, @Value("${sentinel.feed.key:}") String feedKey)
+  SecurityFilterChain api(
+      HttpSecurity http,
+      Clock clock,
+      @Value("${sentinel.feed.key:}") String feedKey,
+      @Value("${sentinel.rate-limit.auth-per-minute:10}") int authPerMinute,
+      @Value("${sentinel.rate-limit.ingestion-per-minute:120}") int ingestionPerMinute)
       throws Exception {
     if (!feedKey.isEmpty()
         && feedKey.getBytes(StandardCharsets.UTF_8).length < MIN_FEED_KEY_BYTES) {
@@ -39,6 +45,10 @@ class SecurityConfiguration {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(new FeedKeyFilter(feedKey), BearerTokenAuthenticationFilter.class)
+        // After authentication, so a submission is counted against the account that sent it.
+        .addFilterAfter(
+            new RateLimitFilter(new RateLimiter(clock), authPerMinute, ingestionPerMinute),
+            BearerTokenAuthenticationFilter.class)
         .authorizeHttpRequests(
             requests ->
                 requests
