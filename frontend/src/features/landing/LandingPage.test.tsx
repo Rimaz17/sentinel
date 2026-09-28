@@ -193,14 +193,14 @@ describe('SiteHeader', () => {
     const sections = within(screen.getByRole('navigation', { name: /sections/i })).getAllByRole(
       'link',
     )
-    expect(sections.map((l) => l.getAttribute('href'))).toEqual(['#mechanism', '#privacy'])
+    expect(sections.map((l) => l.getAttribute('href'))).toEqual(['/#mechanism', '/#privacy'])
   })
 
   it('points every header section link at a section that exists', () => {
     const { container } = renderLanding()
     const nav = screen.getByRole('navigation', { name: /sections/i })
     for (const link of within(nav).getAllByRole('link')) {
-      const id = (link.getAttribute('href') ?? '').slice(1)
+      const id = (link.getAttribute('href') ?? '').split('#')[1] ?? ''
       expect(container.querySelector(`#${id}`)).not.toBeNull()
     }
   })

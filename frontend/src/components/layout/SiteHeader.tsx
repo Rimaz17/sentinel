@@ -2,10 +2,14 @@ import { Link } from 'react-router-dom'
 import { SentinelWordmark } from '@/components/brand/SentinelWordmark'
 import { cx, monoLink, shell } from '@/styles/recipes'
 
-/** In-page anchors, so the header is a way around the page and not just a sign-in. */
+/**
+ * The front page's sections, so the header is a way around the page and not
+ * just a sign-in. They name the front page, so the same header works on every
+ * page that carries it: on the front page they scroll, elsewhere they lead back.
+ */
 const SECTIONS = [
-  { href: '#mechanism', label: 'How it works' },
-  { href: '#privacy', label: 'Privacy' },
+  { href: '/#mechanism', label: 'How it works' },
+  { href: '/#privacy', label: 'Privacy' },
 ]
 
 /**
