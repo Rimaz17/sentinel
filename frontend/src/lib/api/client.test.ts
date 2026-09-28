@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, apiPath, getJson } from './client'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ApiError, apiPath, apiRequest, getJson } from './client'
+import { resetSession, type Session, sessionState, setSession } from './session'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -76,3 +77,116 @@ describe('getJson', () => {
     })
   })
 })
+
+describe('apiRequest', () => {
+  beforeEach(() => {
+    resetSession()
+  })
+
+  it('sends a body as JSON and reads a reply with none', async () => {
+    const fetchMock = stubFetch(new Response(null, { status: 204 }))
+
+    await expect(
+      apiRequest('/admin/accounts/3', { method: 'PATCH', body: { enabled: false } }),
+    ).resolves.toBeUndefined()
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/admin/accounts/3',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: '{"enabled":false}',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      }),
+    )
+  })
+
+  it('keeps the fields a refused form names', async () => {
+    stubFetch(
+      Response.json(
+        {
+          status: 400,
+          detail: 'The request has invalid fields.',
+          errors: [{ field: 'password', message: 'must be at least 12 characters' }],
+        },
+        { status: 400 },
+      ),
+    )
+
+    const error = (await apiRequest('/auth/register', { method: 'POST', body: {} }).catch(
+      (caught: unknown) => caught,
+    )) as ApiError
+    expect(error.problemWith('password')).toBe('must be at least 12 characters')
+    expect(error.problemWith('email')).toBeUndefined()
+  })
+
+  it('sends the signed-in person’s token', async () => {
+    setSession(session('first-token'))
+    const fetchMock = stubFetch(Response.json([]))
+
+    await getJson('/alerts')
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/alerts',
+      expect.objectContaining({
+        headers: { Accept: 'application/json', Authorization: 'Bearer first-token' },
+      }),
+    )
+  })
+
+  it('renews a refused token once and sends the request again', async () => {
+    setSession(session('stale-token'))
+    const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+      if (url === '/api/auth/refresh') {
+        return Promise.resolve(Response.json(session('fresh-token')))
+      }
+      const auth = (init?.headers as Record<string, string>).Authorization
+      return Promise.resolve(
+        auth === 'Bearer fresh-token'
+          ? Response.json(['ok'])
+          : Response.json({ detail: 'expired' }, { status: 401 }),
+      )
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(getJson('/alerts')).resolves.toEqual(['ok'])
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      '/api/alerts',
+      '/api/auth/refresh',
+      '/api/alerts',
+    ])
+  })
+
+  it('renews a token about to expire before using it', async () => {
+    setSession(session('dying-token', Date.now() + 5_000))
+    const fetchMock = vi.fn((url: string) =>
+      Promise.resolve(
+        url === '/api/auth/refresh' ? Response.json(session('fresh-token')) : Response.json([]),
+      ),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await getJson('/alerts')
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual(['/api/auth/refresh', '/api/alerts'])
+  })
+
+  it('signs out when the session cannot be renewed', async () => {
+    setSession(session('stale-token'))
+    stubFetch(Response.json({ detail: 'Not signed in.' }, { status: 401 }))
+
+    await expect(getJson('/alerts')).rejects.toMatchObject({ status: 401 })
+    expect(sessionState().status).toBe('signed-out')
+  })
+})
+
+function session(accessToken: string, expiresAt = Date.now() + 15 * 60_000): Session {
+  return {
+    accessToken,
+    accessTokenExpiresAt: new Date(expiresAt).toISOString(),
+    account: {
+      id: 1,
+      email: 'phi@example.org',
+      displayName: 'Nimal Silva',
+      role: 'PHI',
+      districts: ['KDY'],
+      facility: null,
+    },
+  }
+}
