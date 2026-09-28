@@ -45,7 +45,13 @@ public class ActivationLinks {
   }
 
   /** A link's secret, shown to the administrator this once. Only its hash is kept. */
-  public record IssuedLink(String token, Instant expiresAt) {}
+  public record IssuedLink(String token, Instant expiresAt) {
+
+    @Override
+    public String toString() {
+      return "IssuedLink[token redacted, expiresAt=" + expiresAt + "]";
+    }
+  }
 
   /** A new link for an account, replacing any it had. */
   public IssuedLink issue(Account account) {

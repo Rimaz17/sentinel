@@ -51,7 +51,14 @@ class AdminAccountController {
 
   /** A new account and the link its owner activates it with, shown this once. */
   record IssuedAccount(
-      AdminAccountResponse account, String activationToken, Instant activationExpiresAt) {}
+      AdminAccountResponse account, String activationToken, Instant activationExpiresAt) {
+
+    /** Logged by the web layer at trace level when it is returned, so the link is left out. */
+    @Override
+    public String toString() {
+      return "IssuedAccount[account=" + account.id() + ", activation token redacted]";
+    }
+  }
 
   @GetMapping("/accounts")
   List<AdminAccountResponse> list(@RequestParam(required = false) Role role) {

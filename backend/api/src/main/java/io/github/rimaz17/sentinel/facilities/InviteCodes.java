@@ -44,7 +44,14 @@ public class InviteCodes {
   }
 
   /** A code shown to the administrator this once. Only its hash is kept. */
-  public record IssuedCode(String facilityCode, String inviteCode, Instant issuedAt) {}
+  public record IssuedCode(String facilityCode, String inviteCode, Instant issuedAt) {
+
+    /** Logged by the web layer at trace level when it is returned, so the code is left out. */
+    @Override
+    public String toString() {
+      return "IssuedCode[facilityCode=" + facilityCode + ", invite code redacted]";
+    }
+  }
 
   /** Issues a facility a new code, replacing any it had. */
   public IssuedCode issue(String facilityCode, long administratorId) {
