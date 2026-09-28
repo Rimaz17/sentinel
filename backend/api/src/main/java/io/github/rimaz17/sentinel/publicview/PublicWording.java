@@ -6,7 +6,9 @@ import java.util.Map;
 /**
  * The public register: plain and calm. Internally an alert reads "A-1001, 41 reports, 3.2σ above
  * baseline"; publicly it reads "Kandy district: elevated dengue-like illness activity. Follow
- * standard precautions." No figure that describes the detector's workings is ever in it.
+ * standard precautions." No figure that describes the detector's workings is ever in it, and the
+ * only advice is to follow the local health authorities': Sentinel offers no medical guidance of
+ * its own.
  */
 final class PublicWording {
 
@@ -25,7 +27,8 @@ final class PublicWording {
 
   static String headline(String districtName, SymptomGroup group, boolean active) {
     return active
-        ? "%s district: elevated %s activity. Follow standard precautions."
+        ? ("%s district: elevated %s activity. Follow standard precautions, and advice from your"
+                + " local MOH office or public health inspector.")
             .formatted(districtName, illness(group))
         : "%s district: %s activity is no longer elevated.".formatted(districtName, illness(group));
   }

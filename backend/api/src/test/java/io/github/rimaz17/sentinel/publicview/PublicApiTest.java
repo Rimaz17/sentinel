@@ -1,7 +1,9 @@
 package io.github.rimaz17.sentinel.publicview;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -79,8 +81,9 @@ class PublicApiTest {
         .andExpect(
             jsonPath("$[0].headline")
                 .value(
-                    "Kandy district: elevated dengue-like illness activity."
-                        + " Follow standard precautions."));
+                    "Kandy district: elevated dengue-like illness activity. Follow standard"
+                        + " precautions, and advice from your local MOH office or public health"
+                        + " inspector."));
     mvc.perform(get("/api/public/districts"))
         .andExpect(jsonPath("$[?(@.code == 'KDY')].status").value("ELEVATED"))
         .andExpect(jsonPath("$[?(@.code == 'KDY')].elevatedGroups[0]").value("DENGUE_LIKE"));
@@ -162,6 +165,32 @@ class PublicApiTest {
   }
 
   @Test
+  void setsEachDistrictsWeekAgainstItsOwnUsualWeek() throws Exception {
+    // One report in each of the eight baseline weeks, and two in the current week.
+    for (int weeksAgo = 1; weeksAgo <= 8; weeksAgo++) {
+      store("KDY", Instant.now().minus(7L * weeksAgo, ChronoUnit.DAYS).minus(1, ChronoUnit.HOURS));
+    }
+    store("KDY", Instant.now().minus(1, ChronoUnit.HOURS));
+    store("KDY", Instant.now().minus(2, ChronoUnit.HOURS));
+
+    mvc.perform(get("/api/public/districts"))
+        .andExpect(jsonPath("$[?(@.code == 'KDY')].reportsLast7Days").value(2))
+        .andExpect(jsonPath("$[?(@.code == 'KDY')].usualWeek").value(1.0))
+        .andExpect(jsonPath("$[?(@.code == 'KDY')].percentOfUsual").value(200))
+        .andExpect(jsonPath("$[?(@.code == 'KDY')].status").value("USUAL"));
+  }
+
+  @Test
+  void hasNoPercentageForADistrictWithNoUsualWeek() throws Exception {
+    store("JAF", Instant.now().minus(1, ChronoUnit.HOURS));
+
+    mvc.perform(get("/api/public/districts"))
+        .andExpect(jsonPath("$[?(@.code == 'JAF')].reportsLast7Days").value(1))
+        .andExpect(jsonPath("$[?(@.code == 'JAF')].usualWeek").value(0.0))
+        .andExpect(jsonPath("$[?(@.code == 'JAF')].percentOfUsual", everyItem(nullValue())));
+  }
+
+  @Test
   void chartsNineWeeksForOneDistrictOrTheCountry() throws Exception {
     store("KDY");
 
@@ -196,6 +225,10 @@ class PublicApiTest {
   }
 
   private void store(String district) {
+    store(district, Instant.now().minus(1, ChronoUnit.HOURS));
+  }
+
+  private void store(String district, Instant reportedAt) {
     long facilityId =
         jdbc.queryForObject(
             "select id from facilities where district_code = ? order by code limit 1",
@@ -210,7 +243,7 @@ class PublicApiTest {
             AgeBand.AGE_30_39,
             new BigDecimal("7.291"),
             new BigDecimal("80.634"),
-            Instant.now().minus(1, ChronoUnit.HOURS),
+            reportedAt,
             Instant.now()));
   }
 }

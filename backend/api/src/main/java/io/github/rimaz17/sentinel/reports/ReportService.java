@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -75,6 +76,24 @@ public class ReportService {
   public Map<String, Long> countsByDistrict(Instant from, Instant to) {
     return reports.countByDistrict(from, to).stream()
         .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]));
+  }
+
+  /**
+   * Every district's reports in each of the last {@code weeks} seven-day windows up to now, all
+   * symptom groups together, by district code. Index 0 is the current week, index 1 the week
+   * before, and so on; a district with no reports at all is absent.
+   */
+  @Transactional(readOnly = true)
+  public Map<String, long[]> weeklyTotalsByDistrict(int weeks) {
+    Instant end = clock.instant();
+    Map<String, long[]> totals = new HashMap<>();
+    for (Object[] row : reports.countByDistrictAndWeek(end.minus(WEEK.multipliedBy(weeks)), end)) {
+      totals
+              .computeIfAbsent((String) row[0], code -> new long[weeks])[
+              ((Number) row[1]).intValue()] =
+          ((Number) row[2]).longValue();
+    }
+    return totals;
   }
 
   /** Reports per symptom group in each of the last {@code weeks} seven-day windows, up to now. */

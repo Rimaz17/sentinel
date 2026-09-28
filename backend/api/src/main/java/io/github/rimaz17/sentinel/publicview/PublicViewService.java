@@ -63,21 +63,38 @@ class PublicViewService {
                 Collectors.groupingBy(
                     PublicAlert::districtCode,
                     Collectors.mapping(PublicAlert::symptomGroup, Collectors.toList())));
-    return districts.activity().stream()
+    Map<String, long[]> weekly = reports.weeklyTotalsByDistrict(TREND_WEEKS);
+    return districts.all().stream()
         .map(
-            activity -> {
-              String code = activity.district().getCode();
+            district -> {
+              String code = district.getCode();
               List<SymptomGroup> groups =
                   elevated.getOrDefault(code, List.of()).stream().distinct().sorted().toList();
+              long[] weeks = weekly.getOrDefault(code, new long[TREND_WEEKS]);
+              double usual = usualWeek(weeks);
               return new PublicDistrict(
                   code,
-                  activity.district().getName(),
-                  activity.district().getProvince(),
+                  district.getName(),
+                  district.getProvince(),
                   groups.isEmpty() ? DistrictStatus.USUAL : DistrictStatus.ELEVATED,
                   groups,
-                  activity.reportsLast7Days());
+                  weeks[0],
+                  Math.round(usual * 10) / 10.0,
+                  usual > 0 ? (int) Math.round(weeks[0] * 100 / usual) : null);
             })
         .toList();
+  }
+
+  /**
+   * The average of the eight weeks before the current one: the same baseline weeks the detector
+   * compares against, though without its standard deviation, which the public never sees.
+   */
+  static double usualWeek(long[] weeks) {
+    long sum = 0;
+    for (int i = 1; i < weeks.length; i++) {
+      sum += weeks[i];
+    }
+    return (double) sum / (weeks.length - 1);
   }
 
   /** Nine weeks of reports per symptom group, for one district or, when null, the country. */

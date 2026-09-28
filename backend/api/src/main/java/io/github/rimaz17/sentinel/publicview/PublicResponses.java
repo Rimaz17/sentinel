@@ -27,6 +27,10 @@ final class PublicResponses {
    *
    * @param elevatedGroups the symptom groups with an active published alert
    * @param reportsLast7Days reports from the district's facilities over the last seven days
+   * @param usualWeek the average of the eight weeks before, the district's own usual week
+   * @param percentOfUsual the last seven days as a percentage of the usual week, rounded; null when
+   *     the district has no usual week to compare with. Deliberately a neutral figure: whether a
+   *     rise is worth telling the public about is decided by published alerts alone.
    */
   record PublicDistrict(
       String code,
@@ -34,7 +38,9 @@ final class PublicResponses {
       String province,
       DistrictStatus status,
       List<SymptomGroup> elevatedGroups,
-      long reportsLast7Days) {}
+      long reportsLast7Days,
+      double usualWeek,
+      Integer percentOfUsual) {}
 
   /**
    * Weekly reports per symptom group, for one district or the whole country.

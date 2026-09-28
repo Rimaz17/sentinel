@@ -72,4 +72,22 @@ interface ReportRepository extends JpaRepository<Report, UUID> {
           group by 1, 2
           """)
   List<Object[]> countByGroupAndWeek(Instant start, Instant end, String districtCodes);
+
+  /**
+   * Reports per district and week in [start, end), as {@code [districtCode, weeksAgo, count]}, with
+   * the same weeks as {@link #countByGroupAndWeek}; districts and weeks with none omitted.
+   */
+  @Query(
+      nativeQuery = true,
+      value =
+          """
+          select district_code,
+                 cast(ceil(extract(epoch from (cast(:end as timestamptz) - reported_at)) / 604800)
+                      as integer) - 1 as weeks_ago,
+                 count(*)
+          from reports
+          where reported_at >= :start and reported_at < :end
+          group by 1, 2
+          """)
+  List<Object[]> countByDistrictAndWeek(Instant start, Instant end);
 }
