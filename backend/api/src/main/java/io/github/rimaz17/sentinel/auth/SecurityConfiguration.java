@@ -52,7 +52,9 @@ class SecurityConfiguration {
                         HttpMethod.POST,
                         "/api/auth/signin",
                         "/api/auth/refresh",
-                        "/api/auth/signout")
+                        "/api/auth/signout",
+                        "/api/auth/invite-codes/check",
+                        "/api/auth/register")
                     .permitAll()
                     .requestMatchers("/api/auth/me")
                     .authenticated()

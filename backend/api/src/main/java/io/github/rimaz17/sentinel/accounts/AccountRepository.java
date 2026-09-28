@@ -16,6 +16,8 @@ interface AccountRepository extends JpaRepository<Account, Long> {
 
   boolean existsByRole(Role role);
 
+  boolean existsByEmail(String email);
+
   /** Data provider accounts per facility, as {@code [facilityId, count]}. */
   @Query(
       """
