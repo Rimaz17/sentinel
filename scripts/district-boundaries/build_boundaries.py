@@ -26,10 +26,7 @@ SOURCE_URL = (
     "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LKA/ADM2/"
     "geoBoundaries-LKA-ADM2_simplified.geojson"
 )
-OUTPUT = (
-    Path(__file__).resolve().parents[2]
-    / "frontend/src/features/public/map/districts.geo.json"
-)
+OUTPUT = Path(__file__).resolve().parents[2] / "frontend/src/features/public/map/districts.geo.json"
 DECIMALS = 4
 
 # geoBoundaries' names, less " District", to Sentinel's codes (V1__create_districts.sql).
