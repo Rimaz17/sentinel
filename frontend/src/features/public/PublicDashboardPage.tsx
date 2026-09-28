@@ -18,6 +18,7 @@ import {
 import { DistrictTable } from './DistrictTable'
 import { publicDistrictPath } from './paths'
 import { PublicAlerts } from './PublicAlerts'
+import { weekAgainstUsual } from './usual'
 
 /*
  * The map, with Leaflet and the district outlines, is the heaviest thing on
@@ -138,8 +139,9 @@ export function PublicDashboardPage() {
             </h2>
             <p className="max-w-measure text-small text-ink-70">
               A district is shaded, with a heavier outline, while it has an active alert. Each
-              district’s reports are compared with its own usual week, never with another
-              district’s: Colombo’s usual week is several times Kandy’s.
+              district’s last 7 days are set against its own usual week, the average of the 8 weeks
+              before, never against another district’s: Colombo’s usual week is several times
+              Kandy’s.
             </p>
           </div>
           <QueryView
@@ -286,6 +288,7 @@ function DistrictStatus({
           Usual activity. No alert is active for {district.name} district.
         </p>
       )}
+      <p className="text-small text-ink-70">{weekAgainstUsual(district)}</p>
       <p className="flex flex-wrap gap-x-md text-small">
         <a href="#trends-heading" className="text-ink underline">
           Its weekly reports

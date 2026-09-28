@@ -22,12 +22,21 @@ function district(overrides: Partial<PublicDistrict> = {}): PublicDistrict {
     status: 'USUAL',
     elevatedGroups: [],
     reportsLast7Days: 212,
+    usualWeek: 208.4,
+    percentOfUsual: 102,
     ...overrides,
   }
 }
 
 const DISTRICTS = [
-  district({ code: 'AMP', name: 'Ampara', province: 'Eastern', reportsLast7Days: 30 }),
+  district({
+    code: 'AMP',
+    name: 'Ampara',
+    province: 'Eastern',
+    reportsLast7Days: 3,
+    usualWeek: 0,
+    percentOfUsual: null,
+  }),
   district(),
   district({
     code: 'KDY',
@@ -36,6 +45,8 @@ const DISTRICTS = [
     status: 'ELEVATED',
     elevatedGroups: ['DENGUE_LIKE'],
     reportsLast7Days: 41,
+    usualWeek: 25,
+    percentOfUsual: 164,
   }),
 ]
 
@@ -211,6 +222,9 @@ describe('PublicDashboardPage', () => {
 
     const status = await screen.findByRole('region', { name: 'Colombo' })
     expect(status).toHaveTextContent('Usual activity. No alert is active for Colombo district.')
+    expect(status).toHaveTextContent(
+      '212 reports in the last 7 days, 102% of its usual week of 208.4.',
+    )
   })
 
   it('leads from an alert to its district', async () => {
@@ -231,5 +245,16 @@ describe('PublicDashboardPage', () => {
       'The figures are unavailable at the moment. Try again in a minute.',
     )
     expect(document.body.textContent).not.toMatch(/check that it is running/i)
+  })
+
+  it('sets each district against its own usual week, never as a raw count', async () => {
+    renderAt('/dashboard')
+
+    const table = await screen.findByRole('table', { name: /status of each district/i })
+    const rows = within(table).getAllByRole('row')
+    expect(rows[0]).toHaveTextContent('This week against its usual')
+    expect(within(table).getByRole('row', { name: /kandy/i })).toHaveTextContent('164%')
+    expect(within(table).getByRole('row', { name: /ampara/i })).toHaveTextContent('No usual yet')
+    expect(table).not.toHaveTextContent('212')
   })
 })

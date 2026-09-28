@@ -1,16 +1,17 @@
 import { Link } from 'react-router-dom'
-import { formatCount } from '@/features/dashboard/format'
 import { SYMPTOM_GROUP_STYLES } from '@/features/dashboard/symptomGroups'
 import { cx, tnum } from '@/styles/recipes'
 import type { PublicDistrict } from './api'
 import { publicDistrictPath } from './paths'
+import { percentOfUsual } from './usual'
 
 /**
  * Every district's status in words: the map's accessible counterpart, and the
  * quickest way to read it on a phone. Elevated districts come first; the one
  * chosen is inked in, as the internal dashboard marks the district in view.
- * A district's count is for reading against its own usual week, not against
- * another district's: Colombo's usual week is several times Kandy's.
+ * Each district's week is given as a percentage of its own usual week, never as
+ * a raw count: Colombo's usual week is several times Kandy's, so counts side by
+ * side would invite exactly the comparison the detector refuses to make.
  */
 export function DistrictTable({
   districts,
@@ -34,8 +35,8 @@ export function DistrictTable({
             <th scope="col" className="py-2xs pe-sm text-start font-medium">
               Status
             </th>
-            <th scope="col" className="py-2xs ps-sm text-end font-medium whitespace-nowrap">
-              Reports this week
+            <th scope="col" className="py-2xs ps-sm text-end font-medium">
+              This week against its usual
             </th>
           </tr>
         </thead>
@@ -82,7 +83,7 @@ export function DistrictTable({
                   district.code === selected ? 'text-paper' : 'text-ink-70',
                 )}
               >
-                {formatCount(district.reportsLast7Days)}
+                {percentOfUsual(district) ?? 'No usual yet'}
               </td>
             </tr>
           ))}

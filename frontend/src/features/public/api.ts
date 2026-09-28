@@ -19,6 +19,10 @@ export type PublicDistrict = {
   /** Symptom groups with an active published alert. */
   elevatedGroups: SymptomGroup[]
   reportsLast7Days: number
+  /** The average of the eight weeks before: the district's own usual week. */
+  usualWeek: number
+  /** The last 7 days as a percentage of the usual week; null with no usual week to compare. */
+  percentOfUsual: number | null
 }
 
 /** GET /api/public/alerts */
