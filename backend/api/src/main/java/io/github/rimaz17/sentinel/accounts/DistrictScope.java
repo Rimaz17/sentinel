@@ -19,6 +19,9 @@ public record DistrictScope(boolean national, Set<String> districts) {
 
   public static final DistrictScope NATIONAL = new DistrictScope(true, Set.of());
 
+  /** No district at all: the reach of anyone who is not an inspector. */
+  public static final DistrictScope NONE = new DistrictScope(false, Set.of());
+
   public DistrictScope {
     districts = national ? Set.of() : Set.copyOf(districts);
   }

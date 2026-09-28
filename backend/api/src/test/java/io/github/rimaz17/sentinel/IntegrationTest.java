@@ -15,7 +15,10 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(
-    properties = {"sentinel.auth.jwt-secret=integration-tests-only-signing-key-0123456789"})
+    properties = {
+      "sentinel.auth.jwt-secret=integration-tests-only-signing-key-0123456789",
+      "sentinel.feed.key=" + TestAccounts.FEED_KEY
+    })
 @AutoConfigureMockMvc
 @Import({TestcontainersConfiguration.class, TestAccounts.class})
 public @interface IntegrationTest {}

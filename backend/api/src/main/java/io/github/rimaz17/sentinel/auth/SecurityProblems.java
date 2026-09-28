@@ -22,7 +22,7 @@ final class SecurityProblems implements AuthenticationEntryPoint, AccessDeniedHa
   static final String SIGN_IN = "Sign in to use this part of the API.";
   static final String TOKEN_REFUSED =
       "The access token is not valid or has expired. Renew the session or sign in again.";
-  static final String NOT_PERMITTED = "Your account may not use this part of the API.";
+  static final String NOT_PERMITTED = Caller.NOT_PERMITTED;
 
   @Override
   public void commence(

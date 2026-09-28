@@ -15,6 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @TestComponent
 public class TestAccounts {
 
+  /** The report feed's key in every integration test. */
+  public static final String FEED_KEY = "integration-tests-only-feed-key-0123456789";
+
+  public static final String FEED_KEY_HEADER = "X-Feed-Key";
+
   private final JdbcTemplate jdbc;
   private final PasswordEncoder passwords;
   private final AccountService accounts;
