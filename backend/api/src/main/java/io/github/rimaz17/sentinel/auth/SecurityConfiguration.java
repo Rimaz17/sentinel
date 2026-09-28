@@ -42,12 +42,34 @@ class SecurityConfiguration {
         .authorizeHttpRequests(
             requests ->
                 requests
+                    // Errors are rendered on this path; guarding it would turn every failure
+                    // into a 401.
+                    .requestMatchers("/error")
+                    .permitAll()
+                    .requestMatchers("/api/public/**")
+                    .permitAll()
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/auth/signin",
+                        "/api/auth/refresh",
+                        "/api/auth/signout")
+                    .permitAll()
                     .requestMatchers("/api/auth/me")
                     .authenticated()
                     .requestMatchers(HttpMethod.POST, "/api/ingestion/reports")
                     .hasAnyAuthority("ROLE_DATA_PROVIDER", FeedAuthentication.AUTHORITY)
+                    // The registry is public Ministry of Health data, but it is read only by the
+                    // two callers that need it: the map's facility rings and the simulator.
+                    .requestMatchers(HttpMethod.GET, "/api/facilities")
+                    .hasAnyAuthority("ROLE_PHI", FeedAuthentication.AUTHORITY)
+                    .requestMatchers("/api/districts/**", "/api/alerts/**", "/api/reports/**")
+                    .hasRole("PHI")
+                    .requestMatchers("/api/admin/**")
+                    .hasRole("ADMIN")
+                    // Anything not named above is refused, so a new endpoint is closed until a
+                    // rule here opens it.
                     .anyRequest()
-                    .permitAll())
+                    .denyAll())
         .oauth2ResourceServer(
             server -> server.jwt(Customizer.withDefaults()).authenticationEntryPoint(problems))
         .exceptionHandling(

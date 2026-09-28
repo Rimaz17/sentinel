@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import io.github.rimaz17.sentinel.reports.AgeBand;
 import io.github.rimaz17.sentinel.reports.AnonymisedReport;
 import io.github.rimaz17.sentinel.reports.ReportService;
@@ -26,6 +27,7 @@ class DistrictControllerTest {
   private static final Instant NOW = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
   @Autowired MockMvc mvc;
+  @Autowired TestAccounts testAccounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
 
@@ -47,7 +49,7 @@ class DistrictControllerTest {
 
   @Test
   void listsAllTwentyFiveDistrictsAlphabetically() throws Exception {
-    mvc.perform(get("/api/districts"))
+    mvc.perform(get("/api/districts").with(testAccounts.asInspector("*")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(25)))
         .andExpect(jsonPath("$[0].name").value("Ampara"))
@@ -56,14 +58,14 @@ class DistrictControllerTest {
 
   @Test
   void describesEachDistrict() throws Exception {
-    mvc.perform(get("/api/districts"))
+    mvc.perform(get("/api/districts").with(testAccounts.asInspector("*")))
         .andExpect(jsonPath("$[?(@.code == 'NEL')].name").value("Nuwara Eliya"))
         .andExpect(jsonPath("$[?(@.code == 'NEL')].province").value("Central"));
   }
 
   @Test
   void countsEachDistrictsReportsOverTheLastSevenDays() throws Exception {
-    mvc.perform(get("/api/districts"))
+    mvc.perform(get("/api/districts").with(testAccounts.asInspector("*")))
         .andExpect(jsonPath("$[?(@.code == 'KDY')].reportsLast7Days").value(2))
         .andExpect(jsonPath("$[?(@.code == 'CMB')].reportsLast7Days").value(1))
         .andExpect(jsonPath("$[?(@.code == 'JAF')].reportsLast7Days").value(0));
@@ -71,7 +73,7 @@ class DistrictControllerTest {
 
   @Test
   void countsOnlyOpenAlerts() throws Exception {
-    mvc.perform(get("/api/districts"))
+    mvc.perform(get("/api/districts").with(testAccounts.asInspector("*")))
         // One open; the closed one does not count.
         .andExpect(jsonPath("$[?(@.code == 'KDY')].openAlerts").value(1))
         // Its only alert was last detected outside the 24-hour episode gap.

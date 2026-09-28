@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -26,6 +27,7 @@ class WeeklyCountsTest {
   private static final Duration WEEK = Duration.ofDays(7);
 
   @Autowired MockMvc mvc;
+  @Autowired TestAccounts testAccounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
 
@@ -105,7 +107,10 @@ class WeeklyCountsTest {
     Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
     store("KDY", SymptomGroup.DENGUE_LIKE, now.minus(Duration.ofMinutes(5)));
 
-    mvc.perform(get("/api/reports/weekly-counts").param("district", "KDY"))
+    mvc.perform(
+            get("/api/reports/weekly-counts")
+                .with(testAccounts.asInspector("*"))
+                .param("district", "KDY"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.districtCode").value("KDY"))
         .andExpect(jsonPath("$.asOf").isNotEmpty())
@@ -117,7 +122,7 @@ class WeeklyCountsTest {
 
   @Test
   void servesTheWholeCountryWithoutADistrict() throws Exception {
-    mvc.perform(get("/api/reports/weekly-counts"))
+    mvc.perform(get("/api/reports/weekly-counts").with(testAccounts.asInspector("*")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.districtCode").doesNotExist())
         .andExpect(jsonPath("$.weeks", hasSize(9)));
@@ -125,7 +130,10 @@ class WeeklyCountsTest {
 
   @Test
   void refusesAMalformedDistrictCode() throws Exception {
-    mvc.perform(get("/api/reports/weekly-counts").param("district", "Kandy"))
+    mvc.perform(
+            get("/api/reports/weekly-counts")
+                .with(testAccounts.asInspector("*"))
+                .param("district", "Kandy"))
         .andExpect(status().isBadRequest());
   }
 

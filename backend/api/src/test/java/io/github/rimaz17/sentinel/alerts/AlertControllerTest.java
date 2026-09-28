@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -22,6 +23,7 @@ class AlertControllerTest {
   private static final Instant NOW = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
   @Autowired MockMvc mvc;
+  @Autowired TestAccounts testAccounts;
   @Autowired JdbcTemplate jdbc;
 
   @BeforeEach
@@ -36,7 +38,7 @@ class AlertControllerTest {
 
   @Test
   void listsTheMostRecentlyDetectedFirst() throws Exception {
-    mvc.perform(get("/api/alerts"))
+    mvc.perform(get("/api/alerts").with(testAccounts.asInspector("*")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(4)))
         .andExpect(jsonPath("$[0].symptomGroup").value("GASTROINTESTINAL"))
@@ -47,7 +49,11 @@ class AlertControllerTest {
 
   @Test
   void describesEachAlertInTheDetectorsOwnFigures() throws Exception {
-    mvc.perform(get("/api/alerts").param("district", "KDY").param("limit", "2"))
+    mvc.perform(
+            get("/api/alerts")
+                .with(testAccounts.asInspector("*"))
+                .param("district", "KDY")
+                .param("limit", "2"))
         .andExpect(jsonPath("$[1].code").value(matchesPattern("A-\\d{4,}")))
         .andExpect(jsonPath("$[1].districtCode").value("KDY"))
         .andExpect(jsonPath("$[1].districtName").value("Kandy"))
@@ -64,7 +70,7 @@ class AlertControllerTest {
 
   @Test
   void marksAnAlertOpenWhileTheDetectorCouldStillExtendIt() throws Exception {
-    mvc.perform(get("/api/alerts"))
+    mvc.perform(get("/api/alerts").with(testAccounts.asInspector("*")))
         // Detected two hours ago and ten hours ago: within the 24-hour episode gap.
         .andExpect(jsonPath("$[1].open").value(true))
         .andExpect(jsonPath("$[2].open").value(true))
@@ -74,14 +80,14 @@ class AlertControllerTest {
 
   @Test
   void neverCountsAClosedAlertAsOpen() throws Exception {
-    mvc.perform(get("/api/alerts"))
+    mvc.perform(get("/api/alerts").with(testAccounts.asInspector("*")))
         .andExpect(jsonPath("$[0].status").value("CLOSED"))
         .andExpect(jsonPath("$[0].open").value(false));
   }
 
   @Test
   void filtersByDistrict() throws Exception {
-    mvc.perform(get("/api/alerts").param("district", "KDY"))
+    mvc.perform(get("/api/alerts").with(testAccounts.asInspector("*")).param("district", "KDY"))
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0].districtCode").value("KDY"))
         .andExpect(jsonPath("$[1].districtCode").value("KDY"));
@@ -89,25 +95,29 @@ class AlertControllerTest {
 
   @Test
   void honoursTheLimit() throws Exception {
-    mvc.perform(get("/api/alerts").param("limit", "1")).andExpect(jsonPath("$", hasSize(1)));
+    mvc.perform(get("/api/alerts").with(testAccounts.asInspector("*")).param("limit", "1"))
+        .andExpect(jsonPath("$", hasSize(1)));
   }
 
   @Test
   void returnsAnEmptyListWhenThereAreNoAlerts() throws Exception {
-    mvc.perform(get("/api/alerts").param("district", "JAF"))
+    mvc.perform(get("/api/alerts").with(testAccounts.asInspector("*")).param("district", "JAF"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
   }
 
   @Test
   void refusesALimitOutsideOneToTwoHundred() throws Exception {
-    mvc.perform(get("/api/alerts").param("limit", "0")).andExpect(status().isBadRequest());
-    mvc.perform(get("/api/alerts").param("limit", "201")).andExpect(status().isBadRequest());
+    mvc.perform(get("/api/alerts").with(testAccounts.asInspector("*")).param("limit", "0"))
+        .andExpect(status().isBadRequest());
+    mvc.perform(get("/api/alerts").with(testAccounts.asInspector("*")).param("limit", "201"))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
   void refusesAMalformedDistrictCode() throws Exception {
-    mvc.perform(get("/api/alerts").param("district", "kdy")).andExpect(status().isBadRequest());
+    mvc.perform(get("/api/alerts").with(testAccounts.asInspector("*")).param("district", "kdy"))
+        .andExpect(status().isBadRequest());
   }
 
   private static Instant hoursAgo(int hours) {

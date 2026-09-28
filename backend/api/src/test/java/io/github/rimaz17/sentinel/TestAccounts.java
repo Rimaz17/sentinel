@@ -1,15 +1,21 @@
 package io.github.rimaz17.sentinel;
 
+import io.github.rimaz17.sentinel.accounts.Account;
 import io.github.rimaz17.sentinel.accounts.AccountService;
+import io.github.rimaz17.sentinel.accounts.DistrictScope;
 import io.github.rimaz17.sentinel.auth.AccessTokens;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import org.springframework.boot.test.context.TestComponent;
+import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 /** Creates accounts for integration tests and signs requests as them. */
 @TestComponent
@@ -57,6 +63,42 @@ public class TestAccounts {
   /** An Authorization header value carrying a fresh access token for the account. */
   public String bearer(long accountId) {
     return "Bearer " + tokens.issue(accounts.findById(accountId).orElseThrow()).value();
+  }
+
+  /**
+   * Signs a request as an inspector covering the given districts, {@code "*"} for every district.
+   * Tokens are checked without a lookup, so no account row is needed.
+   */
+  public RequestPostProcessor asInspector(String... districts) {
+    Account inspector =
+        Account.inspector(
+            "inspector@example.org",
+            "Inspector",
+            DistrictScope.of(List.of(districts)),
+            Instant.now());
+    ReflectionTestUtils.setField(inspector, "id", 1L);
+    return signedAs(inspector);
+  }
+
+  /** Signs a request as the given stored account. */
+  public RequestPostProcessor as(long accountId) {
+    return signedAs(accounts.findById(accountId).orElseThrow());
+  }
+
+  /** Signs a request as the report feed. */
+  public static RequestPostProcessor asFeed() {
+    return request -> {
+      request.addHeader(FEED_KEY_HEADER, FEED_KEY);
+      return request;
+    };
+  }
+
+  private RequestPostProcessor signedAs(Account account) {
+    String header = "Bearer " + tokens.issue(account).value();
+    return request -> {
+      request.addHeader(HttpHeaders.AUTHORIZATION, header);
+      return request;
+    };
   }
 
   private long insert(

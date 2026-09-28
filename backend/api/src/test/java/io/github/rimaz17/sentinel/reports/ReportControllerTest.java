@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -22,6 +23,7 @@ class ReportControllerTest {
   private static final Instant NOW = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
   @Autowired MockMvc mvc;
+  @Autowired TestAccounts testAccounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
 
@@ -37,7 +39,7 @@ class ReportControllerTest {
 
   @Test
   void listsTheMostRecentlyReportedFirst() throws Exception {
-    mvc.perform(get("/api/reports"))
+    mvc.perform(get("/api/reports").with(testAccounts.asInspector("*")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0].symptomGroup").value("INFLUENZA_LIKE"))
@@ -47,7 +49,7 @@ class ReportControllerTest {
 
   @Test
   void describesEachReport() throws Exception {
-    mvc.perform(get("/api/reports").param("limit", "1"))
+    mvc.perform(get("/api/reports").with(testAccounts.asInspector("*")).param("limit", "1"))
         .andExpect(jsonPath("$[0].id").isNotEmpty())
         .andExpect(jsonPath("$[0].facilityCode").value("LCB0000018"))
         .andExpect(jsonPath("$[0].districtCode").value("CMB"))
@@ -60,12 +62,13 @@ class ReportControllerTest {
 
   @Test
   void honoursTheLimit() throws Exception {
-    mvc.perform(get("/api/reports").param("limit", "2")).andExpect(jsonPath("$", hasSize(2)));
+    mvc.perform(get("/api/reports").with(testAccounts.asInspector("*")).param("limit", "2"))
+        .andExpect(jsonPath("$", hasSize(2)));
   }
 
   @Test
   void filtersByDistrict() throws Exception {
-    mvc.perform(get("/api/reports").param("district", "KDY"))
+    mvc.perform(get("/api/reports").with(testAccounts.asInspector("*")).param("district", "KDY"))
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0].symptomGroup").value("GASTROINTESTINAL"))
         .andExpect(jsonPath("$[1].symptomGroup").value("DENGUE_LIKE"));
@@ -73,21 +76,25 @@ class ReportControllerTest {
 
   @Test
   void returnsAnEmptyListWhenThereIsNothingToShow() throws Exception {
-    mvc.perform(get("/api/reports").param("district", "JAF"))
+    mvc.perform(get("/api/reports").with(testAccounts.asInspector("*")).param("district", "JAF"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
   }
 
   @Test
   void refusesALimitOutsideOneToFiveHundred() throws Exception {
-    mvc.perform(get("/api/reports").param("limit", "0")).andExpect(status().isBadRequest());
-    mvc.perform(get("/api/reports").param("limit", "501")).andExpect(status().isBadRequest());
-    mvc.perform(get("/api/reports").param("limit", "many")).andExpect(status().isBadRequest());
+    mvc.perform(get("/api/reports").with(testAccounts.asInspector("*")).param("limit", "0"))
+        .andExpect(status().isBadRequest());
+    mvc.perform(get("/api/reports").with(testAccounts.asInspector("*")).param("limit", "501"))
+        .andExpect(status().isBadRequest());
+    mvc.perform(get("/api/reports").with(testAccounts.asInspector("*")).param("limit", "many"))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
   void refusesAMalformedDistrictCode() throws Exception {
-    mvc.perform(get("/api/reports").param("district", "Kandy")).andExpect(status().isBadRequest());
+    mvc.perform(get("/api/reports").with(testAccounts.asInspector("*")).param("district", "Kandy"))
+        .andExpect(status().isBadRequest());
   }
 
   private void store(String facilityCode, String district, SymptomGroup group, int minutesAgo) {
