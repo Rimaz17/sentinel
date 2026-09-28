@@ -11,4 +11,6 @@ interface AccountRepository extends JpaRepository<Account, Long> {
 
   @EntityGraph(attributePaths = "facility")
   Optional<Account> findWithFacilityById(long id);
+
+  boolean existsByRole(Role role);
 }

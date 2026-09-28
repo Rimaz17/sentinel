@@ -22,3 +22,7 @@ sentinel:
     # Left empty when unset, so startup fails with a message saying what to set.
     jwt-secret: ${SENTINEL_JWT_SECRET:}
     cookie-secure: ${SENTINEL_COOKIE_SECURE:true}
+  # The administrator provisioned at setup. Created once, never overwritten.
+  admin:
+    email: ${SENTINEL_ADMIN_EMAIL:}
+    password: ${SENTINEL_ADMIN_PASSWORD:}
