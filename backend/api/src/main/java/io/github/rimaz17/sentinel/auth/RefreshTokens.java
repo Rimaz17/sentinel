@@ -84,6 +84,11 @@ class RefreshTokens {
         .ifPresent(found -> found.revoke(RevokedReason.SIGNED_OUT, clock.instant()));
   }
 
+  /** Ends every session an account holds, because the account itself has changed. */
+  void revokeAll(long accountId) {
+    revokeAll(accountId, RevokedReason.ACCOUNT_CHANGED);
+  }
+
   private void revokeAll(long accountId, RevokedReason reason) {
     Instant now = clock.instant();
     tokens.findByAccountIdAndRevokedAtIsNull(accountId).forEach(t -> t.revoke(reason, now));

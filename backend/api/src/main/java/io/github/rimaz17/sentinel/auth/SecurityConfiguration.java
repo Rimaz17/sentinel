@@ -54,7 +54,9 @@ class SecurityConfiguration {
                         "/api/auth/refresh",
                         "/api/auth/signout",
                         "/api/auth/invite-codes/check",
-                        "/api/auth/register")
+                        "/api/auth/register",
+                        "/api/auth/activation/check",
+                        "/api/auth/activate")
                     .permitAll()
                     .requestMatchers("/api/auth/me")
                     .authenticated()

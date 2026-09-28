@@ -83,6 +83,15 @@ public class AccountService {
             email, displayName, passwords.encode(password), facility, clock.instant()));
   }
 
+  /** Sets an account's password, after checking it against the policy. */
+  @Transactional
+  public Account setPassword(long accountId, String password) {
+    requireAcceptable(password);
+    Account account = accounts.findWithFacilityById(accountId).orElseThrow();
+    account.setPasswordHash(passwords.encode(password));
+    return account;
+  }
+
   /**
    * An inspector created by an administrator, covering the given districts or, with {@code *},
    * every district. They have no password until they follow their activation link.
