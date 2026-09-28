@@ -1,5 +1,6 @@
 import { lazy, type ReactNode, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
+import { ACTIVATE_PATH, ActivatePage } from '@/features/auth/ActivatePage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
 import { RequireRole } from '@/features/auth/RequireRole'
 import { SignInPage } from '@/features/auth/SignInPage'
@@ -70,6 +71,7 @@ export function AppRoutes() {
       <Route path="/signin" element={<SignInPage />} />
 
       <Route path="/register" element={<RegisterPage />} />
+      <Route path={ACTIVATE_PATH} element={<ActivatePage />} />
 
       <Route
         path="/submit"
