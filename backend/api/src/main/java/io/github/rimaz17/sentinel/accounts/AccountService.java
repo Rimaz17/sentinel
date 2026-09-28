@@ -1,6 +1,8 @@
 package io.github.rimaz17.sentinel.accounts;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,5 +24,14 @@ public class AccountService {
   /** An account with its facility loaded, so a token can name the facility. */
   public Optional<Account> findById(long id) {
     return accounts.findWithFacilityById(id);
+  }
+
+  /**
+   * How many data provider accounts each facility has, by facility id. Facilities with none are
+   * absent.
+   */
+  public Map<Long, Long> dataProviderCountsByFacility() {
+    return accounts.countDataProvidersByFacility().stream()
+        .collect(Collectors.toMap(row -> (Long) row[0], row -> (Long) row[1]));
   }
 }
