@@ -1,12 +1,16 @@
 import { Link } from 'react-router-dom'
 import { SentinelWordmark } from '@/components/brand/SentinelWordmark'
 import { QuietButton } from '@/components/ui/QuietButton'
+import { AccountMenu } from '@/features/auth/AccountBar'
+import type { Account } from '@/lib/api/session'
 import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
 import { cx, labelSm, shell } from '@/styles/recipes'
 import { POLL_INTERVAL_MS } from './api/queries'
 import { formatClock } from './format'
 
 type DashboardHeaderProps = {
+  /** The inspector signed in. */
+  account: Account
   /** When the newest figures on screen arrived, or null before any have. */
   updatedAt: number | null
   refreshing: boolean
@@ -15,10 +19,14 @@ type DashboardHeaderProps = {
 
 /**
  * A thin ruled bar: the wordmark home, what this view is, and how fresh its
- * figures are. Beneath it, the simulated-data notice, and a plain statement
- * that this internal view has no sign-in yet.
+ * figures are. Beneath it, the simulated-data notice, and who is signed in.
  */
-export function DashboardHeader({ updatedAt, refreshing, onRefresh }: DashboardHeaderProps) {
+export function DashboardHeader({
+  account,
+  updatedAt,
+  refreshing,
+  onRefresh,
+}: DashboardHeaderProps) {
   return (
     <header className="border-b border-b-ink-14">
       <div className={cx(shell, 'flex min-h-header flex-wrap items-center gap-x-md gap-y-2xs')}>
@@ -46,9 +54,9 @@ export function DashboardHeader({ updatedAt, refreshing, onRefresh }: DashboardH
         )}
       >
         <SimulatedNotice />
-        <p className="text-small text-ink-70">
-          Inspector view with no sign-in until Phase 4. Keep the API on your own machine.
-        </p>
+        <div className="ms-auto">
+          <AccountMenu account={account} />
+        </div>
       </div>
     </header>
   )

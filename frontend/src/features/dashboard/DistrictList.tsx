@@ -7,8 +7,12 @@ import { formatCount } from './format'
 import { districtPath } from './paths'
 import { LoadingRows, QueryView } from './QueryView'
 
+export const ALL_OF_SRI_LANKA = 'All of Sri Lanka'
+
 type DistrictListProps = {
   query: UseQueryResult<DistrictSummary[]>
+  /** The first row, for every district the inspector covers. */
+  allLabel?: string
   /** The district in view, or null for the whole country. */
   selected: string | null
 }
@@ -18,7 +22,7 @@ type DistrictListProps = {
  * alphabetically, each with its last seven days of reports and any open
  * alerts. The district in view is inked in and marked as the current page.
  */
-export function DistrictList({ query, selected }: DistrictListProps) {
+export function DistrictList({ query, selected, allLabel = ALL_OF_SRI_LANKA }: DistrictListProps) {
   return (
     <QueryView
       query={query}
@@ -40,7 +44,7 @@ export function DistrictList({ query, selected }: DistrictListProps) {
             <ul className="border-t border-t-ink">
               <DistrictRow
                 to={districtPath(null)}
-                name="All of Sri Lanka"
+                name={allLabel}
                 reports={total}
                 openAlerts={open}
                 current={selected === null}
@@ -120,9 +124,11 @@ function DistrictRow({
 export function DistrictPicker({
   districts,
   selected,
+  allLabel = ALL_OF_SRI_LANKA,
 }: {
   districts: DistrictSummary[]
   selected: string | null
+  allLabel?: string
 }) {
   const navigate = useNavigate()
   const id = useId()
@@ -137,7 +143,7 @@ export function DistrictPicker({
         onChange={(event) => void navigate(districtPath(event.target.value || null))}
         className="w-full border border-ink-24 bg-paper-raised px-xs py-2xs text-small"
       >
-        <option value="">All of Sri Lanka</option>
+        <option value="">{allLabel}</option>
         {districts.map((district) => (
           <option key={district.code} value={district.code}>
             {district.name}

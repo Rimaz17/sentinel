@@ -1,7 +1,8 @@
 import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { SkipLink } from '@/components/layout/SkipLink'
+import { useAccount } from '@/features/auth/session'
 import { caps, cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
 import {
   useAlerts,
@@ -14,7 +15,7 @@ import type { SymptomGroup } from './api/types'
 import { AlertList } from './AlertList'
 import { WeeklyChart } from './chart/WeeklyChart'
 import { DashboardHeader } from './DashboardHeader'
-import { DistrictList, DistrictPicker } from './DistrictList'
+import { ALL_OF_SRI_LANKA, DistrictList, DistrictPicker } from './DistrictList'
 import { formatCount } from './format'
 import { boundsOf, SRI_LANKA } from './map/geometry'
 import { MapKey } from './map/MapKey'
@@ -30,6 +31,9 @@ const panelTitle = 'text-section leading-snug font-medium tracking-tight'
  * the address, so it survives a reload and the back button works.
  */
 export function DashboardPage() {
+  const account = useAccount()
+  const national = account.districts.includes('*')
+  const onlyDistrict = !national && account.districts.length === 1 ? account.districts[0] : null
   const { code } = useParams()
   // District codes are capitals (KDY), but an address typed as /app/districts/kdy
   // means the same district: it is read as KDY and the address corrected to match.
@@ -52,7 +56,8 @@ export function DashboardPage() {
   const [hidden, setHidden] = useState<ReadonlySet<SymptomGroup>>(new Set())
 
   const district = selected === null ? null : districts.data?.find((d) => d.code === selected)
-  const areaName = selected === null ? 'All of Sri Lanka' : (district?.name ?? selected)
+  const allLabel = national ? ALL_OF_SRI_LANKA : 'Your districts'
+  const areaName = selected === null ? allLabel : (district?.name ?? selected)
 
   useEffect(() => {
     document.title = `${areaName} · Internal dashboard · Sentinel`
@@ -98,10 +103,16 @@ export function DashboardPage() {
     })
   }
 
+  // An inspector who covers one district has no wider view to show.
+  if (selected === null && onlyDistrict) {
+    return <Navigate to={districtPath(onlyDistrict)} replace />
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <SkipLink />
       <DashboardHeader
+        account={account}
         updatedAt={updatedAt > 0 ? updatedAt : null}
         refreshing={refreshing}
         onRefresh={() => void queryClient.refetchQueries({ type: 'active' })}
@@ -112,7 +123,7 @@ export function DashboardPage() {
           <h2 id="districts-heading" className="sr-only">
             Districts
           </h2>
-          <DistrictList query={districts} selected={selected} />
+          <DistrictList query={districts} selected={selected} allLabel={allLabel} />
         </nav>
 
         <main id="main" className="grid min-w-0 content-start gap-xl">
@@ -121,7 +132,9 @@ export function DashboardPage() {
               <h1 className={sectionTitle}>{areaName}</h1>
               <p className={cx(labelSm, caps, 'text-ink-70')}>
                 {selected === null
-                  ? '25 districts'
+                  ? national
+                    ? '25 districts'
+                    : `${account.districts.length} districts`
                   : district
                     ? `${district.province} Province · ${district.code}`
                     : selected}
@@ -135,7 +148,11 @@ export function DashboardPage() {
             ) : null}
             {districts.data ? (
               <div className="max-w-[20rem] xl:hidden">
-                <DistrictPicker districts={districts.data} selected={selected} />
+                <DistrictPicker
+                  districts={districts.data}
+                  selected={selected}
+                  allLabel={allLabel}
+                />
               </div>
             ) : null}
           </div>
