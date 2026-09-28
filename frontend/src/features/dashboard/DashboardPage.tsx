@@ -45,11 +45,16 @@ export function DashboardPage() {
     }
   }, [code, navigate])
 
+  // A district outside the inspector's scope is refused by the API; the page says so itself
+  // rather than asking for data it cannot have.
+  const outOfScope = selected !== null && !national && !account.districts.includes(selected)
+  const inView = outOfScope ? null : selected
+
   const districts = useDistricts()
-  const alerts = useAlerts(selected)
-  const reports = useLocatedReports(selected)
-  const weekly = useWeeklyCounts(selected)
-  const facilities = useFacilities(selected)
+  const alerts = useAlerts(inView)
+  const reports = useLocatedReports(inView)
+  const weekly = useWeeklyCounts(inView)
+  const facilities = useFacilities(inView)
 
   const queryClient = useQueryClient()
   const refreshing = useIsFetching() > 0
@@ -57,6 +62,7 @@ export function DashboardPage() {
 
   const district = selected === null ? null : districts.data?.find((d) => d.code === selected)
   const allLabel = national ? ALL_OF_SRI_LANKA : 'Your districts'
+  const backLabel = national ? 'Back to all of Sri Lanka' : 'Back to your districts'
   const areaName = selected === null ? allLabel : (district?.name ?? selected)
 
   useEffect(() => {
@@ -89,7 +95,8 @@ export function DashboardPage() {
     selected === null ? SRI_LANKA : boundsOf(located.length > 0 ? located : (reports.data ?? []))
   const frameKey = `${selected ?? 'LK'}:${located.length}:${reports.isSuccess ? 'r' : ''}`
 
-  const unknownDistrict = selected !== null && districts.isSuccess && district === undefined
+  const unknownDistrict =
+    selected !== null && !outOfScope && districts.isSuccess && district === undefined
 
   function toggle(group: SymptomGroup) {
     setHidden((current) => {
@@ -157,8 +164,10 @@ export function DashboardPage() {
             ) : null}
           </div>
 
-          {unknownDistrict ? (
-            <UnknownDistrict code={selected} />
+          {outOfScope ? (
+            <OutOfScope code={selected} back={backLabel} />
+          ) : unknownDistrict ? (
+            <UnknownDistrict code={selected} back={backLabel} />
           ) : (
             <>
               <div className="grid gap-xl lg:grid-cols-[minmax(0,21rem)_minmax(0,1fr)]">
@@ -231,7 +240,23 @@ export function DashboardPage() {
   )
 }
 
-function UnknownDistrict({ code }: { code: string }) {
+/** A district the inspector's account does not cover. Nothing about it is shown or fetched. */
+function OutOfScope({ code, back }: { code: string; back: string }) {
+  return (
+    <div className="grid justify-items-start gap-sm border-t border-t-ink py-md">
+      <p className="font-medium">Your account does not cover {code}.</p>
+      <p className="text-small text-ink-70">
+        Inspectors see the districts an administrator assigned to them. To work on another district,
+        ask an administrator to add it to your account.
+      </p>
+      <Link to="/app" className="text-small text-ink underline">
+        {back}
+      </Link>
+    </div>
+  )
+}
+
+function UnknownDistrict({ code, back }: { code: string; back: string }) {
   return (
     <div className="grid justify-items-start gap-sm border-t border-t-ink py-md">
       <p className="font-medium">No district has the code {code}.</p>
@@ -240,7 +265,7 @@ function UnknownDistrict({ code }: { code: string }) {
         list instead.
       </p>
       <Link to="/app" className="text-small text-ink underline">
-        Back to all of Sri Lanka
+        {back}
       </Link>
     </div>
   )

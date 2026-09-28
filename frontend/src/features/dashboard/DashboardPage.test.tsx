@@ -209,4 +209,16 @@ describe('DashboardPage', () => {
     expect(screen.getByText('2 districts')).toBeInTheDocument()
     expect(screen.queryByText('All of Sri Lanka')).not.toBeInTheDocument()
   })
+
+  it('tells an inspector a district is not theirs, and asks the api nothing about it', async () => {
+    setSession(inspectorSession(['KDY', 'NEL']))
+    renderAt('/app/districts/CMB')
+
+    expect(await screen.findByText('Your account does not cover CMB.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to your districts' })).toHaveAttribute(
+      'href',
+      '/app',
+    )
+    expect(fetchMock.mock.calls.map(([url]) => url).join(' ')).not.toMatch(/district=CMB/)
+  })
 })
