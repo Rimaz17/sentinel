@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getJson } from './client'
+import { getJson } from '@/lib/api/client'
 import type { Alert, DistrictSummary, Facility, LocatedReport, WeeklyCounts } from './types'
 
 /**
