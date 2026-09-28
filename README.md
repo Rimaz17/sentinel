@@ -51,7 +51,7 @@ spread evenly across a district suggests a wider seasonal wave.
 |---|---|---|
 | 1 | Walking skeleton, facility registry, simulator, ingestion API, PostgreSQL | **Built** |
 | 2 | Detection v1, z-score baseline job writing alerts | **Built** |
-| 3 | Dashboard v1, React + Leaflet, polling | Not started |
+| 3 | Dashboard v1, React + Leaflet, polling | **Built** |
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | Not started |
 | 5 | Real-time, Kafka, Redis windows, WebSocket alerts | Not started |
 | 6 | Geography, PostGIS, DBSCAN, cluster rings | Not started |
@@ -63,11 +63,15 @@ Ministry of Health data, a Python simulator posting reports to a Spring Boot
 ingestion API, anonymised reports stored in PostgreSQL, and an endpoint listing
 recent reports. Phase 2 adds the detector: an hourly Python job that scores every
 district and symptom group against its own baseline and writes alerts, and
-outbreak injection in the simulator to test it against. Neither has a user
-interface yet; the dashboards arrive in Phase 3.
+outbreak injection in the simulator to test it against. Phase 3 adds the
+inspector's dashboard at `/app`: the alert queue, every report on a Leaflet map,
+the district list, and a weekly chart per symptom group for the country or one
+district, all refreshed by polling every 30 seconds. See
+[ADR 0009](docs/adr/0009-dashboard-v1-polling-and-figures.md).
 
-The landing page is the one browser surface that exists today. Every other route
-renders a page stating which phase it belongs to and what will live there; see
+The landing page and the internal dashboard are the browser surfaces that exist
+today. Every other route renders a page stating which phase it belongs to and
+what will live there; see
 [ADR 0002](docs/adr/0002-unbuilt-routes-render-placeholders.md).
 
 ## Measured detection
@@ -120,14 +124,16 @@ and are measured when Kafka arrives in Phase 5.
 | Event stream | Kafka |
 | Database | PostgreSQL + PostGIS, Flyway |
 | Live counters | Redis |
-| Frontend | React + TypeScript + Vite |
-| Maps | Leaflet with OpenStreetMap / CARTO tiles |
+| Frontend | React + TypeScript + Vite, Tailwind CSS, TanStack Query |
+| Maps | Leaflet with OpenStreetMap tiles |
 | Local stack | Docker Compose |
 | CI | GitHub Actions |
 
 Google Maps is not used anywhere. Its terms forbid using its tiles outside its own
-SDK, which is why it requires billing. Leaflet with free OSM/CARTO tiles needs no
-API key and no billing, and PostGIS handles all spatial queries.
+SDK, which is why it requires billing. Leaflet with free OpenStreetMap tiles needs
+no API key and no billing, and PostGIS handles all spatial queries. CARTO's
+basemaps were the first choice but now stamp "API key required" on keyless tiles;
+see [ADR 0010](docs/adr/0010-openstreetmap-tiles.md).
 
 ## Running the frontend
 
@@ -143,6 +149,14 @@ The dev server prints a local URL, normally <http://localhost:5173>.
 
 The landing page is entirely static and makes no network requests; it does not
 need the backend running.
+
+The internal dashboard at <http://localhost:5173/app> needs the API (see
+[Running the backend](#running-the-backend)). The dev and preview servers pass
+every request under `/api` to <http://localhost:8080>, so the browser only ever
+talks to its own origin and the API needs no CORS setting; set
+`SENTINEL_API_URL` before `npm run dev` to point them elsewhere. `/app` shows the
+whole country and `/app/districts/KDY` one district. Every panel polls every 30
+seconds while the tab is visible, and **Refresh now** asks at once.
 
 ### Frontend scripts
 
@@ -225,8 +239,8 @@ python -m sentinel_detector run
 
 `run` checks once; `watch` checks at a minute past every hour until stopped. A
 check refuses to run until reports reach back 63 days, which the backfill
-provides. Alerts are written to the `alerts` table, numbered from `A-1001`; the
-alert list arrives with the dashboards in Phase 3.
+provides. Alerts are written to the `alerts` table, numbered from `A-1001`, and
+appear in the dashboard's alert list within one poll.
 
 ### Injecting an outbreak
 
@@ -267,6 +281,10 @@ Checked 100 series for the 7 days to 2026-09-27 16:00 UTC: 1 above threshold
 | `GET /api/facilities` | The facility registry; `?district=KDY` for one district. A location is null where it could not be verified. |
 | `POST /api/ingestion/reports` | Submits a report as the facility named in the `X-Facility-Code` header. Answers `202 Accepted` with the report's id. |
 | `GET /api/reports` | Recent reports, newest reported first; `?limit=` 1 to 500 (default 50), `?district=KDY` for one district. |
+| `GET /api/reports/locations` | Reports with a location from the last `?days=` 1 to 63 (default 7), newest first, at most 5,000; `?district=KDY` for one district. The map's dots. |
+| `GET /api/reports/weekly-counts` | Reports per symptom group in each of the last nine seven-day weeks up to now, oldest first, bucketed as the detector buckets them; `?district=KDY` for one district, the whole country without. |
+| `GET /api/districts` | All 25 districts alphabetically, each with its reports over the last seven days and its open alerts. |
+| `GET /api/alerts` | Alerts, most recently detected first; `?limit=` 1 to 200 (default 50), `?district=KDY` for one district. `open` is true while an alert is not closed and was detected within the last 24 hours. |
 
 A report as a facility might send it, identity included:
 
@@ -313,12 +331,17 @@ own machine until Phase 4 replaces the header with sign-in; see
 ```
 sentinel/
 ├── backend/
-│   ├── api/               Spring Boot: facility registry, ingestion, reports
+│   ├── api/               Spring Boot: facility registry, ingestion, reports, districts, alerts
 │   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
 │   ├── detector/          Python: hourly z-score check, alerts, evaluation
 │   └── simulator/         Python: simulated reports and outbreaks, backfill and live modes
 ├── frontend/
-│   └── src/assets/        Shipped WebP figures, several widths each
+│   └── src/
+│       ├── assets/        Shipped WebP figures, several widths each
+│       └── features/
+│           ├── landing/   The public landing page at /
+│           └── dashboard/ The internal dashboard at /app: api client, alert and
+│                          district lists, Leaflet map, weekly chart
 ├── infra/
 │   ├── docker-compose.yml Local PostgreSQL
 │   └── .env.example       Local settings, dummy values; copy to .env at the root
@@ -387,8 +410,18 @@ These are documented on purpose and are not defects.
   1,505. See [ADR 0006](docs/adr/0006-facility-locations-verified-before-use.md)
   and [the registry's README](scripts/facility-registry/README.md).
 - **No authentication until Phase 4.** A facility names itself in a request
-  header, and every endpoint is open. See
+  header, and every endpoint is open, including the internal dashboard at `/app`
+  with its report positions and unpublished alerts. The dashboard says so on
+  screen. See
   [ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
+- **No public dashboard yet.** `/dashboard`, the reduced public view of shaded
+  districts, arrives with accounts and roles in Phase 4; `/app` is the internal
+  view and must not be exposed publicly.
+- **Map tiles depend on OpenStreetMap's tile server,** whose usage policy suits a
+  demonstration but not production traffic. See
+  [ADR 0010](docs/adr/0010-openstreetmap-tiles.md).
+- **The dashboard polls rather than being pushed to.** A new report appears
+  within 30 seconds; alerts are pushed over WebSocket from Phase 5.
 - **Small or gradual outbreaks are caught late or not at all.** At the shipped
   3 sd, an outbreak adding half again to a district's usual week is detected
   28% of the time, and the median time to detect across all injected outbreaks

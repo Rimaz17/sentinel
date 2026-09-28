@@ -1,12 +1,40 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { DISTRICTS, weeklyCounts } from '@/test/fixtures'
+import { QueryWrapper } from '@/test/queryWrapper'
 import { AppRoutes } from './AppRoutes'
+
+// The dashboard's map needs a canvas jsdom does not have.
+vi.mock('@/features/dashboard/map/ReportMap', () => ({ ReportMap: () => null }))
+
+beforeEach(() => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((url: string) =>
+      Promise.resolve(
+        Response.json(
+          url.startsWith('/api/districts')
+            ? DISTRICTS
+            : url.startsWith('/api/reports/weekly-counts')
+              ? weeklyCounts()
+              : [],
+        ),
+      ),
+    ),
+  )
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 function renderAt(path: string) {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <AppRoutes />
+      <QueryWrapper>
+        <AppRoutes />
+      </QueryWrapper>
     </MemoryRouter>,
   )
 }
@@ -24,15 +52,15 @@ describe('AppRoutes', () => {
     ['/signin', /sign in/i],
     ['/register', /facility registration/i],
     ['/submit', /submit a report/i],
-    ['/app', /the internal dashboard/i],
-    ['/app/alerts/1001', /the internal dashboard/i],
+    ['/app/admin', /administration/i],
+    ['/app/admin/invite-codes', /administration/i],
   ])('renders a planned page at %s', (path, heading) => {
     renderAt(path)
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
   })
 
   it('marks every unbuilt route as not built yet rather than faking a product', () => {
-    for (const path of ['/dashboard', '/signin', '/register', '/submit', '/app']) {
+    for (const path of ['/dashboard', '/signin', '/register', '/submit', '/app/admin']) {
       const { unmount } = renderAt(path)
       expect(screen.getByText(/not built yet/i)).toBeInTheDocument()
       unmount()
@@ -49,6 +77,26 @@ describe('AppRoutes', () => {
     // PHI accounts are admin-provisioned, so sign-in must not hand anyone a
     // registration route they cannot use.
     expect(screen.queryByRole('link', { name: /register/i })).not.toBeInTheDocument()
+  })
+
+  it('renders the internal dashboard at /app', async () => {
+    renderAt('/app')
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'All of Sri Lanka' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/not built yet/i)).not.toBeInTheDocument()
+  })
+
+  it('renders one district of the dashboard at /app/districts/:code', async () => {
+    renderAt('/app/districts/KDY')
+    expect(await screen.findByRole('heading', { level: 1, name: 'Kandy' })).toBeInTheDocument()
+  })
+
+  it('falls through to a not-found page for an unknown address under /app', () => {
+    renderAt('/app/alerts/1001')
+    expect(
+      screen.getByRole('heading', { level: 1, name: /that page does not exist/i }),
+    ).toBeInTheDocument()
   })
 
   it('falls through to a not-found page for an unknown route', () => {

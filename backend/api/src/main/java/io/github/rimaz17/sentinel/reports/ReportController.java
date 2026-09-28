@@ -24,6 +24,15 @@ class ReportController {
     this.reports = reports;
   }
 
+  /** The detector's comparison: the current week and the eight baseline weeks before it. */
+  static final int CHART_WEEKS = 9;
+
+  /**
+   * The most report positions one map request returns. A normal week is about 1,100 across the
+   * country, so this leaves room for several weeks or a large outbreak.
+   */
+  static final int MAP_LIMIT = 5000;
+
   @GetMapping
   List<ReportResponse> recent(
       @RequestParam(defaultValue = "50") @Min(1) @Max(500) int limit,
@@ -31,5 +40,28 @@ class ReportController {
     List<Report> found =
         district == null ? reports.recent(limit) : reports.recentInDistrict(district, limit);
     return found.stream().map(ReportResponse::from).toList();
+  }
+
+  /**
+   * Reports with a location from the last {@code days} days, newest first, for the map's report
+   * dots. Reports without a location are left out; at most {@link #MAP_LIMIT} are returned.
+   */
+  @GetMapping("/locations")
+  List<ReportResponse> located(
+      @RequestParam(defaultValue = "7") @Min(1) @Max(63) int days,
+      @RequestParam(required = false) @Pattern(regexp = "[A-Z]{3}") String district) {
+    return reports.locatedWithin(district, days, MAP_LIMIT).stream()
+        .map(ReportResponse::from)
+        .toList();
+  }
+
+  /**
+   * Reports per symptom group in each of the last nine weeks, up to now: the current week and the
+   * eight a detection check compares it against. Without a district, the whole country.
+   */
+  @GetMapping("/weekly-counts")
+  WeeklyCountsResponse weeklyCounts(
+      @RequestParam(required = false) @Pattern(regexp = "[A-Z]{3}") String district) {
+    return WeeklyCountsResponse.from(district, reports.weeklyCountsToNow(district, CHART_WEEKS));
   }
 }

@@ -50,11 +50,11 @@ does not exist on the page the reference was taken from.
 |---|---|---|
 | `--color-paper` | `#eaeeee` | Page ground |
 | `--color-paper-raised` | `#f1f4f4` | Raised ground |
-| `--color-paper-sunk` | `#dfe4e4` | Reserved; unused on the landing page |
+| `--color-paper-sunk` | `#dfe4e4` | The dashboard map's ground, behind the tiles |
 | `--color-ink` | `#15222b` | Body text, rules at full strength, the footer ground |
 | `--color-ochre` | `#8f6203` | The accent. Text-safe at 4.59:1 on paper |
 | `--color-ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces, 2.70:1 on paper, so never type there |
-| `--color-alert` | `#e0443e` | Reserved for the alert vocabulary; unused so far |
+| `--color-alert` | `#e0443e` | The alert vocabulary only: the mark beside an open alert, always with the word "Open" |
 
 Ink alphas and their measured ratios on paper:
 
@@ -303,6 +303,52 @@ screens. The theme restores a plain `:hover` so the page behaves as it always ha
   Generalised and Kept, each a `<dt>` naming the fate and a `<dd>` whose fields run
   along the band rather than stacking into a narrow column. From `68rem` the fate
   sits beside its fields; below that it sits above them, so a phone loses nothing.
+
+## The internal dashboard
+
+`/app` and `/app/districts/:code`, in **Operate** mode: the inspector is working,
+so scanability and consistency outrank expression. It is the same world as the
+landing page, ink on paper and ruled, spent differently.
+
+- **Layout.** From `68rem`: a `15rem` district rail, then the main column with
+  the alert queue (`21rem`) beside the map, and the weekly chart under both.
+  Reading order is districts, area heading, alerts, map, chart; alerts come
+  first because acting on them is the inspector's job. Below `68rem` the rail
+  becomes a labelled `<select>`, and below `60rem` everything stacks.
+- **Rows, not cards.** The district list and the alert queue are ruled lists
+  under a full-ink top rule. The district in view is inked in (paper on ink),
+  the page's selection colours, and carries `aria-current="page"`.
+- **Alert state is words first.** "Open · New", "Ended · New" or "Closed", with a
+  filled alert-red square while open and a hollow ink-40 square after. Wording is
+  the internal register: "A-1003, 55 reports, 4.3σ above baseline".
+- **The ochre is spent once**, on the simulated-data notice under the header,
+  the same component as the landing page's (`SimulatedNotice`). Nothing on the
+  dashboard is ochre otherwise.
+- **The map** draws OpenStreetMap tiles in greyscale at 60% over paper-sunk, so
+  the only colour on it is the symptom groups'. Report dots are 4px canvas
+  circles in the group hue with a 1px paper halo; facilities are 6px ink rings.
+  Its key doubles as its text alternative and lets each group be switched off.
+- **The chart** is four small multiples, one per symptom group: nine weekly
+  columns, the eight baseline weeks at 32% of the group hue, the last seven days
+  at full hue, a dashed ink line at the baseline mean, and a figure only on the
+  current week, haloed in paper so the line never runs through it. Columns stay
+  near 24px wide with a 4px rounded top and square foot. Every panel is named in
+  text, and the numbers are one click away as a table.
+- **States.** Every panel shows ruled skeleton rows while loading, the reason and
+  a "Try again" while failing, a teaching empty state, and, when a later poll
+  fails, the last good figures with a line giving their time.
+- **One action shape added, none invented.** "Refresh now" and "Try again" are the
+  landing page's quiet underlined action as a `<button>` (`QuietButton`).
+
+**The group hues were validated, and two pairs are close.** On the paper ground
+the dataviz validator finds gastrointestinal and leptospirosis-like at ΔE 11 for
+normal vision (floor 15) and dengue-like and influenza-like at ΔE 6.0 under
+deuteranopia. The hues are fixed, so no view depends on them: panels are named,
+alerts name their group, and the map key's switches let a reader isolate a group.
+
+Verified in the browser at 375px and 1440px against a live backfill: no
+horizontal overflow, one `<h1>`, every control named, and every visible text node
+at 4.5:1 or better.
 
 ## Browser surfaces
 
