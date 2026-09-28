@@ -7,7 +7,7 @@ import { QuietButton } from '@/components/ui/QuietButton'
 import { ApiError, apiRequest } from '@/lib/api/client'
 import type { Session } from '@/lib/api/session'
 import { AuthPage, CheckingSession } from './AuthPage'
-import { homeFor, ROLE_NAMES, signOut, startSession, useSession } from './session'
+import { homeFor, mayOpen, ROLE_NAMES, signOut, startSession, useSession } from './session'
 
 /**
  * One sign-in for both staff roles. Data providers are sent to report
@@ -42,7 +42,8 @@ export function SignInPage() {
         body: { email, password },
       })
       startSession(session)
-      void navigate(from ?? homeFor(session.account.role), { replace: true })
+      const role = session.account.role
+      void navigate(from && mayOpen(role, from) ? from : homeFor(role), { replace: true })
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'Could not sign in.')
       setBusy(false)

@@ -4,7 +4,7 @@ import { Link, Navigate, useLocation } from 'react-router-dom'
 import { QuietButton } from '@/components/ui/QuietButton'
 import type { Role } from '@/lib/api/session'
 import { AuthPage, CheckingSession } from './AuthPage'
-import { homeFor, ROLE_NAMES, signOut, useSession } from './session'
+import { aRole, homeFor, signOut, useSession } from './session'
 
 /**
  * Shows its children only to a signed-in person with the given role. Anyone
@@ -36,7 +36,7 @@ function WrongRole({ needed, have }: { needed: Role; have: Role }) {
       title="This page is not for your account."
       intro={
         <p>
-          It is for a {ROLE_NAMES[needed]}, and you are signed in as a {ROLE_NAMES[have]}.
+          It is for {aRole(needed)}, and you are signed in as {aRole(have)}.
         </p>
       }
     >

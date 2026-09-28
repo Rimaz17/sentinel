@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vite
 import { resetSession, type Session } from '@/lib/api/session'
 import { QueryWrapper } from '@/test/queryWrapper'
 import { RequireRole } from './RequireRole'
+import { aRole, mayOpen } from './session'
 import { SignInPage } from './SignInPage'
 
 function session(role: Session['account']['role']): Session {
@@ -143,5 +144,39 @@ describe('SignInPage', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Sign out' }))
     expect(await screen.findByLabelText('Email address')).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledWith('/api/auth/signout', expect.anything())
+  })
+
+  it('goes home instead of to a page left behind that this account may not open', async () => {
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/signin', state: { from: '/app/admin' } }]}>
+        <QueryWrapper>
+          <Routes>
+            <Route path="/signin" element={<SignInPage />} />
+            <Route path="/app" element={<p>Inspector dashboard</p>} />
+            <Route path="/app/admin" element={<p>Administration</p>} />
+          </Routes>
+        </QueryWrapper>
+      </MemoryRouter>,
+    )
+    await signIn('the right password')
+
+    expect(await screen.findByText('Inspector dashboard')).toBeInTheDocument()
+  })
+})
+
+describe('mayOpen and aRole', () => {
+  it('lets each role open only its own pages', () => {
+    expect(mayOpen('PHI', '/app/districts/KDY')).toBe(true)
+    expect(mayOpen('PHI', '/app/admin')).toBe(false)
+    expect(mayOpen('ADMIN', '/app/admin/facilities')).toBe(true)
+    expect(mayOpen('ADMIN', '/submit')).toBe(false)
+    expect(mayOpen('DATA_PROVIDER', '/submit')).toBe(true)
+    expect(mayOpen('DATA_PROVIDER', '/app')).toBe(false)
+  })
+
+  it('puts the right article before a role', () => {
+    expect(aRole('ADMIN')).toBe('an administrator')
+    expect(aRole('PHI')).toBe('a public health inspector')
+    expect(aRole('DATA_PROVIDER')).toBe('a data provider')
   })
 })
