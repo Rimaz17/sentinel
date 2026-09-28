@@ -63,7 +63,8 @@ def test_defaults(monkeypatch):
     assert parse_args(["live"]).interval == 60.0
 
 
-def test_an_unreachable_api_exits_with_an_error(capsys):
+def test_an_unreachable_api_exits_with_an_error(capsys, monkeypatch):
+    monkeypatch.setenv("SENTINEL_FEED_KEY", "a-feed-key-for-tests-only-0123456789")
     # Port 9 (discard) on loopback is closed on any ordinary machine.
     assert main(["--api-url", "http://127.0.0.1:9", "backfill", "--days", "1"]) == 1
     assert "Could not reach the API" in capsys.readouterr().err

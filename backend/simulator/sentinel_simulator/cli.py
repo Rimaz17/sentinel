@@ -23,6 +23,7 @@ from datetime import UTC, datetime, timedelta
 from sentinel_simulator.client import ApiError, SentinelClient
 from sentinel_simulator.generator import Generator
 from sentinel_simulator.outbreaks import parse_outbreak
+from sentinel_simulator.settings import feed_key
 
 DEFAULT_API_URL = "http://localhost:8080"
 PROGRESS_EVERY = 1000
@@ -37,6 +38,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--api-url",
         default=os.environ.get("SENTINEL_API_URL", DEFAULT_API_URL),
         help="API base URL (default: $SENTINEL_API_URL, else %(default)s)",
+    )
+    parser.add_argument(
+        "--feed-key",
+        help="the API's report feed key (default: $SENTINEL_FEED_KEY, else the repository's .env)",
     )
     parser.add_argument("--seed", type=int, help="random seed, for a repeatable run")
     parser.add_argument(
@@ -121,8 +126,16 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError as error:
         print(f"Not a valid outbreak: {error}", file=sys.stderr)
         return 2
+    key = args.feed_key or feed_key()
+    if not key:
+        print(
+            "Set SENTINEL_FEED_KEY, in the environment or the repository's .env, to the feed key"
+            " the API was started with.",
+            file=sys.stderr,
+        )
+        return 2
     try:
-        with SentinelClient(args.api_url) as client:
+        with SentinelClient(args.api_url, key) as client:
             facilities = client.facilities()
             generator = Generator(facilities, rng, spread_km=args.spread_km, outbreaks=outbreaks)
             located = sum(1 for f in facilities if f.latitude is not None)
