@@ -18,6 +18,12 @@ interface AccountRepository extends JpaRepository<Account, Long> {
 
   boolean existsByEmail(String email);
 
+  @EntityGraph(attributePaths = "facility")
+  List<Account> findAllByOrderByRoleAscDisplayNameAsc();
+
+  @EntityGraph(attributePaths = "facility")
+  List<Account> findByRoleOrderByDisplayNameAsc(Role role);
+
   /** Data provider accounts per facility, as {@code [facilityId, count]}. */
   @Query(
       """

@@ -43,6 +43,7 @@ public class TestAccounts {
   public void clear() {
     jdbc.update("delete from refresh_tokens");
     jdbc.update("delete from facility_invite_codes");
+    jdbc.update("delete from activation_tokens");
     jdbc.update("delete from accounts");
   }
 

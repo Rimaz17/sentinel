@@ -1,11 +1,15 @@
 package io.github.rimaz17.sentinel.accounts;
 
+import io.github.rimaz17.sentinel.districts.District;
+import io.github.rimaz17.sentinel.districts.DistrictService;
 import io.github.rimaz17.sentinel.facilities.Facility;
 import io.github.rimaz17.sentinel.web.ApiProblem;
 import io.github.rimaz17.sentinel.web.InvalidFieldException;
 import java.time.Clock;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,15 +21,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class AccountService {
 
   static final String EMAIL_TAKEN = "An account already uses this email address.";
+  static final String SCOPE_REQUIRED = "must name at least one district, or * for every district";
+  static final String SCOPE_WILDCARD_ALONE = "must be * alone, or district codes without *";
+  static final String SCOPE_UNKNOWN = "must be district codes such as KDY";
 
   private final AccountRepository accounts;
   private final PasswordEncoder passwords;
+  private final DistrictService districts;
   private final Clock clock;
 
-  AccountService(AccountRepository accounts, PasswordEncoder passwords, Clock clock) {
+  AccountService(
+      AccountRepository accounts,
+      PasswordEncoder passwords,
+      DistrictService districts,
+      Clock clock) {
     this.accounts = accounts;
     this.passwords = passwords;
+    this.districts = districts;
     this.clock = clock;
+  }
+
+  /** Every account, or those with one role, grouped by role and then by name. */
+  public List<Account> list(Role role) {
+    return role == null
+        ? accounts.findAllByOrderByRoleAscDisplayNameAsc()
+        : accounts.findByRoleOrderByDisplayNameAsc(role);
   }
 
   /** The account for an email address, however it was capitalised or spaced. */
@@ -61,6 +81,37 @@ public class AccountService {
     return accounts.save(
         Account.dataProvider(
             email, displayName, passwords.encode(password), facility, clock.instant()));
+  }
+
+  /**
+   * An inspector created by an administrator, covering the given districts or, with {@code *},
+   * every district. They have no password until they follow their activation link.
+   */
+  @Transactional
+  public Account createInspector(String email, String displayName, List<String> districtEntries) {
+    DistrictScope scope = scopeOf(districtEntries);
+    if (accounts.existsByEmail(Account.normaliseEmail(email))) {
+      throw new ApiProblem(HttpStatus.CONFLICT, EMAIL_TAKEN);
+    }
+    return accounts.save(Account.inspector(email, displayName, scope, clock.instant()));
+  }
+
+  /** A scope from an administrator's list, every entry checked against the 25 districts. */
+  private DistrictScope scopeOf(List<String> entries) {
+    if (entries == null || entries.isEmpty()) {
+      throw new InvalidFieldException("districts", SCOPE_REQUIRED);
+    }
+    if (entries.contains(DistrictScope.EVERY_DISTRICT)) {
+      if (entries.size() > 1) {
+        throw new InvalidFieldException("districts", SCOPE_WILDCARD_ALONE);
+      }
+      return DistrictScope.NATIONAL;
+    }
+    Set<String> known = districts.all().stream().map(District::getCode).collect(Collectors.toSet());
+    if (!known.containsAll(entries)) {
+      throw new InvalidFieldException("districts", SCOPE_UNKNOWN);
+    }
+    return DistrictScope.of(entries);
   }
 
   private static void requireAcceptable(String password) {
