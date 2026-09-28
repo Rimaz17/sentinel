@@ -21,13 +21,19 @@ public class AlertService {
     this.clock = clock;
   }
 
-  /** The most recently detected first, so an alert still being extended stays at the top. */
-  public List<Alert> recent(int limit) {
-    return alerts.findAllByOrderByLastDetectedAtDescIdDesc(Limit.of(limit));
-  }
-
-  public List<Alert> recentInDistrict(String districtCode, int limit) {
-    return alerts.findByDistrictCodeOrderByLastDetectedAtDescIdDesc(districtCode, Limit.of(limit));
+  /**
+   * The most recently detected first, so an alert still being extended stays at the top. Only the
+   * given districts, or every district when {@code districtCodes} is null.
+   */
+  public List<Alert> recent(List<String> districtCodes, int limit) {
+    if (districtCodes == null) {
+      return alerts.findAllByOrderByLastDetectedAtDescIdDesc(Limit.of(limit));
+    }
+    if (districtCodes.isEmpty()) {
+      return List.of();
+    }
+    return alerts.findByDistrictCodeInOrderByLastDetectedAtDescIdDesc(
+        districtCodes, Limit.of(limit));
   }
 
   /** How many alerts are open in each district right now. Districts with none are absent. */

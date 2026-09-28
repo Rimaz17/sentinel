@@ -1,5 +1,6 @@
 package io.github.rimaz17.sentinel.reports;
 
+import io.github.rimaz17.sentinel.auth.Caller;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
@@ -10,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Recent reports, with their approximate locations. This is internal data: it will be restricted to
- * inspectors, scoped to their districts, when sign-in arrives, and it is never part of the public
- * API.
+ * Recent reports, with their approximate locations. Internal data: inspectors only, within their
+ * districts, and never part of the public API. Without a district, a request covers every district
+ * the caller may see.
  */
 @RestController
 @RequestMapping("/api/reports")
@@ -35,11 +36,12 @@ class ReportController {
 
   @GetMapping
   List<ReportResponse> recent(
+      Caller caller,
       @RequestParam(defaultValue = "50") @Min(1) @Max(500) int limit,
       @RequestParam(required = false) @Pattern(regexp = "[A-Z]{3}") String district) {
-    List<Report> found =
-        district == null ? reports.recent(limit) : reports.recentInDistrict(district, limit);
-    return found.stream().map(ReportResponse::from).toList();
+    return reports.recent(caller.districtsFor(district), limit).stream()
+        .map(ReportResponse::from)
+        .toList();
   }
 
   /**
@@ -48,20 +50,24 @@ class ReportController {
    */
   @GetMapping("/locations")
   List<ReportResponse> located(
+      Caller caller,
       @RequestParam(defaultValue = "7") @Min(1) @Max(63) int days,
       @RequestParam(required = false) @Pattern(regexp = "[A-Z]{3}") String district) {
-    return reports.locatedWithin(district, days, MAP_LIMIT).stream()
+    return reports.locatedWithin(caller.districtsFor(district), days, MAP_LIMIT).stream()
         .map(ReportResponse::from)
         .toList();
   }
 
   /**
    * Reports per symptom group in each of the last nine weeks, up to now: the current week and the
-   * eight a detection check compares it against. Without a district, the whole country.
+   * eight a detection check compares it against. Without a district, every district the caller
+   * covers, which for a national inspector is the whole country.
    */
   @GetMapping("/weekly-counts")
   WeeklyCountsResponse weeklyCounts(
+      Caller caller,
       @RequestParam(required = false) @Pattern(regexp = "[A-Z]{3}") String district) {
-    return WeeklyCountsResponse.from(district, reports.weeklyCountsToNow(district, CHART_WEEKS));
+    return WeeklyCountsResponse.from(
+        district, reports.weeklyCountsToNow(caller.districtsFor(district), CHART_WEEKS));
   }
 }

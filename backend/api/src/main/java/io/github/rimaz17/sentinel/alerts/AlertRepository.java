@@ -1,6 +1,7 @@
 package io.github.rimaz17.sentinel.alerts;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -13,7 +14,8 @@ interface AlertRepository extends JpaRepository<Alert, Long> {
   List<Alert> findAllByOrderByLastDetectedAtDescIdDesc(Limit limit);
 
   @EntityGraph(attributePaths = "district")
-  List<Alert> findByDistrictCodeOrderByLastDetectedAtDescIdDesc(String districtCode, Limit limit);
+  List<Alert> findByDistrictCodeInOrderByLastDetectedAtDescIdDesc(
+      Collection<String> districtCodes, Limit limit);
 
   /**
    * Open alerts per district, as {@code [districtCode, count]} rows; districts with none omitted.

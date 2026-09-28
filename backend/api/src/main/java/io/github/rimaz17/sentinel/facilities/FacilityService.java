@@ -15,12 +15,15 @@ public class FacilityService {
     this.facilities = facilities;
   }
 
-  public List<Facility> all() {
-    return facilities.findAllByOrderByCodeAsc();
-  }
-
-  public List<Facility> inDistrict(String districtCode) {
-    return facilities.findByDistrictCodeOrderByCodeAsc(districtCode);
+  /** The facilities in the given districts, or the whole registry when that is null. */
+  public List<Facility> inDistricts(List<String> districtCodes) {
+    if (districtCodes == null) {
+      return facilities.findAllByOrderByCodeAsc();
+    }
+    if (districtCodes.isEmpty()) {
+      return List.of();
+    }
+    return facilities.findByDistrictCodeInOrderByCodeAsc(districtCodes);
   }
 
   public Optional<Facility> findByCode(String code) {

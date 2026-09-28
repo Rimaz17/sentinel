@@ -34,28 +34,40 @@ public class ReportService {
     reports.save(new Report(report, facilities.reference(report.facilityId())));
   }
 
+  /*
+   * The queries below take the districts they may look at: a list of codes, or null for the whole
+   * country. An empty list is a caller who may see no district at all, and finds nothing.
+   */
+
   /**
    * The most recently reported first, by when the patient presented rather than when it arrived.
    */
   @Transactional(readOnly = true)
-  public List<Report> recent(int limit) {
-    return reports.findAllByOrderByReportedAtDescIdDesc(Limit.of(limit));
-  }
-
-  @Transactional(readOnly = true)
-  public List<Report> recentInDistrict(String districtCode, int limit) {
-    return reports.findByDistrictCodeOrderByReportedAtDescIdDesc(districtCode, Limit.of(limit));
+  public List<Report> recent(List<String> districtCodes, int limit) {
+    if (districtCodes == null) {
+      return reports.findAllByOrderByReportedAtDescIdDesc(Limit.of(limit));
+    }
+    if (districtCodes.isEmpty()) {
+      return List.of();
+    }
+    return reports.findByDistrictCodeInOrderByReportedAtDescIdDesc(districtCodes, Limit.of(limit));
   }
 
   /**
    * Reports with a location that presented within the last {@code days} days, newest first, at most
-   * {@code limit}. A null district means the whole country.
+   * {@code limit}.
    */
   @Transactional(readOnly = true)
-  public List<Report> locatedWithin(String districtCode, int days, int limit) {
+  public List<Report> locatedWithin(List<String> districtCodes, int days, int limit) {
     Instant now = clock.instant();
-    return reports.findLocated(
-        now.minus(Duration.ofDays(days)), now, districtCode, Limit.of(limit));
+    Instant from = now.minus(Duration.ofDays(days));
+    if (districtCodes == null) {
+      return reports.findLocated(from, now, Limit.of(limit));
+    }
+    if (districtCodes.isEmpty()) {
+      return List.of();
+    }
+    return reports.findLocatedIn(from, now, districtCodes, Limit.of(limit));
   }
 
   /** How many reports each district has, by when the patient presented, in [from, to). */
@@ -67,16 +79,16 @@ public class ReportService {
 
   /** Reports per symptom group in each of the last {@code weeks} seven-day windows, up to now. */
   @Transactional(readOnly = true)
-  public List<WeekCounts> weeklyCountsToNow(String districtCode, int weeks) {
-    return weeklyCounts(districtCode, clock.instant(), weeks);
+  public List<WeekCounts> weeklyCountsToNow(List<String> districtCodes, int weeks) {
+    return weeklyCounts(districtCodes, clock.instant(), weeks);
   }
 
   /**
    * Reports per symptom group in each of the {@code weeks} seven-day windows ending at {@code end},
-   * oldest first, so the last is [end - 7 days, end). A null district counts the whole country.
+   * oldest first, so the last is [end - 7 days, end), summed over the given districts.
    */
   @Transactional(readOnly = true)
-  public List<WeekCounts> weeklyCounts(String districtCode, Instant end, int weeks) {
+  public List<WeekCounts> weeklyCounts(List<String> districtCodes, Instant end, int weeks) {
     List<Map<SymptomGroup, Long>> counts = new ArrayList<>();
     for (int i = 0; i < weeks; i++) {
       Map<SymptomGroup, Long> week = new EnumMap<>(SymptomGroup.class);
@@ -86,7 +98,13 @@ public class ReportService {
       counts.add(week);
     }
     Instant start = end.minus(WEEK.multipliedBy(weeks));
-    for (Object[] row : reports.countByGroupAndWeek(start, end, districtCode)) {
+    List<Object[]> rows =
+        districtCodes == null
+            ? reports.countByGroupAndWeek(start, end, null)
+            : districtCodes.isEmpty()
+                ? List.of()
+                : reports.countByGroupAndWeek(start, end, String.join(",", districtCodes));
+    for (Object[] row : rows) {
       int weeksAgo = ((Number) row[1]).intValue();
       counts
           .get(weeks - 1 - weeksAgo)
