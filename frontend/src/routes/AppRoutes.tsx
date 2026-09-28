@@ -1,5 +1,6 @@
 import { lazy, type ReactNode, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
+import { RegisterPage } from '@/features/auth/RegisterPage'
 import { RequireRole } from '@/features/auth/RequireRole'
 import { SignInPage } from '@/features/auth/SignInPage'
 import { LandingPage } from '@/features/landing/LandingPage'
@@ -68,23 +69,7 @@ export function AppRoutes() {
 
       <Route path="/signin" element={<SignInPage />} />
 
-      <Route
-        path="/register"
-        element={
-          <PlannedPage title="Facility registration" phase="Phase 4 · Accounts and roles">
-            <p>
-              Registration for healthcare data providers. It requires the invite code issued to your
-              facility, which is validated on the server; without a valid code an account cannot be
-              created at all.
-            </p>
-            <p>
-              The gate exists because a data provider account feeds reports straight into the
-              detector. Open registration would let anyone invent a clinic and either trigger false
-              alerts or bury a real signal in noise.
-            </p>
-          </PlannedPage>
-        }
-      />
+      <Route path="/register" element={<RegisterPage />} />
 
       <Route
         path="/submit"
