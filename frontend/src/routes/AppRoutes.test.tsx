@@ -51,17 +51,16 @@ describe('AppRoutes', () => {
     ).toBeInTheDocument()
   })
 
-  it.each([
-    ['/dashboard', /the public dashboard/i],
-    ['/app/admin', /administration/i],
-    ['/app/admin/invite-codes', /administration/i],
-  ])('renders a planned page at %s', (path, heading) => {
-    renderAt(path)
-    expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
-  })
+  it.each([['/dashboard', /the public dashboard/i]])(
+    'renders a planned page at %s',
+    (path, heading) => {
+      renderAt(path)
+      expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
+    },
+  )
 
   it('marks every unbuilt route as not built yet rather than faking a product', () => {
-    for (const path of ['/dashboard', '/app/admin']) {
+    for (const path of ['/dashboard']) {
       const { unmount } = renderAt(path)
       expect(screen.getByText(/not built yet/i)).toBeInTheDocument()
       unmount()
@@ -114,5 +113,12 @@ describe('AppRoutes', () => {
       'href',
       '/',
     )
+  })
+
+  it('keeps administration from an inspector', async () => {
+    renderAt('/app/admin/facilities')
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'This page is not for your account.' }),
+    ).toBeInTheDocument()
   })
 })

@@ -1,5 +1,6 @@
 import { lazy, type ReactNode, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
+import { AdminPage } from '@/features/admin/AdminPage'
 import { ACTIVATE_PATH, ActivatePage } from '@/features/auth/ActivatePage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
 import { RequireRole } from '@/features/auth/RequireRole'
@@ -89,12 +90,9 @@ export function AppRoutes() {
       <Route
         path="/app/admin/*"
         element={
-          <PlannedPage title="Administration" phase="Phase 4 · Accounts and roles">
-            <p>
-              The facility registry, facility invite codes, and inspector accounts. Inspector
-              accounts are created here by a system administrator; there is no sign-up for them.
-            </p>
-          </PlannedPage>
+          <RequireRole allow="ADMIN">
+            <AdminPage />
+          </RequireRole>
         }
       />
 
