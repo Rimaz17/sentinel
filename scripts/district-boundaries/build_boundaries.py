@@ -103,7 +103,9 @@ def main() -> None:
             source = json.load(response)
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(
-        json.dumps(build(source), separators=(",", ":")) + "\n", encoding="utf-8"
+        json.dumps(build(source), separators=(",", ":")) + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
     print(f"Wrote {len(CODES)} districts to {OUTPUT} ({OUTPUT.stat().st_size:,} bytes)")
 
