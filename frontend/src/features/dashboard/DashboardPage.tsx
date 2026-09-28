@@ -1,6 +1,6 @@
 import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { SkipLink } from '@/components/layout/SkipLink'
 import { caps, cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
 import {
@@ -19,6 +19,7 @@ import { formatCount } from './format'
 import { boundsOf, SRI_LANKA } from './map/geometry'
 import { MapKey } from './map/MapKey'
 import { ReportMap } from './map/ReportMap'
+import { districtPath } from './paths'
 import { LoadingRows, QueryView } from './QueryView'
 
 const panelTitle = 'text-section leading-snug font-medium tracking-tight'
@@ -30,7 +31,15 @@ const panelTitle = 'text-section leading-snug font-medium tracking-tight'
  */
 export function DashboardPage() {
   const { code } = useParams()
-  const selected = code ?? null
+  // District codes are capitals (KDY), but an address typed as /app/districts/kdy
+  // means the same district: it is read as KDY and the address corrected to match.
+  const selected = code === undefined ? null : code.toUpperCase()
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (code !== undefined && code !== code.toUpperCase()) {
+      void navigate(districtPath(code.toUpperCase()), { replace: true })
+    }
+  }, [code, navigate])
 
   const districts = useDistricts()
   const alerts = useAlerts(selected)

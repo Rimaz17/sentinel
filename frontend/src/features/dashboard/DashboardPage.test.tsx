@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { alert, DISTRICTS, report, weeklyCounts } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
@@ -49,10 +49,15 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+function ShowPath() {
+  return <p data-testid="path">{useLocation().pathname}</p>
+}
+
 function renderAt(path: string) {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <QueryWrapper>
+        <ShowPath />
         <Routes>
           <Route path="/app" element={<DashboardPage />} />
           <Route path="/app/districts/:code" element={<DashboardPage />} />
@@ -106,6 +111,19 @@ describe('DashboardPage', () => {
       '/api/reports/weekly-counts?district=KDY',
     ])
     expect(requested('/api/facilities')).toEqual(['/api/facilities?district=KDY'])
+  })
+
+  it('reads a lower-case code in the address as the district it names', async () => {
+    renderAt('/app/districts/nel')
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Nuwara Eliya' }),
+    ).toBeInTheDocument()
+    expect(await screen.findByTestId('path')).toHaveTextContent('/app/districts/NEL')
+    expect(screen.queryByText(/no district has the code/i)).not.toBeInTheDocument()
+    await screen.findByText('No alerts for Nuwara Eliya.')
+    // Only the capitalised code ever reaches the API.
+    expect(fetchMock.mock.calls.map(([url]) => url).join(' ')).not.toMatch(/district=nel/)
   })
 
   it('marks the district in view in the navigation', async () => {
