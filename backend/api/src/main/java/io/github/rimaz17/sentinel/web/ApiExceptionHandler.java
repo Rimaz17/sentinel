@@ -69,6 +69,11 @@ class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     return problem(HttpStatus.FORBIDDEN, ex.getMessage(), List.of());
   }
 
+  @ExceptionHandler(ApiProblem.class)
+  ResponseEntity<Object> apiProblem(ApiProblem ex) {
+    return problem(ex.getStatus(), ex.getMessage(), List.of());
+  }
+
   private static String path(JacksonException ex) {
     return ex.getPath().stream()
         .map(

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,10 +19,11 @@ class AccountsTableTest {
 
   @Autowired AccountRepository accounts;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestAccounts testAccounts;
 
   @BeforeEach
   void clear() {
-    jdbc.update("delete from accounts");
+    testAccounts.clear();
   }
 
   @Test

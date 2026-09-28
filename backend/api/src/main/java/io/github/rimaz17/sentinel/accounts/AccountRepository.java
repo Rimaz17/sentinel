@@ -8,4 +8,7 @@ interface AccountRepository extends JpaRepository<Account, Long> {
 
   @EntityGraph(attributePaths = "facility")
   Optional<Account> findByEmail(String email);
+
+  @EntityGraph(attributePaths = "facility")
+  Optional<Account> findWithFacilityById(long id);
 }

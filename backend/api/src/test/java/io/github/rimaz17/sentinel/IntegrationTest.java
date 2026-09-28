@@ -17,5 +17,5 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(
     properties = {"sentinel.auth.jwt-secret=integration-tests-only-signing-key-0123456789"})
 @AutoConfigureMockMvc
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, TestAccounts.class})
 public @interface IntegrationTest {}
