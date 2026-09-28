@@ -1,8 +1,9 @@
 import 'leaflet/dist/leaflet.css'
 import type { Feature, FeatureCollection, Geometry } from 'geojson'
-import type { Layer, PathOptions } from 'leaflet'
-import { useEffect, useMemo } from 'react'
-import { GeoJSON, MapContainer, useMap } from 'react-leaflet'
+import type { Layer, Path, PathOptions } from 'leaflet'
+import { useMemo } from 'react'
+import { GeoJSON, MapContainer } from 'react-leaflet'
+import { cx, labelSm } from '@/styles/recipes'
 import type { PublicDistrict } from '../api'
 import outlines from './districts.geo.json'
 
@@ -35,16 +36,23 @@ type DistrictMapProps = {
   districts: PublicDistrict[]
   selected: string | null
   onSelect: (code: string) => void
+  /** Sizes the map; it fills whatever height it is given. */
+  className?: string
 }
 
 /**
  * Sri Lanka's 25 districts, each shaded by its status. Nothing finer than a
  * district is drawn: no report, no facility, no street map beneath. A district
  * with an active published alert is filled and drawn with a heavier outline, so
- * the difference is in the line as well as the colour, and the table beside the
- * map says the same in words.
+ * the difference is in the line as well as the colour.
+ *
+ * It is a picture, not a tool: it cannot be panned or zoomed, so a thumb or a
+ * wheel passing over it scrolls the page, and a district is chosen by clicking
+ * it. It is hidden from screen readers and the keyboard, because the district
+ * table beside it says the same in words and is where a district is chosen
+ * without a mouse.
  */
-export function DistrictMap({ districts, selected, onSelect }: DistrictMapProps) {
+export function DistrictMap({ districts, selected, onSelect, className }: DistrictMapProps) {
   const byCode = useMemo(() => new Map(districts.map((d) => [d.code, d])), [districts])
   // A new key redraws the layer, so its styles follow the latest figures.
   const key = districts.map((d) => `${d.code}:${d.status}`).join(',') + `|${selected ?? ''}`
@@ -60,37 +68,46 @@ export function DistrictMap({ districts, selected, onSelect }: DistrictMapProps)
     const status = district?.status === 'ELEVATED' ? 'elevated activity' : 'usual activity'
     layer.bindTooltip(`${feature.properties.name}: ${status}`, { sticky: true })
     layer.on('click', () => onSelect(feature.properties.code))
+    // Leaflet makes each clickable shape a tab stop; the table is the keyboard's way in.
+    layer.on('add', () => (layer as Path).getElement()?.setAttribute('tabindex', '-1'))
   }
 
   return (
-    <MapContainer
-      bounds={[
-        [5.85, 79.5],
-        [9.9, 81.95],
-      ]}
-      minZoom={7}
-      maxZoom={10}
-      maxBounds={[
-        [5, 78.8],
-        [10.6, 82.6],
-      ]}
-      attributionControl
-      className="h-full w-full bg-paper-sunk"
-    >
-      <Attribution />
-      <GeoJSON key={key} data={DISTRICTS} style={style} onEachFeature={describe} />
-    </MapContainer>
+    <figure className="m-0 grid gap-2xs">
+      {/* isolate: Leaflet's panes sit at z-index 400 and up, and would otherwise
+          paint over the sticky site header as the page scrolls past. */}
+      <div aria-hidden="true" className={cx('isolate border border-ink-14', className)}>
+        <MapContainer
+          bounds={[
+            [5.9, 79.65],
+            [9.85, 81.9],
+          ]}
+          zoomSnap={0.1}
+          zoomControl={false}
+          attributionControl={false}
+          dragging={false}
+          touchZoom={false}
+          doubleClickZoom={false}
+          scrollWheelZoom={false}
+          boxZoom={false}
+          keyboard={false}
+          zoomAnimation={false}
+          fadeAnimation={false}
+          className="h-full w-full bg-paper-sunk"
+        >
+          <GeoJSON key={key} data={DISTRICTS} style={style} onEachFeature={describe} />
+        </MapContainer>
+      </div>
+      <figcaption className={cx(labelSm, 'text-ink-70')}>
+        District outlines ©{' '}
+        <a href="https://www.openstreetmap.org/copyright" className="text-ink-70 underline">
+          OpenStreetMap
+        </a>{' '}
+        contributors, via{' '}
+        <a href="https://www.geoboundaries.org" className="text-ink-70 underline">
+          geoBoundaries
+        </a>
+      </figcaption>
+    </figure>
   )
-}
-
-/** Credit for the outlines, which are OpenStreetMap data republished by geoBoundaries. */
-function Attribution() {
-  const map = useMap()
-  useEffect(() => {
-    map.attributionControl.setPrefix(false)
-    map.attributionControl.addAttribution(
-      'District outlines &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, via <a href="https://www.geoboundaries.org">geoBoundaries</a>',
-    )
-  }, [map])
-  return null
 }
