@@ -2,6 +2,7 @@ import { type QueryClient } from '@tanstack/react-query'
 import { useEffect, useSyncExternalStore } from 'react'
 import { apiRequest } from '@/lib/api/client'
 import {
+  type Account,
   type Role,
   renewSession,
   type Session,
@@ -24,6 +25,18 @@ export function useSession(): SessionState {
     }
   }, [state.status])
   return state
+}
+
+/**
+ * The signed-in account, for a page behind RequireRole, which renders nothing
+ * beneath it until someone is signed in.
+ */
+export function useAccount(): Account {
+  const state = useSyncExternalStore(subscribe, sessionState)
+  if (state.status !== 'signed-in') {
+    throw new Error('useAccount is only for pages behind RequireRole')
+  }
+  return state.session.account
 }
 
 /** Where each role works. */
