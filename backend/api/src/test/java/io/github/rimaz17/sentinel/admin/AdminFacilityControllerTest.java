@@ -16,7 +16,6 @@ import com.jayway.jsonpath.JsonPath;
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
 import io.github.rimaz17.sentinel.facilities.InviteCodes;
-import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,9 +119,7 @@ class AdminFacilityControllerTest {
         .andExpect(jsonPath("$[*].districtCode", everyItem(is("KDY"))))
         .andExpect(jsonPath("$[?(@.code == 'LKY0001016')].inviteIssuedAt").isNotEmpty())
         .andExpect(jsonPath("$[?(@.code == 'LKY0001016')].dataProviderAccounts").value(1))
-        .andExpect(
-            jsonPath("$[?(@.code == 'LKY0001008')].inviteIssuedAt")
-                .value(Collections.singletonList(null)))
+        .andExpect(jsonPath("$[?(@.code == 'LKY0001008')].inviteIssuedAt", everyItem(nullValue())))
         .andExpect(jsonPath("$[?(@.code == 'LKY0001008')].dataProviderAccounts").value(0));
   }
 
