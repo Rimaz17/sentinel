@@ -53,7 +53,6 @@ describe('AppRoutes', () => {
 
   it.each([
     ['/dashboard', /the public dashboard/i],
-    ['/submit', /submit a report/i],
     ['/app/admin', /administration/i],
     ['/app/admin/invite-codes', /administration/i],
   ])('renders a planned page at %s', (path, heading) => {
@@ -62,7 +61,7 @@ describe('AppRoutes', () => {
   })
 
   it('marks every unbuilt route as not built yet rather than faking a product', () => {
-    for (const path of ['/dashboard', '/submit', '/app/admin']) {
+    for (const path of ['/dashboard', '/app/admin']) {
       const { unmount } = renderAt(path)
       expect(screen.getByText(/not built yet/i)).toBeInTheDocument()
       unmount()

@@ -5,6 +5,7 @@ import { RegisterPage } from '@/features/auth/RegisterPage'
 import { RequireRole } from '@/features/auth/RequireRole'
 import { SignInPage } from '@/features/auth/SignInPage'
 import { LandingPage } from '@/features/landing/LandingPage'
+import { SubmitPage } from '@/features/submit/SubmitPage'
 import { PlannedPage } from '@/features/planned/PlannedPage'
 
 /*
@@ -76,13 +77,9 @@ export function AppRoutes() {
       <Route
         path="/submit"
         element={
-          <PlannedPage title="Submit a report" phase="Phase 4 · Accounts and roles">
-            <p>
-              The submission form for healthcare data providers. Identity fields are stripped by the
-              ingestion API before anything is stored, and the facility the report belongs to is
-              read from your session rather than from the form.
-            </p>
-          </PlannedPage>
+          <RequireRole allow="DATA_PROVIDER">
+            <SubmitPage />
+          </RequireRole>
         }
       />
 
