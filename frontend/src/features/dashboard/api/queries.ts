@@ -1,6 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
-import { getJson } from '@/lib/api/client'
-import type { Alert, DistrictSummary, Facility, LocatedReport, WeeklyCounts } from './types'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { apiRequest, getJson } from '@/lib/api/client'
+import type {
+  Alert,
+  AlertStatus,
+  DistrictSummary,
+  Facility,
+  LocatedReport,
+  Verdict,
+  WeeklyCounts,
+} from './types'
 
 /**
  * How often the dashboard asks the API again. Reports arrive continuously and
@@ -67,5 +75,29 @@ export function useFacilities(district: string | null) {
     queryFn: ({ signal }) => getJson<Facility[]>('/facilities', { district }, signal),
     enabled: district !== null,
     staleTime: Infinity,
+  })
+}
+
+/** Something an inspector does to an alert: move it on, or give it a verdict. */
+export type AlertAction = { status: AlertStatus } | { verdict: Verdict }
+
+/**
+ * Acts on an alert, then refreshes the alert list and the district counts at
+ * once rather than waiting for the next poll, since closing an alert changes
+ * both.
+ */
+export function useAlertAction(code: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (action: AlertAction) =>
+      apiRequest<Alert>('status' in action ? `/alerts/${code}/status` : `/alerts/${code}/verdict`, {
+        method: 'POST',
+        body: action,
+      }),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['alerts'] }),
+        queryClient.invalidateQueries({ queryKey: ['districts'] }),
+      ]),
   })
 }

@@ -30,6 +30,9 @@ export function alert(overrides: Partial<Alert> = {}): Alert {
     zScore: 3.2,
     peakZScore: 3.4,
     threshold: 3,
+    verdict: null,
+    verdictAt: null,
+    published: false,
     ...overrides,
   }
 }

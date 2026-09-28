@@ -1,9 +1,11 @@
 import { type UseQueryResult } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { caps, cx, labelSm, tnum } from '@/styles/recipes'
+import { AlertActions } from './AlertActions'
 import type { Alert } from './api/types'
 import { formatAgo, formatDateTime, formatDecimal, formatSigma } from './format'
 import { districtPath } from './paths'
+import { publicationWords } from './publication'
 import { EmptyState, LoadingRows, QueryView } from './QueryView'
 import { SYMPTOM_GROUP_STYLES } from './symptomGroups'
 
@@ -107,7 +109,11 @@ function AlertItem({
         <dd>
           {formatDateTime(alert.firstDetectedAt)} to {formatDateTime(alert.lastDetectedAt)}
         </dd>
+        <dt>Public</dt>
+        <dd>{publicationWords(alert)}</dd>
       </dl>
+
+      <AlertActions alert={alert} />
     </article>
   )
 }
