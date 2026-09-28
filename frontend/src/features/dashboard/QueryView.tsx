@@ -14,6 +14,12 @@ type QueryViewProps<T> = {
   isEmpty?: (data: T) => boolean
   /** Shown for a successful response with nothing in it. */
   empty?: ReactNode
+  /**
+   * Said instead of the API's own reason when the first response fails. The
+   * API's reasons are written for staff ("check that it is running"); the
+   * public is told something they can act on.
+   */
+  errorWords?: string
   children: (data: T) => ReactNode
 }
 
@@ -29,13 +35,20 @@ export function QueryView<T>({
   loading,
   isEmpty,
   empty,
+  errorWords,
   children,
 }: QueryViewProps<T>) {
   if (query.isPending) {
     return loading
   }
   if (query.isError && query.data === undefined) {
-    return <ErrorState what={what} error={query.error} onRetry={() => void query.refetch()} />
+    return (
+      <ErrorState
+        what={what}
+        reason={errorWords ?? query.error.message}
+        onRetry={() => void query.refetch()}
+      />
+    )
   }
   const data = query.data as T
   return (
@@ -72,17 +85,17 @@ export function LoadingRows({ label, rows = 4 }: { label: string; rows?: number 
 
 export function ErrorState({
   what,
-  error,
+  reason,
   onRetry,
 }: {
   what: string
-  error: Error
+  reason: string
   onRetry: () => void
 }) {
   return (
     <div role="alert" className="grid justify-items-start gap-2xs border-t border-t-ink py-sm">
       <p className="font-medium">Could not load {what}.</p>
-      <p className="text-small text-ink-70">{error.message}</p>
+      <p className="text-small text-ink-70">{reason}</p>
       <QuietButton onClick={onRetry}>Try again</QuietButton>
     </div>
   )
