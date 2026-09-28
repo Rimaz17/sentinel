@@ -18,9 +18,10 @@ import org.hibernate.annotations.Immutable;
 
 /**
  * An alert episode raised by the detector: a district and symptom group running above its own
- * eight-week baseline. The detector writes these rows; the API only reads them. Its figures
- * describe the most recent check that found the series above threshold. See
- * docs/adr/0007-detection-v1.md.
+ * eight-week baseline. The detector writes its figures, which describe the most recent check that
+ * found the series above threshold (docs/adr/0007-detection-v1.md). Inspectors write only its
+ * status and verdict, through the repository's targeted updates, never by saving this entity, so
+ * the two writers never overwrite each other.
  */
 @Entity
 @Immutable
@@ -75,6 +76,12 @@ public class Alert {
   @Column(nullable = false)
   private BigDecimal threshold;
 
+  @Enumerated(EnumType.STRING)
+  private Verdict verdict;
+
+  @Column(name = "verdict_at")
+  private Instant verdictAt;
+
   protected Alert() {}
 
   /**
@@ -83,6 +90,16 @@ public class Alert {
    */
   public boolean isOpenAt(Instant now) {
     return status != AlertStatus.CLOSED && !lastDetectedAt.plus(EPISODE_GAP).isBefore(now);
+  }
+
+  /**
+   * Whether the public may see this alert: an inspector confirmed it, or no inspector has judged it
+   * yet and its peak ran at least {@code publicThreshold} standard deviations above baseline. A
+   * false alarm never is. See docs/adr/0013-public-alerts.md.
+   */
+  public boolean isPublic(BigDecimal publicThreshold) {
+    return verdict == Verdict.CONFIRMED
+        || (verdict == null && peakZScore.compareTo(publicThreshold) >= 0);
   }
 
   public String getCode() {
@@ -131,5 +148,13 @@ public class Alert {
 
   public BigDecimal getThreshold() {
     return threshold;
+  }
+
+  public Verdict getVerdict() {
+    return verdict;
+  }
+
+  public Instant getVerdictAt() {
+    return verdictAt;
   }
 }

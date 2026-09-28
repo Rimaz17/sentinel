@@ -25,6 +25,10 @@ sentinel:
   # The trusted report feed the simulator submits through. Unset switches it off.
   feed:
     key: ${SENTINEL_FEED_KEY:}
+  alerts:
+    # How far above baseline, in standard deviations, an alert no inspector has
+    # judged must peak to be published anyway. See docs/adr/0013-public-alerts.md.
+    public-threshold: 5.0
   # The administrator provisioned at setup. Created once, never overwritten.
   admin:
     email: ${SENTINEL_ADMIN_EMAIL:}

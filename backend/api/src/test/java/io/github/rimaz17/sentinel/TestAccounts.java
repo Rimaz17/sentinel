@@ -41,6 +41,7 @@ public class TestAccounts {
 
   /** Removes every account and everything that refers to one. */
   public void clear() {
+    jdbc.update("delete from alerts where verdict_by is not null");
     jdbc.update("delete from refresh_tokens");
     jdbc.update("delete from facility_invite_codes");
     jdbc.update("delete from activation_tokens");
