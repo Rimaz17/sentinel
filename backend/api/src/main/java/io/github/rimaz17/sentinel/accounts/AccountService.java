@@ -24,6 +24,10 @@ public class AccountService {
   static final String SCOPE_REQUIRED = "must name at least one district, or * for every district";
   static final String SCOPE_WILDCARD_ALONE = "must be * alone, or district codes without *";
   static final String SCOPE_UNKNOWN = "must be district codes such as KDY";
+  static final String ONLY_INSPECTORS_HAVE_DISTRICTS = "only an inspector's account has districts";
+  static final String NO_SUCH_ACCOUNT = "No account has this id.";
+  static final String CANNOT_DISABLE_SELF = "You cannot disable your own account.";
+  static final String ENABLE_BEFORE_LINK = "Enable this account before issuing it a new link.";
 
   private final AccountRepository accounts;
   private final PasswordEncoder passwords;
@@ -103,6 +107,44 @@ public class AccountService {
       throw new ApiProblem(HttpStatus.CONFLICT, EMAIL_TAKEN);
     }
     return accounts.save(Account.inspector(email, displayName, scope, clock.instant()));
+  }
+
+  /**
+   * An administrator's change to an account: enabling or disabling it, or changing an inspector's
+   * districts. A null field is left as it is. A disabled account cannot sign in or renew a session;
+   * an access token it already holds lasts out its fifteen minutes. A new scope reaches the
+   * inspector's token the next time their session is renewed.
+   */
+  @Transactional
+  public Account update(
+      long accountId, Boolean enabled, List<String> districtEntries, long administratorId) {
+    Account account = accounts.findWithFacilityById(accountId).orElseThrow(AccountService::noSuch);
+    if (Boolean.FALSE.equals(enabled) && accountId == administratorId) {
+      throw new ApiProblem(HttpStatus.CONFLICT, CANNOT_DISABLE_SELF);
+    }
+    if (districtEntries != null) {
+      if (account.getRole() != Role.PHI) {
+        throw new InvalidFieldException("districts", ONLY_INSPECTORS_HAVE_DISTRICTS);
+      }
+      account.setScope(scopeOf(districtEntries));
+    }
+    if (enabled != null) {
+      account.setEnabled(enabled);
+    }
+    return account;
+  }
+
+  /** An account that may be sent a new activation link: it must exist and be enabled. */
+  public Account requireLinkable(long accountId) {
+    Account account = accounts.findWithFacilityById(accountId).orElseThrow(AccountService::noSuch);
+    if (!account.isEnabled()) {
+      throw new ApiProblem(HttpStatus.CONFLICT, ENABLE_BEFORE_LINK);
+    }
+    return account;
+  }
+
+  private static ApiProblem noSuch() {
+    return new ApiProblem(HttpStatus.NOT_FOUND, NO_SUCH_ACCOUNT);
   }
 
   /** A scope from an administrator's list, every entry checked against the 25 districts. */

@@ -4,6 +4,7 @@ import io.github.rimaz17.sentinel.accounts.Account;
 import io.github.rimaz17.sentinel.accounts.AccountService;
 import io.github.rimaz17.sentinel.accounts.Role;
 import io.github.rimaz17.sentinel.auth.ActivationLinks;
+import io.github.rimaz17.sentinel.auth.Caller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +16,8 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,6 +68,25 @@ class AdminAccountController {
     Account inspector =
         accounts.createInspector(request.email(), request.displayName(), request.districts());
     return issued(inspector, HttpStatus.CREATED);
+  }
+
+  /** A change to an account. Fields left out, or null, are not changed. */
+  record AccountChange(Boolean enabled, @Size(max = 25) List<String> districts) {}
+
+  @PatchMapping("/accounts/{id}")
+  AdminAccountResponse update(
+      Caller.Staff admin, @PathVariable long id, @Valid @RequestBody AccountChange change) {
+    Account account = accounts.update(id, change.enabled(), change.districts(), admin.accountId());
+    return AdminAccountResponse.from(account, activationLinks.expiryByAccount(List.of(id)).get(id));
+  }
+
+  /**
+   * A new activation link for an account, replacing any it had: how an inspector who never
+   * activated gets another chance, and how anyone who has forgotten their password sets a new one.
+   */
+  @PostMapping("/accounts/{id}/activation")
+  ResponseEntity<IssuedAccount> reissueLink(@PathVariable long id) {
+    return issued(accounts.requireLinkable(id), HttpStatus.OK);
   }
 
   private ResponseEntity<IssuedAccount> issued(Account account, HttpStatus status) {
