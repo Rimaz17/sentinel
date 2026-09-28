@@ -324,7 +324,7 @@ that name the field at fault and never repeat what was submitted in it.
 
 | Endpoint | What it does |
 |---|---|
-| `GET /api/public/districts` | Every district with its status, `USUAL` or `ELEVATED` with the symptom groups elevated, and its reports over the last seven days. |
+| `GET /api/public/districts` | Every district with its status, `USUAL` or `ELEVATED` with the symptom groups elevated, its reports over the last seven days, its usual week (the average of the eight before) and the one as a percentage of the other. |
 | `GET /api/public/alerts` | Published alerts from the last 90 days, active first, in plain wording, with the day each was first and last flagged and whether an inspector confirmed it. |
 | `GET /api/public/trends` | Reports per symptom group in each of the last nine weeks; `?district=KDY` for one district. |
 

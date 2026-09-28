@@ -43,7 +43,10 @@ be scraped.
   `sentinel.alerts.public-threshold`.
 - **Plain, calm wording, built on the server.** "Kandy district: elevated
   dengue-like illness activity. Follow standard precautions." An alert that has
-  ended reads "... activity is no longer elevated." The public record carries the
+  ended reads "... activity is no longer elevated." The only advice is the
+  spec's "Follow standard precautions", and to follow the local MOH office's or
+  public health inspector's advice; Sentinel offers no medical guidance of its
+  own. The public record carries the
   district, the symptom group, whether it is active, the day it was first and
   last flagged in Sri Lanka, and whether an inspector confirmed it or the higher
   threshold published it. It does not carry the alert's code, whose numbering
@@ -54,6 +57,15 @@ be scraped.
   over the last seven days; nine weeks of reports per symptom group for a
   district or the country; and published alerts from the last 90 days, active
   first. Each may be cached for a minute.
+- **A district's week is shown against its own usual week, as a percentage and
+  nothing more.** The public dashboard gives each district's last seven days as a
+  percentage of the average of the eight weeks before, never as a raw count,
+  because counts side by side invite comparing Colombo with Kandy, which the
+  detector refuses to do. It never turns that percentage into words such as
+  "higher than usual": a rise the public is told about is one an inspector
+  confirmed or one past the higher threshold, and words drawn from a looser rule
+  would pre-empt both. The weekly trends already published hold the same
+  information; the percentage only reads it out plainly.
 
 ## Consequences
 
