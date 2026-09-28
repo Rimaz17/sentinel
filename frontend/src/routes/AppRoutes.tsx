@@ -7,7 +7,7 @@ import { RequireRole } from '@/features/auth/RequireRole'
 import { SignInPage } from '@/features/auth/SignInPage'
 import { LandingPage } from '@/features/landing/LandingPage'
 import { SubmitPage } from '@/features/submit/SubmitPage'
-import { PlannedPage } from '@/features/planned/PlannedPage'
+import { NotFoundPage } from '@/features/notfound/NotFoundPage'
 
 /*
  * The dashboard, with Leaflet and the query library, loads only when an
@@ -20,6 +20,27 @@ const DashboardPage = lazy(() =>
     default: module.DashboardPage,
   })),
 )
+
+/* The public dashboard loads on demand too: it carries Leaflet and the district outlines. */
+const PublicDashboardPage = lazy(() =>
+  import('@/features/public/PublicDashboardPage').then((module) => ({
+    default: module.PublicDashboardPage,
+  })),
+)
+
+function PublicDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <p role="status" className="p-gutter text-small text-ink-70">
+          Loading the public dashboard
+        </p>
+      }
+    >
+      <PublicDashboardPage />
+    </Suspense>
+  )
+}
 
 function Dashboard() {
   return (
@@ -43,32 +64,15 @@ function Inspector({ page }: { page: ReactNode }) {
 /**
  * The route map from the project plan.
  *
- * The landing page and the internal dashboard are built. Every other route
- * renders a page that says so and names the build phase it belongs to, so a
- * link from the front page is never a dead end and never a mock-up presented
- * as a product.
+ * Every route in the plan is built. An address that matches none of them
+ * renders a page that says so, with a way back to the front page.
  */
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
 
-      <Route
-        path="/dashboard"
-        element={
-          <PlannedPage title="The public dashboard" phase="Phase 4 · Accounts and roles">
-            <p>
-              District-level status across all 25 districts, disease trends and historical data, and
-              alerts that a public health inspector has confirmed for publication.
-            </p>
-            <p>
-              Geography here is shown as shaded district polygons or a heatmap, never individual
-              report positions, because a point at a pharmacy’s exact coordinates can reveal which
-              household got sick.
-            </p>
-          </PlannedPage>
-        }
-      />
+      <Route path="/dashboard" element={<PublicDashboard />} />
 
       <Route path="/signin" element={<SignInPage />} />
 
@@ -96,17 +100,7 @@ export function AppRoutes() {
         }
       />
 
-      <Route
-        path="*"
-        element={
-          <PlannedPage title="That page does not exist." phase="Unknown route">
-            <p>
-              The address you followed does not match anything in Sentinel. If you arrived from a
-              link on this site, it is a mistake worth reporting.
-            </p>
-          </PlannedPage>
-        }
-      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }

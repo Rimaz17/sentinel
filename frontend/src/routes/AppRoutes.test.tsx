@@ -6,8 +6,13 @@ import { DISTRICTS, inspectorSession, weeklyCounts } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import { AppRoutes } from './AppRoutes'
 
-// The dashboard's map needs a canvas jsdom does not have.
+// The maps need a canvas and layout jsdom does not have.
 vi.mock('@/features/dashboard/map/ReportMap', () => ({ ReportMap: () => null }))
+vi.mock('@/features/public/map/DistrictMap', () => ({ DistrictMap: () => null }))
+
+function requestedUrls(): string[] {
+  return vi.mocked(fetch).mock.calls.map(([url]) => url as string)
+}
 
 beforeEach(() => {
   resetSession()
@@ -18,11 +23,13 @@ beforeEach(() => {
         Response.json(
           url === '/api/auth/refresh'
             ? inspectorSession()
-            : url.startsWith('/api/districts')
-              ? DISTRICTS
-              : url.startsWith('/api/reports/weekly-counts')
-                ? weeklyCounts()
-                : [],
+            : url.startsWith('/api/public/trends')
+              ? weeklyCounts(null)
+              : url.startsWith('/api/districts')
+                ? DISTRICTS
+                : url.startsWith('/api/reports/weekly-counts')
+                  ? weeklyCounts()
+                  : [],
         ),
       ),
     ),
@@ -51,20 +58,13 @@ describe('AppRoutes', () => {
     ).toBeInTheDocument()
   })
 
-  it.each([['/dashboard', /the public dashboard/i]])(
-    'renders a planned page at %s',
-    (path, heading) => {
-      renderAt(path)
-      expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
-    },
-  )
-
-  it('marks every unbuilt route as not built yet rather than faking a product', () => {
-    for (const path of ['/dashboard']) {
-      const { unmount } = renderAt(path)
-      expect(screen.getByText(/not built yet/i)).toBeInTheDocument()
-      unmount()
-    }
+  it('renders the public dashboard at /dashboard, without signing in', async () => {
+    resetSession()
+    renderAt('/dashboard')
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Sri Lanka, district by district' }),
+    ).toBeInTheDocument()
+    expect(requestedUrls()).not.toContain('/api/auth/refresh')
   })
 
   it('tells an inspector without an account to contact an administrator', async () => {
@@ -107,8 +107,8 @@ describe('AppRoutes', () => {
     ).toBeInTheDocument()
   })
 
-  it('gives every planned page a way back to the front page', () => {
-    renderAt('/dashboard')
+  it('gives an unknown address a way back to the front page', () => {
+    renderAt('/nope/not-a-route')
     expect(screen.getByRole('link', { name: /back to the front page/i })).toHaveAttribute(
       'href',
       '/',
