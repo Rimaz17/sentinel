@@ -7,7 +7,10 @@ import { publicDistrictPath } from './paths'
 
 /**
  * Every district's status in words: the map's accessible counterpart, and the
- * quickest way to read it on a phone. Elevated districts come first.
+ * quickest way to read it on a phone. Elevated districts come first; the one
+ * chosen is inked in, as the internal dashboard marks the district in view.
+ * A district's count is for reading against its own usual week, not against
+ * another district's: Colombo's usual week is several times Kandy's.
  */
 export function DistrictTable({
   districts,
@@ -32,7 +35,7 @@ export function DistrictTable({
               Status
             </th>
             <th scope="col" className="py-2xs ps-sm text-end font-medium whitespace-nowrap">
-              Reports · 7 days
+              Reports this week
             </th>
           </tr>
         </thead>
@@ -40,26 +43,45 @@ export function DistrictTable({
           {ordered.map((district) => (
             <tr
               key={district.code}
-              aria-current={district.code === selected ? 'true' : undefined}
-              className={cx('border-b border-b-ink-14', district.code === selected && 'bg-ink-04')}
+              className={cx(
+                'border-b border-b-ink-14',
+                district.code === selected && 'bg-ink text-paper',
+              )}
             >
-              <th scope="row" className="py-2xs pe-sm text-start font-regular">
-                <Link to={publicDistrictPath(district.code)} className="text-ink underline">
+              <th scope="row" className="pe-sm text-start font-regular">
+                <Link
+                  to={publicDistrictPath(district.code)}
+                  aria-current={district.code === selected ? 'page' : undefined}
+                  className={cx(
+                    'inline-block py-xs underline',
+                    district.code === selected ? 'font-medium text-paper' : 'text-ink',
+                  )}
+                >
                   {district.name}
                 </Link>
               </th>
               <td className="py-2xs pe-sm">
                 {district.status === 'ELEVATED' ? (
-                  <span className="inline-flex flex-wrap items-center gap-x-[0.4rem]">
-                    <span aria-hidden="true" className="inline-block size-[0.55rem] bg-alert" />
+                  <>
+                    <span
+                      aria-hidden="true"
+                      className="me-[0.4rem] inline-block size-[0.55rem] bg-alert"
+                    />
                     <span className="font-medium">Elevated:</span>{' '}
                     {district.elevatedGroups.map((g) => SYMPTOM_GROUP_STYLES[g].label).join(', ')}
-                  </span>
+                  </>
                 ) : (
-                  <span className="text-ink-70">Usual</span>
+                  <span className={district.code === selected ? undefined : 'text-ink-70'}>
+                    Usual
+                  </span>
                 )}
               </td>
-              <td className="py-2xs ps-sm text-end font-mono text-label">
+              <td
+                className={cx(
+                  'py-2xs ps-sm text-end font-mono text-label',
+                  district.code === selected ? 'text-paper' : 'text-ink-70',
+                )}
+              >
                 {formatCount(district.reportsLast7Days)}
               </td>
             </tr>

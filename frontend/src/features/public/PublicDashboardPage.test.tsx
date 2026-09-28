@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { weeklyCounts } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
@@ -64,6 +65,8 @@ let fetchMock: Mock<(url: string) => Promise<Response>>
 let alerts: PublicAlert[]
 
 beforeEach(() => {
+  // jsdom lays nothing out, so it has no scrolling to do.
+  Element.prototype.scrollIntoView = vi.fn()
   alerts = [ACTIVE, ENDED]
   fetchMock = vi.fn((url: string) => {
     const { pathname, searchParams } = new URL(url, 'http://localhost')
@@ -85,10 +88,16 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+function Address() {
+  const { pathname, search } = useLocation()
+  return <p data-testid="address">{pathname + search}</p>
+}
+
 function renderAt(path: string) {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <QueryWrapper>
+        <Address />
         <Routes>
           <Route path="/dashboard" element={<PublicDashboardPage />} />
         </Routes>
@@ -183,5 +192,44 @@ describe('PublicDashboardPage', () => {
     await screen.findByText(ACTIVE.headline)
 
     expect(container.textContent ?? '').not.toContain('—')
+  })
+
+  it('answers for the district a visitor picks, before anything else', async () => {
+    renderAt('/dashboard')
+
+    await userEvent.selectOptions(await screen.findByLabelText('Your district'), 'KDY')
+
+    expect(screen.getByTestId('address')).toHaveTextContent('/dashboard?district=KDY')
+    const status = await screen.findByRole('region', { name: 'Kandy' })
+    expect(status).toHaveTextContent('Elevated activity')
+    expect(status).toHaveTextContent(ACTIVE.headline)
+    expect(status).toHaveFocus()
+  })
+
+  it('says a quiet district is quiet', async () => {
+    renderAt('/dashboard?district=CMB')
+
+    const status = await screen.findByRole('region', { name: 'Colombo' })
+    expect(status).toHaveTextContent('Usual activity. No alert is active for Colombo district.')
+  })
+
+  it('leads from an alert to its district', async () => {
+    renderAt('/dashboard')
+
+    expect(await screen.findByRole('link', { name: ACTIVE.headline })).toHaveAttribute(
+      'href',
+      '/dashboard?district=KDY',
+    )
+  })
+
+  it('tells the public what to do when figures cannot be fetched, not how to fix the api', async () => {
+    fetchMock.mockImplementation(() => Promise.reject(new TypeError('Failed to fetch')))
+    renderAt('/dashboard')
+
+    const failures = await screen.findAllByRole('alert')
+    expect(failures[0]).toHaveTextContent(
+      'The figures are unavailable at the moment. Try again in a minute.',
+    )
+    expect(document.body.textContent).not.toMatch(/check that it is running/i)
   })
 })

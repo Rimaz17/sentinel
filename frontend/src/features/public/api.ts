@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import type { SymptomGroup, WeeklyCounts } from '@/features/dashboard/api/types'
 import { getJson } from '@/lib/api/client'
 
@@ -68,6 +68,8 @@ export function usePublicTrends(district: string | null) {
   return useQuery({
     queryKey: ['public', 'trends', district],
     queryFn: ({ signal }) => getJson<WeeklyCounts>('/public/trends', { district }, signal),
+    // The last chart stays up while the next district's loads, so the page does not jump.
+    placeholderData: keepPreviousData,
     ...polling,
   })
 }

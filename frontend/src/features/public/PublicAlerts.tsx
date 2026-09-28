@@ -1,8 +1,10 @@
 import { type UseQueryResult } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { formatDay } from '@/features/dashboard/format'
 import { EmptyState, LoadingRows, QueryView } from '@/features/dashboard/QueryView'
 import { caps, cx, labelSm } from '@/styles/recipes'
 import type { PublicAlert } from './api'
+import { publicDistrictPath } from './paths'
 
 const BASIS = {
   CONFIRMED: 'Confirmed by a public health inspector',
@@ -14,11 +16,18 @@ const BASIS = {
  * to do, with no counts or statistics. Active alerts first; those that have
  * ended stay listed for a season, under their own heading.
  */
-export function PublicAlerts({ query }: { query: UseQueryResult<PublicAlert[]> }) {
+export function PublicAlerts({
+  query,
+  errorWords,
+}: {
+  query: UseQueryResult<PublicAlert[]>
+  errorWords: string
+}) {
   return (
     <QueryView
       query={query}
       what="alerts"
+      errorWords={errorWords}
       loading={<LoadingRows label="Loading alerts" rows={2} />}
     >
       {(alerts) => {
@@ -41,7 +50,9 @@ export function PublicAlerts({ query }: { query: UseQueryResult<PublicAlert[]> }
             )}
             {ended.length > 0 ? (
               <details className="border-t border-t-ink-14 pt-xs">
-                <summary className={cx(labelSm, caps, 'cursor-pointer text-ink-70 hover:text-ink')}>
+                <summary
+                  className={cx(labelSm, caps, 'cursor-pointer py-2xs text-ink-70 hover:text-ink')}
+                >
                   Ended in the last 90 days · {ended.length}
                 </summary>
                 <ul className="mt-xs">
@@ -67,12 +78,16 @@ function AlertRow({ alert }: { alert: PublicAlert }) {
           Active
         </p>
       ) : null}
-      <p className="font-medium">{alert.headline}</p>
-      <p className={cx(labelSm, 'text-ink-70')}>
+      <p className="font-medium">
+        <Link to={publicDistrictPath(alert.districtCode)} className="text-ink underline">
+          {alert.headline}
+        </Link>
+      </p>
+      <p className="text-small text-ink-70">
         {alert.active
           ? `Since ${formatDay(alert.since)}`
-          : `${formatDay(alert.since)} to ${formatDay(alert.lastElevated)}`}{' '}
-        · {BASIS[alert.basis]}
+          : `${formatDay(alert.since)} to ${formatDay(alert.lastElevated)}`}
+        . {BASIS[alert.basis]}.
       </p>
     </li>
   )
