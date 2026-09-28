@@ -91,6 +91,32 @@ class DistrictScopeEnforcementTest {
         .andExpect(jsonPath("$[0].code").value("KDY"));
   }
 
+  @ParameterizedTest
+  @ValueSource(strings = {"CMB", "colombo", "XYZ"})
+  void aKandyInspectorAskingForAnotherDistrictDirectlyGets403(String code) throws Exception {
+    mvc.perform(get("/api/districts/" + code).with(accounts.asInspector("KDY")))
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.detail").value(Caller.OUT_OF_SCOPE));
+  }
+
+  @Test
+  void aKandyInspectorReadsKandyDirectly() throws Exception {
+    mvc.perform(get("/api/districts/KDY").with(accounts.asInspector("KDY")))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("Kandy"))
+        .andExpect(jsonPath("$.reportsLast7Days").value(1))
+        .andExpect(jsonPath("$.openAlerts").value(1));
+  }
+
+  @Test
+  void aNationalInspectorIsToldWhenADistrictDoesNotExist() throws Exception {
+    mvc.perform(get("/api/districts/XYZ").with(accounts.asInspector("*")))
+        .andExpect(status().isNotFound());
+    mvc.perform(get("/api/districts/cmb").with(accounts.asInspector("*")))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code").value("CMB"));
+  }
+
   @Test
   void aKandyInspectorsRegistryHoldsOnlyKandysFacilities() throws Exception {
     mvc.perform(get("/api/facilities").with(accounts.asInspector("KDY")))
