@@ -19,6 +19,7 @@ class SecurityConfiguration {
 
   @Bean
   SecurityFilterChain api(HttpSecurity http) throws Exception {
+    SecurityProblems problems = new SecurityProblems();
     return http.csrf(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
@@ -28,7 +29,11 @@ class SecurityConfiguration {
         .authorizeHttpRequests(
             requests ->
                 requests.requestMatchers("/api/auth/me").authenticated().anyRequest().permitAll())
-        .oauth2ResourceServer(server -> server.jwt(Customizer.withDefaults()))
+        .oauth2ResourceServer(
+            server -> server.jwt(Customizer.withDefaults()).authenticationEntryPoint(problems))
+        .exceptionHandling(
+            exceptions ->
+                exceptions.authenticationEntryPoint(problems).accessDeniedHandler(problems))
         .build();
   }
 
