@@ -321,7 +321,7 @@ screens. The theme restores a plain `:hover` so the page behaves as it always ha
   | Tone | Look | Where |
   |---|---|---|
   | `sheet` | `--color-card` (`#f7f9f9`) ground, 1px `ink-08` border, `--radius-panel` (`0.875rem`), `--shadow-panel` (a 1px contact shadow and a low, wide shadow offset downward) | The dashboards and report submission |
-  | `ruled` | The same ground in a square 1px full-ink box, flat | The staff sign-in pages, as the user drew them |
+  | `ruled` | The page's own paper (`--color-paper`) in a square 2px full-ink box, flat, so the box is drawn by its line alone | The staff sign-in pages, as the user drew them |
 
   Ink on the card ground is 15.34:1 and ink-70 5.82:1. Controls inside a panel
   (the district search, the map frame, the symptom tiles) take
@@ -441,8 +441,8 @@ Administration and submission take a thin staff header instead: the wordmark, th
 section, "Signed in as", a quiet "Sign out", and the simulated-data notice
 beneath.
 
-- **The frame: two boxes.** Each half is a `ruled` panel, a square 1px full-ink
-  box on the card ground, as the user sketched them. From `68rem` they stand side
+- **The frame: two boxes.** Each half is a `ruled` panel, a square 2px full-ink
+  box on the page's own paper, as the user sketched them. From `68rem` they stand side
   by side, their tops and feet level (the grid stretches both to one height): the
   left box carries the title, the intro, the rail and then the notes in small
   ink-70; the right box carries the form. Below `68rem` the form's box follows
