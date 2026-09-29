@@ -187,7 +187,10 @@ describe('useAlertStream', () => {
     const hook = renderHook(() => useAlertStream(), { wrapper })
     const client = FakeStompClient.latest()
     resetSession()
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(new Response(null, { status: 401 }))))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(new Response(null, { status: 401 }))),
+    )
 
     await act(() => client.open())
 
