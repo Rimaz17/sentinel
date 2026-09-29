@@ -164,7 +164,9 @@ def measure(
             time.sleep(1.0)
             with lock:
                 accepted = len(run.submissions)
-            run.lag_samples.append(accepted - stored_since(connection, started_wall))
+            # A report can be stored before its 202 reaches the submitter, so storage can
+            # briefly run ahead of the accepted count; that is no report waiting.
+            run.lag_samples.append(max(0, accepted - stored_since(connection, started_wall)))
 
     threads = [threading.Thread(target=submit_until_done) for _ in range(workers)]
     sampler = threading.Thread(target=sample_lag)
@@ -195,9 +197,13 @@ def measure(
 
 
 def stored_since(connection: psycopg.Connection, since: datetime) -> int:
-    """Reports stored that were received since the run began; nothing else may be submitting."""
+    """Reports stored that were received since the run began; nothing else may be submitting.
+
+    The API stamps received_at by the same machine's clock as `since`, so no margin is
+    allowed: one would count the previous run's last reports as this one's.
+    """
     return connection.execute(
-        "select count(*) from reports where received_at >= %s", (since - timedelta(seconds=1),)
+        "select count(*) from reports where received_at >= %s", (since,)
     ).fetchone()[0]
 
 
