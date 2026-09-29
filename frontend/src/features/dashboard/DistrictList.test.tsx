@@ -117,7 +117,7 @@ describe('DistrictList', () => {
     const kandy = screen.getByRole('link', { name: /kandy/i })
 
     const bar = (link: HTMLElement) =>
-      (link.querySelector('[aria-hidden="true"] > span') as HTMLElement | null)?.style.width
+      link.querySelector<HTMLElement>('[aria-hidden="true"] > span')?.style.width
     expect(bar(colombo)).toBe('100%')
     expect(bar(kandy)).toBe('19%')
   })
