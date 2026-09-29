@@ -379,6 +379,11 @@ the landing page, set as sheet panels.
   fails, the last good figures with a line giving their time.
 - **One action shape added, none invented.** "Refresh now" and "Try again" are the
   landing page's quiet underlined action as a `<button>` (`QuietButton`).
+- **Freshness is words.** The header's mono line says when the figures were
+  updated, how often they refresh, and how alerts arrive: "alerts arrive live",
+  "connecting for live alerts" or "live alerts reconnecting". No dot or colour
+  marks the socket's state. A newly raised alert is also read out, from a
+  visually hidden status region: "New alert A-1002: Kandy, dengue-like."
 
 **The group hues were validated, and two pairs are close.** On the paper ground
 the dataviz validator finds gastrointestinal and leptospirosis-like at ΔE 11 for
