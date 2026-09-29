@@ -81,7 +81,7 @@ export function PublicDashboardPage() {
         id="main"
         className={cx(shell, 'grid flex-1 content-start gap-md py-md xl:grid-cols-2')}
       >
-        <Panel as="div" className="gap-md">
+        <Panel as="div" className="gap-md xl:row-span-2">
           <div className="grid gap-sm">
             <h1 className={cx(sectionTitle, 'max-w-[22ch]')}>Sri Lanka, district by district</h1>
             <p className="max-w-measure text-body text-ink-70">
@@ -115,7 +115,10 @@ export function PublicDashboardPage() {
               </div>
             )}
           </QueryView>
-          {district ? (
+        </Panel>
+
+        {district ? (
+          <Panel as="div">
             <DistrictStatus
               district={district}
               takeFocus={chosenHere}
@@ -123,8 +126,8 @@ export function PublicDashboardPage() {
                 (alert) => alert.active && alert.districtCode === district.code,
               )}
             />
-          ) : null}
-        </Panel>
+          </Panel>
+        ) : null}
 
         <Panel labelledBy="alerts-heading" className="xl:self-start">
           <PanelHeading id="alerts-heading">Alerts</PanelHeading>
@@ -262,7 +265,7 @@ function DistrictStatus({
       ref={ref}
       tabIndex={-1}
       aria-labelledby="district-status-heading"
-      className="grid gap-2xs border-t border-t-ink pt-xs"
+      className="grid gap-2xs"
     >
       <h2
         id="district-status-heading"
