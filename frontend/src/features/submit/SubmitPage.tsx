@@ -41,10 +41,7 @@ export function SubmitPage() {
     <div className="flex min-h-screen flex-col">
       <SkipLink />
       <StaffHeader section="Report submission" account={account} />
-      <main
-        id="main"
-        className={cx(shell, split(), 'flex-1 content-start py-xl')}
-      >
+      <main id="main" className={cx(shell, split(), 'flex-1 content-start py-xl')}>
         <div className="grid content-start gap-lg">
           <div className="grid gap-xs">
             <h1 className={sectionTitle}>Submit a report</h1>
