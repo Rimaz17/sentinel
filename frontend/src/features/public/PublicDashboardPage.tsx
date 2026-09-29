@@ -34,7 +34,7 @@ const DistrictMap = lazy(() =>
 /** What the public is told when figures cannot be fetched: something they can act on. */
 export const PUBLIC_ERROR = 'The figures are unavailable at the moment. Try again in a minute.'
 
-const MAP_HEIGHT = 'h-[22rem] md:h-[30rem]'
+const MAP_HEIGHT = 'h-[22rem] md:h-[36rem]'
 
 /**
  * The public dashboard: the pattern, not the individuals. A visitor's question
