@@ -52,10 +52,24 @@ export function homeFor(role: Role): string {
 }
 
 /**
- * Whether a role may open a page. The page a signed-out visitor was heading
- * for is only returned to if the account that signs in may open it: after one
- * person signs out, the next may hold a different role.
+ * A page someone was sent away from to sign in, and the account that was
+ * signed in when they left it: null when nobody had signed in on this page load.
  */
+export type LeftPage = { from: string; leftBy: number | null }
+
+/**
+ * Where signing in takes an account. The page left behind is returned to only
+ * by the account that left it, or after nobody had signed in, as when a
+ * bookmarked page asks for a sign-in; and only if the account's role may open
+ * it. One person signing out and another signing in starts the second at home,
+ * never in the first person's district.
+ */
+export function afterSignIn(account: Account, left: LeftPage | null): string {
+  const returning = left !== null && (left.leftBy === null || left.leftBy === account.id)
+  return returning && mayOpen(account.role, left.from) ? left.from : homeFor(account.role)
+}
+
+/** Whether a role may open a page. */
 export function mayOpen(role: Role, path: string): boolean {
   switch (role) {
     case 'PHI':

@@ -2,13 +2,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import { type ReactNode } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { QuietButton } from '@/components/ui/QuietButton'
-import type { Role } from '@/lib/api/session'
+import { lastAccountId, type Role } from '@/lib/api/session'
 import { AuthPage, CheckingSession } from './AuthPage'
-import { aRole, homeFor, signOut, useSession } from './session'
+import { aRole, homeFor, type LeftPage, signOut, useSession } from './session'
 
 /**
  * Shows its children only to a signed-in person with the given role. Anyone
- * else is sent to sign in, and brought back here afterwards.
+ * else is sent to sign in, and brought back here afterwards if they are the
+ * same person who left it.
  *
  * This is navigation, not access control: the API refuses every request the
  * role may not make, whatever the browser shows.
@@ -21,7 +22,8 @@ export function RequireRole({ allow, children }: { allow: Role; children: ReactN
     return <CheckingSession />
   }
   if (state.status === 'signed-out') {
-    return <Navigate to="/signin" replace state={{ from: location.pathname }} />
+    const left: LeftPage = { from: location.pathname, leftBy: lastAccountId() }
+    return <Navigate to="/signin" replace state={left} />
   }
   if (state.session.account.role !== allow) {
     return <WrongRole needed={allow} have={state.session.account.role} />

@@ -8,12 +8,37 @@ import { ApiError, apiRequest } from '@/lib/api/client'
 import type { Session } from '@/lib/api/session'
 import { AuthPage, CheckingSession } from './AuthPage'
 import { RouteList } from './RouteRail'
-import { homeFor, mayOpen, ROLE_NAMES, signOut, startSession, useSession } from './session'
+import {
+  afterSignIn,
+  homeFor,
+  type LeftPage,
+  ROLE_NAMES,
+  signOut,
+  startSession,
+  useSession,
+} from './session'
+
+/**
+ * The page left behind for sign-in, from the router's state. That state
+ * survives a reload in the browser's history, so its shape is checked rather
+ * than trusted.
+ */
+function leftPage(state: unknown): LeftPage | null {
+  if (typeof state !== 'object' || state === null) {
+    return null
+  }
+  const { from, leftBy } = state as Record<string, unknown>
+  if (typeof from !== 'string') {
+    return null
+  }
+  return { from, leftBy: typeof leftBy === 'number' ? leftBy : null }
+}
 
 /**
  * One sign-in for both staff roles. Data providers are sent to report
  * submission, inspectors to the internal dashboard, administrators to
- * administration, or each back to the page that sent them here.
+ * administration, or each back to the page that sent them here if it was
+ * theirs.
  *
  * There is no registration link: inspector accounts are created by an
  * administrator, and a data provider's registration starts from the front page
@@ -23,7 +48,7 @@ export function SignInPage() {
   const state = useSession()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = (location.state as { from?: string } | null)?.from
+  const left = leftPage(location.state)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -43,8 +68,7 @@ export function SignInPage() {
         body: { email, password },
       })
       startSession(session)
-      const role = session.account.role
-      void navigate(from && mayOpen(role, from) ? from : homeFor(role), { replace: true })
+      void navigate(afterSignIn(session.account, left), { replace: true })
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'Could not sign in.')
       setBusy(false)
