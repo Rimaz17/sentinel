@@ -11,7 +11,9 @@ export type FieldWidth = 'sm' | 'code' | 'md' | 'lg'
 const WIDTHS: Record<FieldWidth, string> = {
   sm: 'max-w-field-sm',
   code: 'max-w-field-code',
-  md: 'max-w-field',
+  /* On a phone a name or password field fills the column, level with the email
+     field and the button, rather than stopping just short of them. */
+  md: 'md:max-w-field',
   lg: 'max-w-field-lg',
 }
 
