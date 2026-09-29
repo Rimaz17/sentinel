@@ -8,7 +8,7 @@ import { SYMPTOM_GROUP_STYLES } from '@/features/dashboard/symptomGroups'
 import { StaffHeader } from '@/features/auth/AccountBar'
 import { useAccount } from '@/features/auth/session'
 import { ApiError, apiRequest } from '@/lib/api/client'
-import { caps, cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
+import { caps, cx, labelSm, sectionTitle, shell, split } from '@/styles/recipes'
 
 /** POST /api/ingestion/reports */
 type Receipt = { reportId: string; receivedAt: string }
@@ -43,10 +43,7 @@ export function SubmitPage() {
       <StaffHeader section="Report submission" account={account} />
       <main
         id="main"
-        className={cx(
-          shell,
-          'grid flex-1 gap-xl py-xl lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)]',
-        )}
+        className={cx(shell, split(), 'flex-1 content-start py-xl')}
       >
         <div className="grid content-start gap-lg">
           <div className="grid gap-xs">
@@ -189,6 +186,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
         label="When the patient presented"
         type="datetime-local"
         name="reportedAt"
+        width="code"
         required
         value={presented}
         onChange={(event) => setPresented(event.target.value)}
@@ -198,6 +196,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
         label="Age in years"
         type="number"
         name="age"
+        width="sm"
         inputMode="numeric"
         min={0}
         max={130}
@@ -215,7 +214,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
           Decimal degrees. Rounded to about 100 m before it is stored, and never shown to the
           public.
         </p>
-        <div className="grid gap-sm md:grid-cols-2">
+        <div className="grid gap-sm md:grid-cols-[repeat(2,minmax(0,var(--container-field-code)))]">
           <Field
             label="Latitude"
             type="number"
