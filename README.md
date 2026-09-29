@@ -153,8 +153,49 @@ inside ordinary week-to-week variation. Each lower threshold buys detection
 with false alarms, which is the trade-off the overview's "two thresholds"
 describe. They measure the detector against this simulator, not against real
 disease: series are independent, baselines hold no past epidemics, and every
-report arrives on time. Throughput and end-to-end latency are pipeline figures
-and are measured when Kafka arrives in Phase 5.
+report arrives on time. Throughput and end-to-end latency are pipeline figures;
+see [Measured pipeline](#measured-pipeline).
+
+## Measured pipeline
+
+Two of the overview's success figures are about the pipeline rather than the
+detector: the rate it sustains without reports piling up on Kafka, and the
+time from a report being submitted to it being stored and counted. These come
+from an actual run of `scripts/measure-pipeline` (seed 2026, 30 seconds a
+rate, 16 concurrent submitters), with the whole stack on one laptop: an Intel
+Core i5-10210U with 16 GB, Windows 11, Docker Desktop given 8 CPUs.
+
+| Target rate | Accepted | Submission round trip, median · 95th | Submitted to stored, median · 95th · slowest | Most waiting on the stream | Sustained |
+|---|---|---|---|---|---|
+| 25/s | 25.0/s | 20 ms · 31 ms | 20 ms · 31 ms · 144 ms | 1 | yes |
+| 50/s | 50.0/s | 19 ms · 27 ms | 18 ms · 26 ms · 81 ms | 2 | yes |
+| 100/s | 100.0/s | 15 ms · 28 ms | 16 ms · 108 ms · 337 ms | 15 | yes |
+| 150/s | 149.9/s | 13 ms · 33 ms | 19 ms · 550 ms · 1.0 s | 73 | yes |
+| 200/s | 200.0/s | 13 ms · 27 ms | 25 ms · 442 ms · 769 ms | 95 | yes |
+| 250/s | 249.8/s | 13 ms · 29 ms | 155 ms · 1.9 s · 2.6 s | 231 | yes, just |
+| 300/s | 299.8/s | 13 ms · 33 ms | 6.8 s · 17.4 s · 19.0 s | 3,139 | no |
+
+A rate counts as sustained when every report was accepted on time, no more
+than a second's worth was still waiting when sending ended, and all were stored
+within two seconds after; see
+[the measurement's README](scripts/measure-pipeline/README.md). No report was
+refused at any rate, and none went to the dead-letter topic.
+
+What these numbers say: storage, not ingestion, is the limit. Ingestion's
+median answer stayed within 20 ms at every rate, and in an earlier run it took
+about 490 reports a second from the same 16 submitters; the stream processor,
+storing one report at a time on three threads, keeps pace up to about 250 a
+second here and falls behind beyond it. An earlier run on the same machine
+sustained 200 a second with a median of 281 ms to storage and fell far behind
+at 400, so read the limit as 200 to 250 and expect it to vary. The simulated
+country sends about 1,100 reports a week, a small fraction of one a second, so
+the limit is far above the load; a 63-day backfill from one sequential
+submitter runs at about 50 a second.
+
+End to end, a report is stored and counted in its district's seven-day window
+about 20 ms after it is submitted, at up to 200 reports a second. The
+dashboard then shows it at its next 30-second poll; an alert raised from it is
+pushed over WebSocket as the detector commits it.
 
 ## Stack
 
@@ -450,6 +491,8 @@ sentinel/
 │           ├── public/    The public dashboard at /dashboard, and the district outlines
 │           ├── auth/      Sign-in, registration, activation, the session and route guards
 │           ├── submit/    Report submission for data providers
+| `python measure_pipeline.py` | `scripts/measure-pipeline` | Measure throughput and latency against a running stack, as in [Measured pipeline](#measured-pipeline); it adds reports, so use a throwaway one. See [its README](scripts/measure-pipeline/README.md) |
+| `pytest` · `ruff check .` · `black .` | `scripts/measure-pipeline` | Test, lint and format the measurement |
 │           ├── admin/     Inspector accounts and facility invite codes
 │           └── dashboard/ The internal dashboard at /app: alert list and review,
 │                          district list, Leaflet map, weekly chart
@@ -545,8 +588,21 @@ These are documented on purpose and are not defects.
 - **Map tiles depend on OpenStreetMap's tile server,** whose usage policy suits a
   demonstration but not production traffic. See
   [ADR 0010](docs/adr/0010-openstreetmap-tiles.md).
-- **The dashboard polls rather than being pushed to.** A new report appears
-  within 30 seconds; alerts are pushed over WebSocket from Phase 5.
+- **Only alerts are pushed.** An alert reaches the internal dashboard over
+  WebSocket as it commits, but a new report's dot and count appear at the next
+  30-second poll.
+- **Nothing reads the dead-letter topic.** A message the stream processor could
+  never store waits on `sentinel.reports.dead-letters` for a person with
+  Kafka's own tools. None arrived in any run measured here.
+- **While Redis is down, storage waits for it.** The stream processor retries
+  each report until Redis returns; nothing is lost, but the map stops moving
+  and the district figures answer 503 meanwhile.
+- **Storage keeps pace to about 200 to 250 reports a second** on the laptop
+  measured, storing one report at a time. Far above the simulated load; a
+  real national feed would want reports stored in batches first. See
+  [Measured pipeline](#measured-pipeline).
+- **The local Kafka is a single broker**, so each message is kept once. The
+  topic survives a restart of the broker, not the loss of its disk.
 - **Small or gradual outbreaks are caught late or not at all.** At the shipped
   3 sd, an outbreak adding half again to a district's usual week is detected
   28% of the time, and the median time to detect across all injected outbreaks
