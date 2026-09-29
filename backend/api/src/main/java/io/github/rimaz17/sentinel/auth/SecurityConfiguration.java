@@ -58,6 +58,11 @@ class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers("/api/public/**")
                     .permitAll()
+                    // The alert socket's handshake. A browser cannot attach a token to it, so the
+                    // STOMP CONNECT frame that follows carries one and is checked there, by
+                    // SocketAuthentication.
+                    .requestMatchers(HttpMethod.GET, "/api/ws")
+                    .permitAll()
                     .requestMatchers(
                         HttpMethod.POST,
                         "/api/auth/signin",
