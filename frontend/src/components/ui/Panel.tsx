@@ -48,16 +48,23 @@ export function PanelHeading({
   children,
   aside,
   description,
+  focusable = false,
 }: {
   id: string
   children: ReactNode
   aside?: ReactNode
   description?: ReactNode
+  /** Whether a link on the page may move focus to the heading. */
+  focusable?: boolean
 }) {
   return (
     <div className="grid gap-3xs">
       <div className="flex flex-wrap items-baseline justify-between gap-x-sm gap-y-3xs">
-        <h2 id={id} className="text-section leading-snug font-medium tracking-tight">
+        <h2
+          id={id}
+          tabIndex={focusable ? -1 : undefined}
+          className="text-section leading-snug font-medium tracking-tight"
+        >
           {children}
         </h2>
         {aside}
