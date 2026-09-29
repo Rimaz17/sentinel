@@ -7,6 +7,7 @@ import { ApiError, apiRequest } from '@/lib/api/client'
 import type { Session } from '@/lib/api/session'
 import { caps, cx, labelSm } from '@/styles/recipes'
 import { AuthPage } from './AuthPage'
+import { StepRail } from './RouteRail'
 import { startSession } from './session'
 
 /** POST /api/auth/invite-codes/check */
@@ -39,6 +40,18 @@ export function RegisterPage() {
           For staff at a hospital, clinic or pharmacy who submit reports for their facility. You
           need the invite code your facility was given.
         </p>
+      }
+      rail={
+        <StepRail
+          label="Registration steps"
+          steps={[
+            preview
+              ? { label: 'Invite code', state: 'done', value: preview.code.toUpperCase() }
+              : { label: 'Invite code', state: 'current' },
+            { label: 'Your account', state: preview ? 'current' : 'next' },
+            { label: 'Submit reports', state: 'next' },
+          ]}
+        />
       }
       aside={
         <>
@@ -96,6 +109,7 @@ function CodeStep({ onFound }: { onFound: (code: string, facility: InvitePreview
         label="Facility invite code"
         hint="Three letters for the district, then seven more, as in KDY-7X2-M4QP. Capitals and dashes do not matter."
         name="inviteCode"
+        width="code"
         autoComplete="off"
         spellCheck={false}
         required
@@ -145,7 +159,7 @@ function AccountStep({
 
   return (
     <div className="grid gap-md">
-      <div className="grid gap-2xs border-t border-t-ink pt-sm">
+      <div className="grid gap-2xs">
         <p className={cx(labelSm, caps, 'text-ink-70')}>Your facility</p>
         <p className="text-section font-medium">{facility.facilityName}</p>
         <p className="text-small text-ink-70">
@@ -161,6 +175,7 @@ function AccountStep({
         <Field
           label="Your name"
           name="displayName"
+          width="md"
           autoComplete="name"
           required
           value={displayName}
@@ -171,6 +186,7 @@ function AccountStep({
           label="Email address"
           type="email"
           name="email"
+          width="lg"
           autoComplete="username"
           required
           value={email}
@@ -181,6 +197,7 @@ function AccountStep({
           label="Password"
           type="password"
           name="password"
+          width="md"
           autoComplete="new-password"
           hint="At least 12 characters. A few words together are easier to remember than symbols."
           required
