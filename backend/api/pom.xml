@@ -54,6 +54,11 @@
       <artifactId>spring-boot-starter-kafka</artifactId>
     </dependency>
     <dependency>
+      <!-- The live seven-day windows. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-database-postgresql</artifactId>
     </dependency>

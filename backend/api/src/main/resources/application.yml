@@ -43,6 +43,15 @@ spring:
       # A new consumer group starts from the oldest report still on the topic,
       # so nothing published before the first start is skipped.
       auto-offset-reset: earliest
+  # The seven-day windows the live counts are read from. See
+  # docs/adr/0015-seven-day-windows-in-redis.md.
+  data:
+    redis:
+      url: ${SENTINEL_REDIS_URL}
+      # With Redis down, a request fails in seconds rather than waiting on the
+      # client's one-minute default.
+      connect-timeout: 2s
+      timeout: 2s
 
 sentinel:
   auth:
