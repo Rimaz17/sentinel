@@ -5,6 +5,8 @@ import io.github.rimaz17.sentinel.ingestion.ReportsUnavailableException;
 import io.github.rimaz17.sentinel.ingestion.UnknownFacilityException;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.dao.QueryTimeoutException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -25,6 +27,9 @@ import tools.jackson.core.JacksonException;
  */
 @RestControllerAdvice
 class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+
+  static final String FIGURES_UNAVAILABLE =
+      "The figures are unavailable right now. Try again shortly.";
 
   record FieldProblem(String field, String message) {}
 
@@ -73,6 +78,16 @@ class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(ReportsUnavailableException.class)
   ResponseEntity<Object> reportsUnavailable(ReportsUnavailableException ex) {
     return problem(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), List.of());
+  }
+
+  /**
+   * A store the answer depends on cannot be reached or did not answer in time: Redis, most likely,
+   * whose seven-day windows every district figure is read from. Nothing about the request was at
+   * fault, so it is 503 and worth trying again.
+   */
+  @ExceptionHandler({DataAccessResourceFailureException.class, QueryTimeoutException.class})
+  ResponseEntity<Object> storeUnavailable(RuntimeException ex) {
+    return problem(HttpStatus.SERVICE_UNAVAILABLE, FIGURES_UNAVAILABLE, List.of());
   }
 
   @ExceptionHandler(InvalidFieldException.class)
