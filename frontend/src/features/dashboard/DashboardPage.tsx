@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { SkipLink } from '@/components/layout/SkipLink'
 import { useAccount } from '@/features/auth/session'
-import { caps, cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
+import { Panel, PanelHeading } from '@/components/ui/Panel'
+import { cx, shell } from '@/styles/recipes'
 import {
   useAlerts,
   useDistricts,
@@ -13,17 +14,15 @@ import {
 } from './api/queries'
 import type { SymptomGroup } from './api/types'
 import { AlertList } from './AlertList'
+import { AreaSummary } from './AreaSummary'
 import { WeeklyChart } from './chart/WeeklyChart'
 import { DashboardHeader } from './DashboardHeader'
 import { ALL_OF_SRI_LANKA, DistrictList, DistrictPicker } from './DistrictList'
-import { formatCount } from './format'
 import { boundsOf, SRI_LANKA } from './map/geometry'
 import { MapKey } from './map/MapKey'
 import { ReportMap } from './map/ReportMap'
 import { districtPath } from './paths'
 import { LoadingRows, QueryView } from './QueryView'
-
-const panelTitle = 'text-section leading-snug font-medium tracking-tight'
 
 /**
  * The inspector's view, for the whole country at /app or one district at
@@ -125,44 +124,38 @@ export function DashboardPage() {
         onRefresh={() => void queryClient.refetchQueries({ type: 'active' })}
       />
 
-      <div className={cx(shell, 'grid flex-1 gap-xl py-lg xl:grid-cols-[15rem_minmax(0,1fr)]')}>
-        <nav aria-labelledby="districts-heading" className="hidden xl:block">
-          <h2 id="districts-heading" className="sr-only">
-            Districts
-          </h2>
-          <DistrictList query={districts} selected={selected} allLabel={allLabel} />
-        </nav>
-
-        <main id="main" className="grid min-w-0 content-start gap-xl">
-          <div className="grid gap-sm">
-            <div className="grid gap-2xs">
-              <h1 className={sectionTitle}>{areaName}</h1>
-              <p className={cx(labelSm, caps, 'text-ink-70')}>
-                {selected === null
-                  ? national
-                    ? '25 districts'
-                    : `${account.districts.length} districts`
-                  : district
-                    ? `${district.province} Province · ${district.code}`
-                    : selected}
-              </p>
-            </div>
-            {reportsInArea !== undefined && openAlerts !== undefined ? (
-              <p className="text-small text-ink-70">
-                {formatCount(reportsInArea)} reports in the last 7 days ·{' '}
-                {openAlerts === 1 ? '1 open alert' : `${formatCount(openAlerts)} open alerts`}
-              </p>
-            ) : null}
-            {districts.data ? (
-              <div className="max-w-[20rem] xl:hidden">
+      <main
+        id="main"
+        className={cx(
+          shell,
+          'grid flex-1 content-start gap-md py-md xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start',
+        )}
+      >
+        <div className="grid min-w-0 content-start gap-md">
+          <AreaSummary
+            areaName={areaName}
+            subtitle={
+              selected === null
+                ? national
+                  ? '25 districts'
+                  : `${account.districts.length} districts`
+                : district
+                  ? `${district.province} Province · ${district.code}`
+                  : selected
+            }
+            reports={reportsInArea}
+            openAlerts={openAlerts}
+            weekly={outOfScope || unknownDistrict ? null : weekly}
+            picker={
+              districts.data ? (
                 <DistrictPicker
                   districts={districts.data}
                   selected={selected}
                   allLabel={allLabel}
                 />
-              </div>
-            ) : null}
-          </div>
+              ) : null
+            }
+          />
 
           {outOfScope ? (
             <OutOfScope code={selected} back={backLabel} />
@@ -170,65 +163,65 @@ export function DashboardPage() {
             <UnknownDistrict code={selected} back={backLabel} />
           ) : (
             <>
-              <div className="grid gap-xl lg:grid-cols-[minmax(0,21rem)_minmax(0,1fr)]">
-                <section aria-labelledby="alerts-heading" className="grid content-start gap-sm">
-                  <h2 id="alerts-heading" className={panelTitle}>
-                    Alerts
-                  </h2>
-                  <AlertList
-                    query={alerts}
-                    districtName={selected === null ? null : areaName}
-                    now={now}
-                  />
-                </section>
+              <Panel labelledBy="alerts-heading">
+                <PanelHeading id="alerts-heading">Alerts</PanelHeading>
+                <AlertList
+                  query={alerts}
+                  districtName={selected === null ? null : areaName}
+                  now={now}
+                />
+              </Panel>
 
-                <section aria-labelledby="map-heading" className="grid content-start gap-sm">
-                  <h2 id="map-heading" className={panelTitle}>
-                    Reports on the map
-                  </h2>
-                  <div className="h-[24rem] border border-ink-14 md:h-[30rem] xl:h-[34rem]">
-                    <ReportMap
-                      reports={(reports.data ?? []).filter((r) => !hidden.has(r.symptomGroup))}
-                      facilities={facilities.data ?? []}
-                      bounds={bounds}
-                      frameKey={frameKey}
-                    />
-                  </div>
-                  <QueryView
-                    query={reports}
-                    what="report positions"
-                    loading={<LoadingRows label="Loading report positions" rows={1} />}
-                  >
-                    {(data) => (
-                      <MapKey
-                        reports={data}
-                        reportsInArea={reportsInArea ?? data.length}
-                        facilities={facilities.data ?? []}
-                        areaName={areaName}
-                        hidden={hidden}
-                        onToggle={toggle}
-                      />
-                    )}
-                  </QueryView>
-                </section>
-              </div>
-
-              <section aria-labelledby="chart-heading" className="grid gap-sm">
-                <div className="grid gap-2xs">
-                  <h2 id="chart-heading" className={panelTitle}>
-                    Weekly reports
-                  </h2>
-                  <p className="max-w-measure text-small text-ink-70">
-                    Each symptom group’s last 7 days against the 8 weeks before, the comparison the
-                    hourly detection check makes. Weeks run back from now.
-                  </p>
-                </div>
+              <Panel labelledBy="chart-heading" className="gap-md">
+                <PanelHeading
+                  id="chart-heading"
+                  description="Each symptom group’s last 7 days against the 8 weeks before, the comparison the hourly detection check makes. Weeks run back from now."
+                >
+                  Weekly reports
+                </PanelHeading>
                 <WeeklyChart query={weekly} areaName={areaName} />
-              </section>
+              </Panel>
             </>
           )}
-        </main>
-      </div>
+        </div>
+
+        <div className="grid min-w-0 content-start gap-md">
+          <Panel as="nav" labelledBy="districts-heading" className="hidden xl:grid">
+            <PanelHeading id="districts-heading">Districts</PanelHeading>
+            <DistrictList query={districts} selected={selected} allLabel={allLabel} />
+          </Panel>
+
+          {outOfScope || unknownDistrict ? null : (
+            <Panel labelledBy="map-heading">
+              <PanelHeading id="map-heading">Reports on the map</PanelHeading>
+              <div className="h-[22rem] overflow-hidden rounded-control border border-ink-14 md:h-[28rem] xl:h-[32rem]">
+                <ReportMap
+                  reports={(reports.data ?? []).filter((r) => !hidden.has(r.symptomGroup))}
+                  facilities={facilities.data ?? []}
+                  bounds={bounds}
+                  frameKey={frameKey}
+                />
+              </div>
+              <QueryView
+                query={reports}
+                what="report positions"
+                loading={<LoadingRows label="Loading report positions" rows={1} />}
+              >
+                {(data) => (
+                  <MapKey
+                    reports={data}
+                    reportsInArea={reportsInArea ?? data.length}
+                    facilities={facilities.data ?? []}
+                    areaName={areaName}
+                    hidden={hidden}
+                    onToggle={toggle}
+                  />
+                )}
+              </QueryView>
+            </Panel>
+          )}
+        </div>
+      </main>
 
       <footer className="border-t border-t-ink-14 py-md">
         <p className={cx(shell, 'text-label-sm text-ink-70')}>
@@ -243,7 +236,7 @@ export function DashboardPage() {
 /** A district the inspector's account does not cover. Nothing about it is shown or fetched. */
 function OutOfScope({ code, back }: { code: string; back: string }) {
   return (
-    <div className="grid justify-items-start gap-sm border-t border-t-ink py-md">
+    <Panel as="div" className="justify-items-start">
       <p className="font-medium">Your account does not cover {code}.</p>
       <p className="text-small text-ink-70">
         Inspectors see the districts an administrator assigned to them. To work on another district,
@@ -252,13 +245,13 @@ function OutOfScope({ code, back }: { code: string; back: string }) {
       <Link to="/app" className="text-small text-ink underline">
         {back}
       </Link>
-    </div>
+    </Panel>
   )
 }
 
 function UnknownDistrict({ code, back }: { code: string; back: string }) {
   return (
-    <div className="grid justify-items-start gap-sm border-t border-t-ink py-md">
+    <Panel as="div" className="justify-items-start">
       <p className="font-medium">No district has the code {code}.</p>
       <p className="text-small text-ink-70">
         District codes are three capital letters, such as KDY for Kandy. Choose a district from the
@@ -267,6 +260,6 @@ function UnknownDistrict({ code, back }: { code: string; back: string }) {
       <Link to="/app" className="text-small text-ink underline">
         {back}
       </Link>
-    </div>
+    </Panel>
   )
 }
