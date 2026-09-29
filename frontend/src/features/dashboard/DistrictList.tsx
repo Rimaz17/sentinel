@@ -15,6 +15,8 @@ type DistrictListProps = {
   allLabel?: string
   /** The district in view, or null for the whole country. */
   selected: string | null
+  /** Whether to lead with a row for every district in scope together. */
+  showTotal?: boolean
 }
 
 /** More districts than this, and the list offers a search. */
@@ -27,7 +29,12 @@ export const SEARCH_FROM = 6
  * district in view is marked as the current page. A national list of 25 can
  * be narrowed by name.
  */
-export function DistrictList({ query, selected, allLabel = ALL_OF_SRI_LANKA }: DistrictListProps) {
+export function DistrictList({
+  query,
+  selected,
+  allLabel = ALL_OF_SRI_LANKA,
+  showTotal = true,
+}: DistrictListProps) {
   const [search, setSearch] = useState('')
   const searchId = useId()
   return (
@@ -73,15 +80,17 @@ export function DistrictList({ query, selected, allLabel = ALL_OF_SRI_LANKA }: D
               <span>District</span>
               <span className="col-span-2">Reports · 7 days</span>
             </p>
-            <ul className="max-h-[26rem] overflow-y-auto border-t border-t-ink">
-              <DistrictRow
-                to={districtPath(null)}
-                name={allLabel}
-                reports={total}
-                openAlerts={open}
-                current={selected === null}
-                share={null}
-              />
+            <ul className="border-t border-t-ink">
+              {showTotal ? (
+                <DistrictRow
+                  to={districtPath(null)}
+                  name={allLabel}
+                  reports={total}
+                  openAlerts={open}
+                  current={selected === null}
+                  share={null}
+                />
+              ) : null}
               {shown.map((district) => (
                 <DistrictRow
                   key={district.code}
@@ -129,7 +138,7 @@ function DistrictRow({
         aria-current={current ? 'page' : undefined}
         aria-label={`${name}, ${formatCount(reports)} reports in the last 7 days${alerts}`}
         className={cx(
-          'my-[0.2rem] grid grid-cols-[minmax(0,1fr)_3.5rem_4.5rem] items-center gap-x-sm rounded-control px-2xs py-[0.45rem] text-small text-ink no-underline',
+          'my-[0.15rem] grid grid-cols-[minmax(0,1fr)_3.5rem_4.5rem] items-center gap-x-sm rounded-control px-2xs py-[0.35rem] text-small text-ink no-underline',
           'transition-colors duration-(--dur-fast) ease-out',
           current ? 'bg-ink-08 font-medium' : 'hover:bg-ink-04',
         )}
