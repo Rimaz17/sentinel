@@ -127,8 +127,7 @@ function PasswordForm({
   return (
     <form onSubmit={(event) => void submit(event)} className="grid gap-md" noValidate>
       <p className="text-small text-ink-70">
-        Account <span className="font-medium text-ink">{owner.email}</span>,{' '}
-        {ROLE_NAMES[owner.role]}.
+        Account <span className="font-mono text-ink">{owner.email}</span>, {ROLE_NAMES[owner.role]}.
       </p>
       <Field
         label="Password"
