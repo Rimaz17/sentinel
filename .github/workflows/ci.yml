@@ -79,10 +79,14 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
-          cache-dependency-path: backend/simulator/requirements-dev.txt
+          cache-dependency-path: |
+            backend/simulator/requirements-dev.txt
+            scripts/measure-pipeline/requirements-dev.txt
 
       - name: Install tools
-        run: pip install -r backend/simulator/requirements-dev.txt
+        run: |
+          pip install -r backend/simulator/requirements-dev.txt
+          pip install -r scripts/measure-pipeline/requirements-dev.txt
 
       # Each project is checked from its own directory so that Ruff and Black
       # read that project's pyproject.toml.
@@ -95,6 +99,15 @@ jobs:
 
       - name: Facility registry build
         working-directory: scripts/facility-registry
+        run: |
+          ruff check .
+          black --check .
+          pytest
+
+      # Imports the simulator's client and the detector's settings from their
+      # own directories, as its pyproject.toml says.
+      - name: Pipeline measurement
+        working-directory: scripts/measure-pipeline
         run: |
           ruff check .
           black --check .
