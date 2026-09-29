@@ -152,14 +152,16 @@ function DistrictRow({
         >
           {formatCount(reports)}
         </span>
-        <span aria-hidden="true" className="block h-[0.4rem] rounded-full bg-ink-08">
-          {share !== null ? (
+        {share !== null ? (
+          <span aria-hidden="true" className="block h-[0.4rem] rounded-full bg-ink-08">
             <span
               className="block h-full rounded-full bg-ink-70"
               style={{ width: `${Math.max(3, Math.round(share * 100))}%` }}
             />
-          ) : null}
-        </span>
+          </span>
+        ) : (
+          <span aria-hidden="true" />
+        )}
       </Link>
     </li>
   )
