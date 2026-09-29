@@ -9,11 +9,16 @@ import react from '@vitejs/plugin-react'
  * never makes a cross-origin request, so the API needs no CORS configuration.
  * SENTINEL_API_URL points it elsewhere, as it does for the simulator.
  */
+const api = process.env.SENTINEL_API_URL ?? 'http://localhost:8080'
+
+/*
+ * The alert socket comes first, because the first matching prefix wins. It
+ * keeps the browser's own Host header, so the API's same-origin check on the
+ * handshake sees the page's origin and passes, without a CORS setting.
+ */
 const apiProxy = {
-  '/api': {
-    target: process.env.SENTINEL_API_URL ?? 'http://localhost:8080',
-    changeOrigin: true,
-  },
+  '/api/ws': { target: api, ws: true },
+  '/api': { target: api, changeOrigin: true },
 }
 
 // https://vite.dev/config/
