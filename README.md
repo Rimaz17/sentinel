@@ -53,7 +53,7 @@ spread evenly across a district suggests a wider seasonal wave.
 | 2 | Detection v1, z-score baseline job writing alerts | **Built** |
 | 3 | Dashboard v1, React + Leaflet, polling | **Built** |
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | **Built** |
-| 5 | Real-time, Kafka, Redis windows, WebSocket alerts | Not started |
+| 5 | Real-time, Kafka, Redis windows, WebSocket alerts | **Built** |
 | 6 | Geography, PostGIS, DBSCAN, cluster rings | Not started |
 | 7 | Ship it, Docker Compose, CI, deployed demo | Not started |
 | n/a | **Landing page**, the public entry point at `/` | **Built** |
@@ -91,6 +91,29 @@ See [ADR 0011](docs/adr/0011-accounts-tokens-and-district-scope.md),
 
 Every route in the plan is now built. Until Phase 4 the unbuilt ones said so;
 see [ADR 0002](docs/adr/0002-unbuilt-routes-render-placeholders.md).
+
+Phase 5 makes the pipeline real-time:
+
+- **Kafka between ingestion and storage.** Ingestion anonymises a report,
+  publishes it to the `sentinel.reports` topic keyed by its district, and
+  answers 202 once Kafka has it; a stream processor in the API stores it. A
+  report delivered twice is stored once, a database outage leaves reports
+  waiting on the topic rather than lost, and a message that can never be stored
+  is set aside on a dead-letter topic.
+- **Seven-day windows in Redis.** One sorted set per district and symptom group
+  holds the last seven days' reports. Each district's figure on the internal
+  list and on the public dashboard is read from them, and if Redis loses them
+  they are rebuilt from PostgreSQL before the next answer.
+- **Alerts pushed over WebSocket.** When the detector raises or extends an
+  alert, or an inspector moves one on, the database announces it as the change
+  commits, and the API pushes it over STOMP to every inspector whose districts
+  cover it, and to nobody else. The dashboard stops polling alerts while the
+  socket is open, says so in its header, and polls again while it is not.
+
+See [ADR 0014](docs/adr/0014-kafka-between-ingestion-and-storage.md),
+[ADR 0015](docs/adr/0015-seven-day-windows-in-redis.md) and
+[ADR 0016](docs/adr/0016-alerts-pushed-over-websocket.md), and
+[Measured pipeline](#measured-pipeline) for how fast it runs.
 
 ## Measured detection
 
