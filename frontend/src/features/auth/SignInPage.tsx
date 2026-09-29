@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { type FormEvent, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { SubmitButton } from '@/components/ui/Action'
+import { Action, SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { ApiError, apiRequest } from '@/lib/api/client'
@@ -129,9 +129,7 @@ function SignedIn({ session }: { session: Session }) {
         Signed in as <span className="font-medium">{displayName}</span>, {ROLE_NAMES[role]}.
       </p>
       <div className="flex flex-wrap items-center gap-md">
-        <Link to={homeFor(role)} className="text-ink underline">
-          Continue
-        </Link>
+        <Action to={homeFor(role)}>Continue</Action>
         <QuietButton onClick={() => void signOut(queryClient)}>Sign out</QuietButton>
       </div>
     </div>
