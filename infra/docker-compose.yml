@@ -1,5 +1,5 @@
-# Local development services. Phase 1 needs only the database; the rest of the
-# stack joins this file in the phases that introduce it.
+# Local development services: the database, the event stream and the live
+# counters. The API, the simulator and the detector run on the host.
 #
 # Run from the repository root:
 #   docker compose --env-file .env -f infra/docker-compose.yml up -d
@@ -24,5 +24,53 @@ services:
       timeout: 3s
       retries: 10
 
+  # One Kafka node acting as both broker and controller (KRaft), so no ZooKeeper.
+  # Reports wait here between ingestion and storage (docs/adr/0014).
+  kafka:
+    image: apache/kafka:4.2.1
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      # What clients on the host are told to connect to: the published port below.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:${SENTINEL_KAFKA_PORT:?set SENTINEL_KAFKA_PORT in .env}
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      # A single node can keep only one copy of anything.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      # The API creates its topics with the partitions it expects; a typo in a
+      # topic name must fail rather than quietly create a new topic.
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      # On the volume below, so reports not yet stored survive a restart.
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    ports:
+      - "127.0.0.1:${SENTINEL_KAFKA_PORT}:9092"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+
+  # The seven-day windows (docs/adr/0015). Nothing here is the only copy: the
+  # API rebuilds the windows from PostgreSQL whenever it finds them missing, so
+  # Redis keeps no snapshot or log on disk.
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:${SENTINEL_REDIS_PORT:?set SENTINEL_REDIS_PORT in .env}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
 volumes:
   postgres-data:
+  kafka-data:
