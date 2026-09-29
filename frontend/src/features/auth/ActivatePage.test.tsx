@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
@@ -67,6 +67,15 @@ describe('ActivatePage', () => {
       await screen.findByRole('heading', { level: 1, name: 'Welcome, Nimal Silva.' }),
     ).toBeInTheDocument()
     expect(screen.getByTestId('address')).toHaveTextContent(/^\/activate$/)
+  })
+
+  it('marks the link as checked and the password as the current step', async () => {
+    renderAt('/activate#token=good-link')
+    await screen.findByRole('heading', { level: 1, name: 'Welcome, Nimal Silva.' })
+    const steps = within(screen.getByRole('list', { name: 'Activation steps' }))
+
+    expect(steps.getByText('Your link').closest('li')).toHaveTextContent('done')
+    expect(steps.getByText('Your password').closest('li')).toHaveAttribute('aria-current', 'step')
   })
 
   it('sets the password, signs the inspector in and opens the dashboard', async () => {
