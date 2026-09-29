@@ -159,7 +159,7 @@ export function PublicDashboardPage() {
                       districts={list}
                       selected={selected}
                       onSelect={choose}
-                      className={cx(MAP_HEIGHT, 'overflow-hidden rounded-control')}
+                      className={`${MAP_HEIGHT} overflow-hidden rounded-control`}
                     />
                   </Suspense>
                 </div>
