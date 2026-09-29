@@ -157,6 +157,13 @@
   --container-measure-narrow: 46ch;
   --container-shell: 84rem;
 
+  /* Form fields are as wide as what goes in them, never the column's width:
+     an age, an invite code or a time, a name or a password, an email address. */
+  --container-field-sm: 9rem;
+  --container-field-code: 16rem;
+  --container-field: 20rem;
+  --container-field-lg: 28rem;
+
   /* ---- Spacing ----------------------------------------------------------
      A 4px-rooted scale. The larger steps are fluid so that vertical rhythm
      compresses on a phone instead of forcing the page into a long scroll of
