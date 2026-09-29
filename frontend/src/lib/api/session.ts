@@ -30,6 +30,8 @@ export type SessionState =
   { status: 'unknown' } | { status: 'signed-out' } | { status: 'signed-in'; session: Session }
 
 let state: SessionState = { status: 'unknown' }
+/** Whoever was last signed in on this page load, kept after they sign out. */
+let lastAccount: number | null = null
 const listeners = new Set<() => void>()
 
 export function subscribe(listener: () => void): () => void {
@@ -43,11 +45,19 @@ export function sessionState(): SessionState {
 
 export function setSession(session: Session | null) {
   state = session ? { status: 'signed-in', session } : { status: 'signed-out' }
+  if (session) {
+    lastAccount = session.account.id
+  }
   listeners.forEach((listener) => listener())
 }
 
 export function currentSession(): Session | null {
   return state.status === 'signed-in' ? state.session : null
+}
+
+/** The id of the account last signed in on this page load, or null if none has been. */
+export function lastAccountId(): number | null {
+  return lastAccount
 }
 
 /** Renewed this long before it expires, so a request never goes out on a dying token. */
@@ -106,6 +116,7 @@ async function renew(): Promise<Session | null> {
 /** For tests: forget everything, as a fresh page load would. */
 export function resetSession() {
   state = { status: 'unknown' }
+  lastAccount = null
   renewal = null
   listeners.forEach((listener) => listener())
 }
