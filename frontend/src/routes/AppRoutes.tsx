@@ -1,7 +1,13 @@
-import { lazy, Suspense } from 'react'
+import { lazy, type ReactNode, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
+import { AdminPage } from '@/features/admin/AdminPage'
+import { ACTIVATE_PATH, ActivatePage } from '@/features/auth/ActivatePage'
+import { RegisterPage } from '@/features/auth/RegisterPage'
+import { RequireRole } from '@/features/auth/RequireRole'
+import { SignInPage } from '@/features/auth/SignInPage'
 import { LandingPage } from '@/features/landing/LandingPage'
-import { PlannedPage } from '@/features/planned/PlannedPage'
+import { SubmitPage } from '@/features/submit/SubmitPage'
+import { NotFoundPage } from '@/features/notfound/NotFoundPage'
 
 /*
  * The dashboard, with Leaflet and the query library, loads only when an
@@ -14,6 +20,27 @@ const DashboardPage = lazy(() =>
     default: module.DashboardPage,
   })),
 )
+
+/* The public dashboard loads on demand too: it carries Leaflet and the district outlines. */
+const PublicDashboardPage = lazy(() =>
+  import('@/features/public/PublicDashboardPage').then((module) => ({
+    default: module.PublicDashboardPage,
+  })),
+)
+
+function PublicDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <p role="status" className="p-gutter text-small text-ink-70">
+          Loading the public dashboard
+        </p>
+      }
+    >
+      <PublicDashboardPage />
+    </Suspense>
+  )
+}
 
 function Dashboard() {
   return (
@@ -29,110 +56,51 @@ function Dashboard() {
   )
 }
 
+/** The internal dashboard is for public health inspectors only. */
+function Inspector({ page }: { page: ReactNode }) {
+  return <RequireRole allow="PHI">{page}</RequireRole>
+}
+
 /**
  * The route map from the project plan.
  *
- * The landing page and the internal dashboard are built. Every other route
- * renders a page that says so and names the build phase it belongs to, so a
- * link from the front page is never a dead end and never a mock-up presented
- * as a product.
+ * Every route in the plan is built. An address that matches none of them
+ * renders a page that says so, with a way back to the front page.
  */
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
 
-      <Route
-        path="/dashboard"
-        element={
-          <PlannedPage title="The public dashboard" phase="Phase 4 · Accounts and roles">
-            <p>
-              District-level status across all 25 districts, disease trends and historical data, and
-              alerts that a public health inspector has confirmed for publication.
-            </p>
-            <p>
-              Geography here is shown as shaded district polygons or a heatmap, never individual
-              report positions, because a point at a pharmacy’s exact coordinates can reveal which
-              household got sick.
-            </p>
-          </PlannedPage>
-        }
-      />
+      <Route path="/dashboard" element={<PublicDashboard />} />
 
-      <Route
-        path="/signin"
-        element={
-          <PlannedPage title="Sign in" phase="Phase 4 · Accounts and roles">
-            <p>
-              One sign-in for both staff roles: healthcare data providers submitting reports on
-              behalf of a facility, and public health inspectors working the internal dashboard.
-            </p>
-            <p>
-              Inspector accounts are created by a system administrator and there is no sign-up route
-              for them. An inspector without an account should contact their district administrator
-              to request access.
-            </p>
-          </PlannedPage>
-        }
-      />
+      <Route path="/signin" element={<SignInPage />} />
 
-      <Route
-        path="/register"
-        element={
-          <PlannedPage title="Facility registration" phase="Phase 4 · Accounts and roles">
-            <p>
-              Registration for healthcare data providers. It requires the invite code issued to your
-              facility, which is validated on the server; without a valid code an account cannot be
-              created at all.
-            </p>
-            <p>
-              The gate exists because a data provider account feeds reports straight into the
-              detector. Open registration would let anyone invent a clinic and either trigger false
-              alerts or bury a real signal in noise.
-            </p>
-          </PlannedPage>
-        }
-      />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path={ACTIVATE_PATH} element={<ActivatePage />} />
 
       <Route
         path="/submit"
         element={
-          <PlannedPage title="Submit a report" phase="Phase 4 · Accounts and roles">
-            <p>
-              The submission form for healthcare data providers. Identity fields are stripped by the
-              ingestion API before anything is stored, and the facility the report belongs to is
-              read from your session rather than from the form.
-            </p>
-          </PlannedPage>
+          <RequireRole allow="DATA_PROVIDER">
+            <SubmitPage />
+          </RequireRole>
         }
       />
 
-      <Route path="/app" element={<Dashboard />} />
-      <Route path="/app/districts/:code" element={<Dashboard />} />
+      <Route path="/app" element={<Inspector page={<Dashboard />} />} />
+      <Route path="/app/districts/:code" element={<Inspector page={<Dashboard />} />} />
 
       <Route
         path="/app/admin/*"
         element={
-          <PlannedPage title="Administration" phase="Phase 4 · Accounts and roles">
-            <p>
-              The facility registry, facility invite codes, and inspector accounts. Inspector
-              accounts are created here by a system administrator; there is no sign-up for them.
-            </p>
-          </PlannedPage>
+          <RequireRole allow="ADMIN">
+            <AdminPage />
+          </RequireRole>
         }
       />
 
-      <Route
-        path="*"
-        element={
-          <PlannedPage title="That page does not exist." phase="Unknown route">
-            <p>
-              The address you followed does not match anything in Sentinel. If you arrived from a
-              link on this site, it is a mistake worth reporting.
-            </p>
-          </PlannedPage>
-        }
-      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }

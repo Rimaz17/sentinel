@@ -4,6 +4,7 @@ import type {
   LocatedReport,
   WeeklyCounts,
 } from '@/features/dashboard/api/types'
+import type { Session } from '@/lib/api/session'
 
 /*
  * API responses for component tests, shaped exactly as the API sends them.
@@ -29,6 +30,9 @@ export function alert(overrides: Partial<Alert> = {}): Alert {
     zScore: 3.2,
     peakZScore: 3.4,
     threshold: 3,
+    verdict: null,
+    verdictAt: null,
+    published: false,
     ...overrides,
   }
 }
@@ -96,5 +100,21 @@ export function weeklyCounts(districtCode: string | null = 'KDY'): WeeklyCounts 
         LEPTOSPIROSIS_LIKE: 0,
       },
     })),
+  }
+}
+
+/** A signed-in inspector, as /api/auth/refresh returns one. National unless given districts. */
+export function inspectorSession(districts: string[] = ['*']): Session {
+  return {
+    accessToken: 'test-access-token',
+    accessTokenExpiresAt: new Date(Date.now() + 15 * 60_000).toISOString(),
+    account: {
+      id: 7,
+      email: 'phi@example.org',
+      displayName: 'Nimal Silva',
+      role: 'PHI',
+      districts,
+      facility: null,
+    },
   }
 }

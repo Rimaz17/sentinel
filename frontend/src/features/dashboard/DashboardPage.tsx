@@ -1,7 +1,8 @@
 import { useIsFetching, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { SkipLink } from '@/components/layout/SkipLink'
+import { useAccount } from '@/features/auth/session'
 import { caps, cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
 import {
   useAlerts,
@@ -14,7 +15,7 @@ import type { SymptomGroup } from './api/types'
 import { AlertList } from './AlertList'
 import { WeeklyChart } from './chart/WeeklyChart'
 import { DashboardHeader } from './DashboardHeader'
-import { DistrictList, DistrictPicker } from './DistrictList'
+import { ALL_OF_SRI_LANKA, DistrictList, DistrictPicker } from './DistrictList'
 import { formatCount } from './format'
 import { boundsOf, SRI_LANKA } from './map/geometry'
 import { MapKey } from './map/MapKey'
@@ -30,6 +31,9 @@ const panelTitle = 'text-section leading-snug font-medium tracking-tight'
  * the address, so it survives a reload and the back button works.
  */
 export function DashboardPage() {
+  const account = useAccount()
+  const national = account.districts.includes('*')
+  const onlyDistrict = !national && account.districts.length === 1 ? account.districts[0] : null
   const { code } = useParams()
   // District codes are capitals (KDY), but an address typed as /app/districts/kdy
   // means the same district: it is read as KDY and the address corrected to match.
@@ -41,18 +45,25 @@ export function DashboardPage() {
     }
   }, [code, navigate])
 
+  // A district outside the inspector's scope is refused by the API; the page says so itself
+  // rather than asking for data it cannot have.
+  const outOfScope = selected !== null && !national && !account.districts.includes(selected)
+  const inView = outOfScope ? null : selected
+
   const districts = useDistricts()
-  const alerts = useAlerts(selected)
-  const reports = useLocatedReports(selected)
-  const weekly = useWeeklyCounts(selected)
-  const facilities = useFacilities(selected)
+  const alerts = useAlerts(inView)
+  const reports = useLocatedReports(inView)
+  const weekly = useWeeklyCounts(inView)
+  const facilities = useFacilities(inView)
 
   const queryClient = useQueryClient()
   const refreshing = useIsFetching() > 0
   const [hidden, setHidden] = useState<ReadonlySet<SymptomGroup>>(new Set())
 
   const district = selected === null ? null : districts.data?.find((d) => d.code === selected)
-  const areaName = selected === null ? 'All of Sri Lanka' : (district?.name ?? selected)
+  const allLabel = national ? ALL_OF_SRI_LANKA : 'Your districts'
+  const backLabel = national ? 'Back to all of Sri Lanka' : 'Back to your districts'
+  const areaName = selected === null ? allLabel : (district?.name ?? selected)
 
   useEffect(() => {
     document.title = `${areaName} · Internal dashboard · Sentinel`
@@ -84,7 +95,8 @@ export function DashboardPage() {
     selected === null ? SRI_LANKA : boundsOf(located.length > 0 ? located : (reports.data ?? []))
   const frameKey = `${selected ?? 'LK'}:${located.length}:${reports.isSuccess ? 'r' : ''}`
 
-  const unknownDistrict = selected !== null && districts.isSuccess && district === undefined
+  const unknownDistrict =
+    selected !== null && !outOfScope && districts.isSuccess && district === undefined
 
   function toggle(group: SymptomGroup) {
     setHidden((current) => {
@@ -98,10 +110,16 @@ export function DashboardPage() {
     })
   }
 
+  // An inspector who covers one district has no wider view to show.
+  if (selected === null && onlyDistrict) {
+    return <Navigate to={districtPath(onlyDistrict)} replace />
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <SkipLink />
       <DashboardHeader
+        account={account}
         updatedAt={updatedAt > 0 ? updatedAt : null}
         refreshing={refreshing}
         onRefresh={() => void queryClient.refetchQueries({ type: 'active' })}
@@ -112,7 +130,7 @@ export function DashboardPage() {
           <h2 id="districts-heading" className="sr-only">
             Districts
           </h2>
-          <DistrictList query={districts} selected={selected} />
+          <DistrictList query={districts} selected={selected} allLabel={allLabel} />
         </nav>
 
         <main id="main" className="grid min-w-0 content-start gap-xl">
@@ -121,7 +139,9 @@ export function DashboardPage() {
               <h1 className={sectionTitle}>{areaName}</h1>
               <p className={cx(labelSm, caps, 'text-ink-70')}>
                 {selected === null
-                  ? '25 districts'
+                  ? national
+                    ? '25 districts'
+                    : `${account.districts.length} districts`
                   : district
                     ? `${district.province} Province · ${district.code}`
                     : selected}
@@ -135,13 +155,19 @@ export function DashboardPage() {
             ) : null}
             {districts.data ? (
               <div className="max-w-[20rem] xl:hidden">
-                <DistrictPicker districts={districts.data} selected={selected} />
+                <DistrictPicker
+                  districts={districts.data}
+                  selected={selected}
+                  allLabel={allLabel}
+                />
               </div>
             ) : null}
           </div>
 
-          {unknownDistrict ? (
-            <UnknownDistrict code={selected} />
+          {outOfScope ? (
+            <OutOfScope code={selected} back={backLabel} />
+          ) : unknownDistrict ? (
+            <UnknownDistrict code={selected} back={backLabel} />
           ) : (
             <>
               <div className="grid gap-xl lg:grid-cols-[minmax(0,21rem)_minmax(0,1fr)]">
@@ -214,7 +240,23 @@ export function DashboardPage() {
   )
 }
 
-function UnknownDistrict({ code }: { code: string }) {
+/** A district the inspector's account does not cover. Nothing about it is shown or fetched. */
+function OutOfScope({ code, back }: { code: string; back: string }) {
+  return (
+    <div className="grid justify-items-start gap-sm border-t border-t-ink py-md">
+      <p className="font-medium">Your account does not cover {code}.</p>
+      <p className="text-small text-ink-70">
+        Inspectors see the districts an administrator assigned to them. To work on another district,
+        ask an administrator to add it to your account.
+      </p>
+      <Link to="/app" className="text-small text-ink underline">
+        {back}
+      </Link>
+    </div>
+  )
+}
+
+function UnknownDistrict({ code, back }: { code: string; back: string }) {
   return (
     <div className="grid justify-items-start gap-sm border-t border-t-ink py-md">
       <p className="font-medium">No district has the code {code}.</p>
@@ -223,7 +265,7 @@ function UnknownDistrict({ code }: { code: string }) {
         list instead.
       </p>
       <Link to="/app" className="text-small text-ink underline">
-        Back to all of Sri Lanka
+        {back}
       </Link>
     </div>
   )

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,6 +28,7 @@ class LocatedReportsTest {
   private static final Instant NOW = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
   @Autowired MockMvc mvc;
+  @Autowired TestAccounts testAccounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
 
@@ -43,7 +45,7 @@ class LocatedReportsTest {
 
   @Test
   void listsLocatedReportsFromTheLastWeekNewestFirst() throws Exception {
-    mvc.perform(get("/api/reports/locations"))
+    mvc.perform(get("/api/reports/locations").with(testAccounts.asInspector("*")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[*].latitude", everyItem(notNullValue())))
@@ -54,7 +56,10 @@ class LocatedReportsTest {
 
   @Test
   void describesEachDotWithItsFacilityAndGroup() throws Exception {
-    mvc.perform(get("/api/reports/locations").param("district", "CMB"))
+    mvc.perform(
+            get("/api/reports/locations")
+                .with(testAccounts.asInspector("*"))
+                .param("district", "CMB"))
         .andExpect(jsonPath("$[0].facilityCode").isNotEmpty())
         .andExpect(jsonPath("$[0].symptomGroup").value("DENGUE_LIKE"))
         .andExpect(jsonPath("$[0].ageBand").value("30-39"))
@@ -64,28 +69,37 @@ class LocatedReportsTest {
 
   @Test
   void widensTheWindowOnRequest() throws Exception {
-    mvc.perform(get("/api/reports/locations").param("days", "14"))
+    mvc.perform(
+            get("/api/reports/locations").with(testAccounts.asInspector("*")).param("days", "14"))
         .andExpect(jsonPath("$", hasSize(4)));
   }
 
   @Test
   void filtersByDistrict() throws Exception {
-    mvc.perform(get("/api/reports/locations").param("district", "KDY"))
+    mvc.perform(
+            get("/api/reports/locations")
+                .with(testAccounts.asInspector("*"))
+                .param("district", "KDY"))
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[*].districtCode", everyItem(is("KDY"))));
   }
 
   @Test
   void refusesAWindowOutsideOneToSixtyThreeDays() throws Exception {
-    mvc.perform(get("/api/reports/locations").param("days", "0"))
+    mvc.perform(
+            get("/api/reports/locations").with(testAccounts.asInspector("*")).param("days", "0"))
         .andExpect(status().isBadRequest());
-    mvc.perform(get("/api/reports/locations").param("days", "64"))
+    mvc.perform(
+            get("/api/reports/locations").with(testAccounts.asInspector("*")).param("days", "64"))
         .andExpect(status().isBadRequest());
   }
 
   @Test
   void refusesAMalformedDistrictCode() throws Exception {
-    mvc.perform(get("/api/reports/locations").param("district", "K"))
+    mvc.perform(
+            get("/api/reports/locations")
+                .with(testAccounts.asInspector("*"))
+                .param("district", "K"))
         .andExpect(status().isBadRequest());
   }
 

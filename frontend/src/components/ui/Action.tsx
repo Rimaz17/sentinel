@@ -40,6 +40,34 @@ const VARIANTS: Record<Variant, { link: string[]; trailing: string }> = {
 }
 
 /**
+ * The primary shape as a form's submit button: the same ruled box, so a form
+ * adds no third action shape. Dimmed while the form is on its way.
+ */
+export function SubmitButton({
+  children,
+  busy = false,
+}: {
+  children: React.ReactNode
+  busy?: boolean
+}) {
+  return (
+    <button
+      type="submit"
+      disabled={busy}
+      aria-busy={busy}
+      className={cx(
+        'group/action inline-flex cursor-pointer items-center gap-[0.7rem] font-medium whitespace-nowrap',
+        monoLink,
+        ...VARIANTS.primary.link,
+        'disabled:cursor-default disabled:border-ink-40 disabled:text-ink-70 disabled:hover:bg-[length:100%_0%]',
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+/**
  * The page has exactly two action shapes: a ruled box for the thing most
  * visitors came to do, and a quiet underlined link for everything else. There
  * is no third. A filled button would be a third voice on a page that is

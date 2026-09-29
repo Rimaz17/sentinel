@@ -52,7 +52,7 @@ spread evenly across a district suggests a wider seasonal wave.
 | 1 | Walking skeleton, facility registry, simulator, ingestion API, PostgreSQL | **Built** |
 | 2 | Detection v1, z-score baseline job writing alerts | **Built** |
 | 3 | Dashboard v1, React + Leaflet, polling | **Built** |
-| 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | Not started |
+| 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | **Built** |
 | 5 | Real-time, Kafka, Redis windows, WebSocket alerts | Not started |
 | 6 | Geography, PostGIS, DBSCAN, cluster rings | Not started |
 | 7 | Ship it, Docker Compose, CI, deployed demo | Not started |
@@ -69,10 +69,28 @@ the district list, and a weekly chart per symptom group for the country or one
 district, all refreshed by polling every 30 seconds. See
 [ADR 0009](docs/adr/0009-dashboard-v1-polling-and-figures.md).
 
-The landing page and the internal dashboard are the browser surfaces that exist
-today. Every other route renders a page stating which phase it belongs to and
-what will live there; see
-[ADR 0002](docs/adr/0002-unbuilt-routes-render-placeholders.md).
+Phase 4 adds accounts and roles, and the public view:
+
+- **Sign-in** for staff, with a 15-minute access token and a refresh cookie
+  that keeps an inspector signed in through a long shift.
+- **Data providers** register only with their facility's invite code, and every
+  report they submit is counted as that facility's, whatever the request says.
+- **Inspectors** are created by an administrator, who is given a one-time link to
+  pass on; there is no sign-up for them. An inspector covers a list of
+  districts, or all of them, and the API enforces it in every query: a Kandy
+  inspector asking for Colombo gets 403.
+- **Inspectors review alerts**: acknowledge, investigate, close, and confirm a
+  rise or mark it a false alarm.
+- **The public dashboard** at `/dashboard` shows every district's status, weekly
+  trends, and alerts in plain words, once an inspector confirms them or a rise
+  passes a higher threshold. It never shows a report's position or a facility.
+
+See [ADR 0011](docs/adr/0011-accounts-tokens-and-district-scope.md),
+[ADR 0012](docs/adr/0012-trusted-report-feed.md) and
+[ADR 0013](docs/adr/0013-public-alerts.md).
+
+Every route in the plan is now built. Until Phase 4 the unbuilt ones said so;
+see [ADR 0002](docs/adr/0002-unbuilt-routes-render-placeholders.md).
 
 ## Measured detection
 
@@ -150,13 +168,27 @@ The dev server prints a local URL, normally <http://localhost:5173>.
 The landing page is entirely static and makes no network requests; it does not
 need the backend running.
 
-The internal dashboard at <http://localhost:5173/app> needs the API (see
-[Running the backend](#running-the-backend)). The dev and preview servers pass
-every request under `/api` to <http://localhost:8080>, so the browser only ever
-talks to its own origin and the API needs no CORS setting; set
-`SENTINEL_API_URL` before `npm run dev` to point them elsewhere. `/app` shows the
-whole country and `/app/districts/KDY` one district. Every panel polls every 30
-seconds while the tab is visible, and **Refresh now** asks at once.
+Every other page needs the API (see [Running the backend](#running-the-backend)).
+The dev and preview servers pass every request under `/api` to
+<http://localhost:8080>, so the browser only ever talks to its own origin and the
+API needs no CORS setting; set `SENTINEL_API_URL` before `npm run dev` to point
+them elsewhere.
+
+| Page | Who | What |
+|---|---|---|
+| `/dashboard` | Anyone | District status, trends and published alerts; no sign-in |
+| `/signin` | Staff | One sign-in for data providers, inspectors and the administrator |
+| `/register` | Data providers | Registration with a facility invite code |
+| `/activate#token=...` | Inspectors | Sets a password from an administrator's one-time link |
+| `/submit` | Data providers | Report submission for their own facility |
+| `/app`, `/app/districts/KDY` | Inspectors | The internal dashboard, within their districts, with alert review |
+| `/app/admin` | Administrator | Inspector accounts, and facility invite codes |
+
+To try it end to end: sign in as the administrator from `.env`, create an
+inspector at `/app/admin` and open the link it gives you, then issue a facility a
+code under **Facilities and invite codes** and register with it at `/register`.
+Every internal panel polls every 30 seconds while the tab is visible, and
+**Refresh now** asks at once; the public dashboard refreshes every minute.
 
 ### Frontend scripts
 
@@ -177,8 +209,11 @@ seconds while the tab is visible, and **Refresh now** asks at once.
 Requires **Docker**, **Java 17** and, for the simulator, **Python 3.12 or later**.
 Maven is not needed; the Maven wrapper fetches it.
 
-**1. Start the database.** From the repository root, copy the example settings
-(and change the password in `.env`), then start PostgreSQL:
+**1. Start the database.** From the repository root, copy the example settings,
+then start PostgreSQL. In `.env`, change the database password and fill in the
+four Phase 4 settings with real values: `SENTINEL_JWT_SECRET` and
+`SENTINEL_FEED_KEY` each from `openssl rand -base64 48`, and an address and a
+password of 12 characters or more for the administrator.
 
 ```bash
 cp infra/.env.example .env
@@ -192,8 +227,10 @@ It listens on `localhost:5433`, so it does not collide with a PostgreSQL already
 installed on the default port.
 
 **2. Start the API.** It reads the repository's `.env`, applies the database
-migrations and, on first start, seeds the facility registry. On Windows, use
-`mvnw.cmd`.
+migrations, seeds the facility registry, and on first start creates the
+administrator named in `SENTINEL_ADMIN_EMAIL`; it never changes that account
+afterwards. It refuses to start without a `SENTINEL_JWT_SECRET` of at least 32
+bytes. On Windows, use `mvnw.cmd`.
 
 ```bash
 cd backend/api
@@ -202,7 +239,9 @@ cd backend/api
 
 The API listens on <http://localhost:8080>.
 
-**3. Feed it reports.** The simulator uses only Python's standard library. From
+**3. Feed it reports.** The simulator uses only Python's standard library, and
+submits through the API's report feed with the `SENTINEL_FEED_KEY` both of them
+read from `.env` ([ADR 0012](docs/adr/0012-trusted-report-feed.md)). From
 `backend/simulator`, fill in nine weeks of history, which is what detection
 compares against, then keep reports arriving:
 
@@ -223,8 +262,10 @@ points it at another API.
 **4. Look at what arrived.**
 
 ```bash
-curl "http://localhost:8080/api/reports?limit=5&district=KDY"
+curl "http://localhost:8080/api/public/districts"
 ```
+
+Internal data needs an inspector's sign-in; the public API needs none.
 
 **5. Run the detector.** It needs pandas and psycopg, and reads the same database
 settings as the API, from `.env`. From `backend/detector`:
@@ -276,15 +317,62 @@ Checked 100 series for the 7 days to 2026-09-27 16:00 UTC: 1 above threshold
 
 ### API
 
+Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details
+that name the field at fault and never repeat what was submitted in it.
+
+**Public**, open to anyone and cacheable for a minute:
+
 | Endpoint | What it does |
 |---|---|
-| `GET /api/facilities` | The facility registry; `?district=KDY` for one district. A location is null where it could not be verified. |
-| `POST /api/ingestion/reports` | Submits a report as the facility named in the `X-Facility-Code` header. Answers `202 Accepted` with the report's id. |
-| `GET /api/reports` | Recent reports, newest reported first; `?limit=` 1 to 500 (default 50), `?district=KDY` for one district. |
-| `GET /api/reports/locations` | Reports with a location from the last `?days=` 1 to 63 (default 7), newest first, at most 5,000; `?district=KDY` for one district. The map's dots. |
-| `GET /api/reports/weekly-counts` | Reports per symptom group in each of the last nine seven-day weeks up to now, oldest first, bucketed as the detector buckets them; `?district=KDY` for one district, the whole country without. |
-| `GET /api/districts` | All 25 districts alphabetically, each with its reports over the last seven days and its open alerts. |
-| `GET /api/alerts` | Alerts, most recently detected first; `?limit=` 1 to 200 (default 50), `?district=KDY` for one district. `open` is true while an alert is not closed and was detected within the last 24 hours. |
+| `GET /api/public/districts` | Every district with its status, `USUAL` or `ELEVATED` with the symptom groups elevated, its reports over the last seven days, its usual week (the average of the eight before) and the one as a percentage of the other. |
+| `GET /api/public/alerts` | Published alerts from the last 90 days, active first, in plain wording, with the day each was first and last flagged and whether an inspector confirmed it. |
+| `GET /api/public/trends` | Reports per symptom group in each of the last nine weeks; `?district=KDY` for one district. |
+
+**Sign-in**, all `POST`:
+
+| Endpoint | What it does |
+|---|---|
+| `/api/auth/signin` | Email and password in; an access token and the account out, and a refresh token in an `HttpOnly` cookie. |
+| `/api/auth/refresh` | A new access token, and a new refresh cookie in place of the one sent. |
+| `/api/auth/signout` | Ends the session the cookie belongs to. |
+| `/api/auth/invite-codes/check` | The facility an invite code belongs to. |
+| `/api/auth/register` | A data provider account for the code's facility, signed in. |
+| `/api/auth/activation/check`, `/api/auth/activate` | Whose activation link this is; set a password from it and sign in. |
+
+`GET /api/auth/me` describes the signed-in account. Sign-in, registration and
+activation are limited to 10 requests a minute from one address.
+
+**Data providers** and the **report feed**:
+
+| Endpoint | What it does |
+|---|---|
+| `POST /api/ingestion/reports` | Submits a report. A data provider's facility is the one in their token; the feed names it in `X-Facility-Code`. Answers `202 Accepted` with the report's id. Limited to 120 a minute per data provider. |
+| `GET /api/facilities` | The registry, for the feed and for inspectors' maps. |
+
+**Inspectors**, within their districts; anything outside them is 403:
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/districts` · `GET /api/districts/{code}` | The districts the inspector covers, each with its reports over the last seven days and its open alerts. |
+| `GET /api/alerts` | Alerts, most recently detected first; `?limit=` 1 to 200, `?district=KDY`. `open` is true while an alert is not closed and was detected within the last 24 hours; `published` says whether the public sees it. |
+| `POST /api/alerts/{code}/status` | Moves an alert on: `ACKNOWLEDGED`, `INVESTIGATING`, `CLOSED`. Never back. |
+| `POST /api/alerts/{code}/verdict` | `CONFIRMED`, which publishes it, or `FALSE_ALARM`, which closes it. Final. |
+| `GET /api/reports` | Recent reports, newest reported first; `?limit=` 1 to 500, `?district=KDY`. |
+| `GET /api/reports/locations` | Located reports from the last `?days=` 1 to 63 (default 7), at most 5,000; the map's dots. |
+| `GET /api/reports/weekly-counts` | Reports per symptom group in each of the last nine weeks, bucketed as the detector buckets them. |
+
+Without `?district=`, an inspector's requests cover every district they may see.
+
+**The administrator:**
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/admin/accounts` | Staff accounts; `?role=PHI` for one role. |
+| `POST /api/admin/inspectors` | Creates an inspector for `districts`, such as `["KDY"]` or `["*"]`, and returns a one-time activation link's secret. |
+| `PATCH /api/admin/accounts/{id}` | Enables or disables an account, or changes an inspector's districts. |
+| `POST /api/admin/accounts/{id}/activation` | A new activation link, which is also how a password is reset. |
+| `GET /api/admin/facilities` | The registry with each facility's invite status; `?district=KDY`. |
+| `POST` / `DELETE /api/admin/facilities/{code}/invite-code` | Issues a facility a new code, shown once, or revokes it. |
 
 A report as a facility might send it, identity included:
 
@@ -306,13 +394,7 @@ What is stored from it is the facility, its district, `DENGUE_LIKE`, the age ban
 `30-39`, the location `7.291, 80.634` and the two timestamps. The symptom groups
 are `DENGUE_LIKE`, `INFLUENZA_LIKE`, `GASTROINTESTINAL` and `LEPTOSPIROSIS_LIKE`.
 `dateOfBirth` (`yyyy-mm-dd`) may stand in for `age`; the location is optional.
-Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details
-that name the field at fault and never repeat what was submitted in it.
-
-**Phase 1 has no authentication.** The header names a facility but does not prove
-it, and every endpoint is open, including report locations. Keep the API on your
-own machine until Phase 4 replaces the header with sign-in; see
-[ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
+The submission page at `/submit` never asks for any identity field at all.
 
 ### Backend checks
 
@@ -331,7 +413,9 @@ own machine until Phase 4 replaces the header with sign-in; see
 ```
 sentinel/
 ├── backend/
-│   ├── api/               Spring Boot: facility registry, ingestion, reports, districts, alerts
+│   ├── api/               Spring Boot: accounts and sign-in, facility registry and invite
+│   │                      codes, ingestion, reports, districts, alerts, administration,
+│   │                      and the public API
 │   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
 │   ├── detector/          Python: hourly z-score check, alerts, evaluation
 │   └── simulator/         Python: simulated reports and outbreaks, backfill and live modes
@@ -340,8 +424,12 @@ sentinel/
 │       ├── assets/        Shipped WebP figures, several widths each
 │       └── features/
 │           ├── landing/   The public landing page at /
-│           └── dashboard/ The internal dashboard at /app: api client, alert and
-│                          district lists, Leaflet map, weekly chart
+│           ├── public/    The public dashboard at /dashboard, and the district outlines
+│           ├── auth/      Sign-in, registration, activation, the session and route guards
+│           ├── submit/    Report submission for data providers
+│           ├── admin/     Inspector accounts and facility invite codes
+│           └── dashboard/ The internal dashboard at /app: alert list and review,
+│                          district list, Leaflet map, weekly chart
 ├── infra/
 │   ├── docker-compose.yml Local PostgreSQL
 │   └── .env.example       Local settings, dummy values; copy to .env at the root
@@ -353,6 +441,7 @@ sentinel/
 │       └── source-images/ Full-resolution originals (archived, not shipped)
 ├── scripts/
 │   ├── build-images.py    Regenerates frontend/src/assets from the originals
+│   ├── district-boundaries/ Builds the public map's district outlines from geoBoundaries
 │   ├── facility-registry/ Builds the registry seed from the Ministry of Health list
 │   └── git-hooks/         commit-msg hook
 └── README.md
@@ -409,14 +498,27 @@ These are documented on purpose and are not defects.
   the project overview quotes, because no principled filter of the source gives
   1,505. See [ADR 0006](docs/adr/0006-facility-locations-verified-before-use.md)
   and [the registry's README](scripts/facility-registry/README.md).
-- **No authentication until Phase 4.** A facility names itself in a request
-  header, and every endpoint is open, including the internal dashboard at `/app`
-  with its report positions and unpublished alerts. The dashboard says so on
-  screen. See
-  [ADR 0004](docs/adr/0004-facility-identity-from-a-header-until-sign-in.md).
-- **No public dashboard yet.** `/dashboard`, the reduced public view of shaded
-  districts, arrives with accounts and roles in Phase 4; `/app` is the internal
-  view and must not be exposed publicly.
+- **The report feed can submit as any facility.** The simulator needs it to
+  stand in for over 800 facilities at once. It is off unless `SENTINEL_FEED_KEY`
+  is set, and a real deployment would give each integration its own key scoped
+  to its facilities. See [ADR 0012](docs/adr/0012-trusted-report-feed.md).
+- **An access token cannot be revoked.** Disabling an account or narrowing an
+  inspector's districts takes effect at the next session renewal, at most 15
+  minutes later.
+- **Rate limits are counted in memory, per client address.** A restart forgets
+  them, and behind a reverse proxy every visitor shares the proxy's address.
+- **Invite codes are stored as SHA-256 hashes.** Registration has to find the
+  facility by its code, so they cannot use BCrypt; a copy of the table would let
+  codes of about 35 bits be recovered offline.
+- **Sentinel sends no email.** An administrator passes an inspector's activation
+  link, and a facility its invite code, by hand.
+- **Public alerts can appear without an inspector.** An unjudged alert whose rise
+  passes 5 standard deviations is published on that alone, about one false
+  alarm every eight or nine weeks nationally. See
+  [ADR 0013](docs/adr/0013-public-alerts.md).
+- **District outlines are OpenStreetMap data from 2017**, via geoBoundaries,
+  simplified for a map. They shade districts; they never decide which district a
+  report belongs to.
 - **Map tiles depend on OpenStreetMap's tile server,** whose usage policy suits a
   demonstration but not production traffic. See
   [ADR 0010](docs/adr/0010-openstreetmap-tiles.md).

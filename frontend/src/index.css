@@ -90,8 +90,9 @@
   --color-ochre-bright: #c88a05;
   --color-ochre-wash: rgb(200 138 5 / 0.12);
 
-  /* Alert red. Reserved for the alert vocabulary; unused on this page, but
-     recorded here so later surfaces do not invent a second red. */
+  /* Alert red. Reserved for the alert vocabulary: the mark beside an open or
+     active alert, always with a word, and the fill of a district on the public
+     map that has one. Nowhere else. */
   --color-alert: #e0443e;
 
   /* Symptom groups. Fixed hues from the project's existing documents. Never

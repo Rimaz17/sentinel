@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,17 +18,18 @@ import org.springframework.test.web.servlet.MockMvc;
 class FacilityControllerTest {
 
   @Autowired MockMvc mvc;
+  @Autowired TestAccounts testAccounts;
 
   @Test
   void listsTheWholeRegistry() throws Exception {
-    mvc.perform(get("/api/facilities"))
+    mvc.perform(get("/api/facilities").with(testAccounts.asInspector("*")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1501)));
   }
 
   @Test
   void filtersByDistrict() throws Exception {
-    mvc.perform(get("/api/facilities").param("district", "KDY"))
+    mvc.perform(get("/api/facilities").with(testAccounts.asInspector("*")).param("district", "KDY"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(109)))
         .andExpect(jsonPath("$[*].districtCode", everyItem(is("KDY"))));
@@ -35,7 +37,7 @@ class FacilityControllerTest {
 
   @Test
   void describesAFacilityWithAVerifiedLocation() throws Exception {
-    mvc.perform(get("/api/facilities").param("district", "AMP"))
+    mvc.perform(get("/api/facilities").with(testAccounts.asInspector("*")).param("district", "AMP"))
         .andExpect(jsonPath("$[?(@.code == 'LAP0000059')].name").value("Ampara"))
         .andExpect(jsonPath("$[?(@.code == 'LAP0000059')].category").value("HOSPITAL"))
         .andExpect(
@@ -46,7 +48,7 @@ class FacilityControllerTest {
 
   @Test
   void leavesAnUnverifiedLocationEmpty() throws Exception {
-    mvc.perform(get("/api/facilities").param("district", "ANU"))
+    mvc.perform(get("/api/facilities").with(testAccounts.asInspector("*")).param("district", "ANU"))
         .andExpect(jsonPath("$[?(@.code == 'LAN0000034')]", hasSize(1)))
         .andExpect(jsonPath("$[?(@.code == 'LAN0000034')].latitude", everyItem(nullValue())))
         .andExpect(jsonPath("$[?(@.code == 'LAN0000034')].longitude", everyItem(nullValue())));
@@ -54,14 +56,15 @@ class FacilityControllerTest {
 
   @Test
   void returnsNothingForAWellFormedDistrictThatDoesNotExist() throws Exception {
-    mvc.perform(get("/api/facilities").param("district", "XYZ"))
+    mvc.perform(get("/api/facilities").with(testAccounts.asInspector("*")).param("district", "XYZ"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
   }
 
   @Test
   void rejectsAMalformedDistrictCode() throws Exception {
-    mvc.perform(get("/api/facilities").param("district", "kandy"))
+    mvc.perform(
+            get("/api/facilities").with(testAccounts.asInspector("*")).param("district", "kandy"))
         .andExpect(status().isBadRequest());
   }
 }

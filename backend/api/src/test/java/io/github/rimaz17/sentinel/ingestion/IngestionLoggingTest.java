@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
@@ -71,6 +72,7 @@ class IngestionLoggingTest {
   private void submit(String facilityCode, String body) throws Exception {
     mvc.perform(
         post("/api/ingestion/reports")
+            .header(TestAccounts.FEED_KEY_HEADER, TestAccounts.FEED_KEY)
             .header("X-Facility-Code", facilityCode)
             .contentType(MediaType.APPLICATION_JSON)
             .content(body));

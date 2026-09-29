@@ -14,7 +14,14 @@ import org.springframework.context.annotation.Import;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest
+@SpringBootTest(
+    properties = {
+      "sentinel.auth.jwt-secret=integration-tests-only-signing-key-0123456789",
+      "sentinel.feed.key=" + TestAccounts.FEED_KEY,
+      // Tests sign in far more often than a person does; RateLimitTest sets its own limits.
+      "sentinel.rate-limit.auth-per-minute=100000",
+      "sentinel.rate-limit.ingestion-per-minute=100000"
+    })
 @AutoConfigureMockMvc
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, TestAccounts.class})
 public @interface IntegrationTest {}

@@ -2,7 +2,8 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
-import { alert, DISTRICTS, report, weeklyCounts } from '@/test/fixtures'
+import { resetSession, setSession } from '@/lib/api/session'
+import { alert, DISTRICTS, inspectorSession, report, weeklyCounts } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import type { LocatedReport } from './api/types'
 import { DashboardPage } from './DashboardPage'
@@ -41,6 +42,8 @@ function respond(url: string): Response {
 }
 
 beforeEach(() => {
+  resetSession()
+  setSession(inspectorSession())
   fetchMock = vi.fn((url: string) => Promise.resolve(respond(url)))
   vi.stubGlobal('fetch', fetchMock)
 })
@@ -186,5 +189,36 @@ describe('DashboardPage', () => {
       ]),
     )
     expect(failures[0]).toHaveTextContent('The API could not be reached. Check that it is running.')
+  })
+
+  it('takes an inspector who covers one district straight to it', async () => {
+    setSession(inspectorSession(['KDY']))
+    renderAt('/app')
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Kandy' })).toBeInTheDocument()
+    expect(screen.getByTestId('path')).toHaveTextContent('/app/districts/KDY')
+  })
+
+  it('calls an inspector’s wider view their districts, not the country', async () => {
+    setSession(inspectorSession(['KDY', 'NEL']))
+    renderAt('/app')
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Your districts' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('2 districts')).toBeInTheDocument()
+    expect(screen.queryByText('All of Sri Lanka')).not.toBeInTheDocument()
+  })
+
+  it('tells an inspector a district is not theirs, and asks the api nothing about it', async () => {
+    setSession(inspectorSession(['KDY', 'NEL']))
+    renderAt('/app/districts/CMB')
+
+    expect(await screen.findByText('Your account does not cover CMB.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to your districts' })).toHaveAttribute(
+      'href',
+      '/app',
+    )
+    expect(fetchMock.mock.calls.map(([url]) => url).join(' ')).not.toMatch(/district=CMB/)
   })
 })

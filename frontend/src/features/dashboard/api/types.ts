@@ -15,6 +15,9 @@ export type SymptomGroup = (typeof SYMPTOM_GROUPS)[number]
 
 export type AlertStatus = 'NEW' | 'ACKNOWLEDGED' | 'INVESTIGATING' | 'CLOSED'
 
+/** An inspector's final judgement of an alert. */
+export type Verdict = 'CONFIRMED' | 'FALSE_ALARM'
+
 /** GET /api/districts */
 export type DistrictSummary = {
   code: string
@@ -41,6 +44,11 @@ export type Alert = {
   zScore: number
   peakZScore: number
   threshold: number
+  /** Null until an inspector gives one. */
+  verdict: Verdict | null
+  verdictAt: string | null
+  /** Whether the public dashboard shows it: confirmed, or unjudged past the higher threshold. */
+  published: boolean
 }
 
 /** GET /api/reports/locations */

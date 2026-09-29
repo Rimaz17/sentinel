@@ -1,6 +1,6 @@
 # 0004, Facility identity comes from a header until sign-in exists
 
-Status: accepted · 2026-09-27
+Status: superseded by [0011](0011-accounts-tokens-and-district-scope.md) and [0012](0012-trusted-report-feed.md) · 2026-09-28
 
 ## Context
 

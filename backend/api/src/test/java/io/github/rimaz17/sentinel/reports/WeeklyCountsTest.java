@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -26,6 +27,7 @@ class WeeklyCountsTest {
   private static final Duration WEEK = Duration.ofDays(7);
 
   @Autowired MockMvc mvc;
+  @Autowired TestAccounts testAccounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
 
@@ -36,7 +38,7 @@ class WeeklyCountsTest {
 
   @Test
   void returnsNineWeeksOldestFirstEndingAtTheGivenMoment() {
-    List<WeekCounts> weeks = reports.weeklyCounts("KDY", END, 9);
+    List<WeekCounts> weeks = reports.weeklyCounts(List.of("KDY"), END, 9);
 
     assertThat(weeks).hasSize(9);
     assertThat(weeks.get(8).end()).isEqualTo(END);
@@ -49,7 +51,7 @@ class WeeklyCountsTest {
 
   @Test
   void fillsEveryGroupWithZeroWhenThereAreNoReports() {
-    List<WeekCounts> weeks = reports.weeklyCounts("KDY", END, 9);
+    List<WeekCounts> weeks = reports.weeklyCounts(List.of("KDY"), END, 9);
 
     assertThat(weeks)
         .allSatisfy(
@@ -66,7 +68,7 @@ class WeeklyCountsTest {
     store("KDY", SymptomGroup.INFLUENZA_LIKE, END.minus(Duration.ofDays(8)));
     store("KDY", SymptomGroup.GASTROINTESTINAL, END.minus(Duration.ofDays(62)));
 
-    List<WeekCounts> weeks = reports.weeklyCounts("KDY", END, 9);
+    List<WeekCounts> weeks = reports.weeklyCounts(List.of("KDY"), END, 9);
 
     assertThat(weeks.get(8).counts().get(SymptomGroup.DENGUE_LIKE)).isEqualTo(2);
     assertThat(weeks.get(7).counts().get(SymptomGroup.INFLUENZA_LIKE)).isEqualTo(1);
@@ -82,7 +84,7 @@ class WeeklyCountsTest {
     // Exactly nine weeks before the end: the first moment of the oldest week.
     store("KDY", SymptomGroup.DENGUE_LIKE, END.minus(WEEK.multipliedBy(9)));
 
-    List<WeekCounts> weeks = reports.weeklyCounts("KDY", END, 9);
+    List<WeekCounts> weeks = reports.weeklyCounts(List.of("KDY"), END, 9);
 
     assertThat(weeks.get(8).counts().get(SymptomGroup.DENGUE_LIKE)).isEqualTo(1);
     assertThat(weeks.get(7).counts().get(SymptomGroup.DENGUE_LIKE)).isZero();
@@ -94,7 +96,12 @@ class WeeklyCountsTest {
     store("KDY", SymptomGroup.DENGUE_LIKE, END.minus(Duration.ofHours(1)));
     store("CMB", SymptomGroup.DENGUE_LIKE, END.minus(Duration.ofHours(2)));
 
-    assertThat(reports.weeklyCounts("KDY", END, 9).get(8).counts().get(SymptomGroup.DENGUE_LIKE))
+    assertThat(
+            reports
+                .weeklyCounts(List.of("KDY"), END, 9)
+                .get(8)
+                .counts()
+                .get(SymptomGroup.DENGUE_LIKE))
         .isEqualTo(1);
     assertThat(reports.weeklyCounts(null, END, 9).get(8).counts().get(SymptomGroup.DENGUE_LIKE))
         .isEqualTo(2);
@@ -105,7 +112,10 @@ class WeeklyCountsTest {
     Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
     store("KDY", SymptomGroup.DENGUE_LIKE, now.minus(Duration.ofMinutes(5)));
 
-    mvc.perform(get("/api/reports/weekly-counts").param("district", "KDY"))
+    mvc.perform(
+            get("/api/reports/weekly-counts")
+                .with(testAccounts.asInspector("*"))
+                .param("district", "KDY"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.districtCode").value("KDY"))
         .andExpect(jsonPath("$.asOf").isNotEmpty())
@@ -117,7 +127,7 @@ class WeeklyCountsTest {
 
   @Test
   void servesTheWholeCountryWithoutADistrict() throws Exception {
-    mvc.perform(get("/api/reports/weekly-counts"))
+    mvc.perform(get("/api/reports/weekly-counts").with(testAccounts.asInspector("*")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.districtCode").doesNotExist())
         .andExpect(jsonPath("$.weeks", hasSize(9)));
@@ -125,7 +135,10 @@ class WeeklyCountsTest {
 
   @Test
   void refusesAMalformedDistrictCode() throws Exception {
-    mvc.perform(get("/api/reports/weekly-counts").param("district", "Kandy"))
+    mvc.perform(
+            get("/api/reports/weekly-counts")
+                .with(testAccounts.asInspector("*"))
+                .param("district", "Kandy"))
         .andExpect(status().isBadRequest());
   }
 

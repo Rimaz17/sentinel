@@ -69,6 +69,19 @@ class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     return problem(HttpStatus.FORBIDDEN, ex.getMessage(), List.of());
   }
 
+  @ExceptionHandler(InvalidFieldException.class)
+  ResponseEntity<Object> invalidField(InvalidFieldException ex) {
+    return problem(
+        HttpStatus.BAD_REQUEST,
+        "The request has invalid fields.",
+        List.of(new FieldProblem(ex.getField(), ex.getMessage())));
+  }
+
+  @ExceptionHandler(ApiProblem.class)
+  ResponseEntity<Object> apiProblem(ApiProblem ex) {
+    return problem(ex.getStatus(), ex.getMessage(), List.of());
+  }
+
   private static String path(JacksonException ex) {
     return ex.getPath().stream()
         .map(

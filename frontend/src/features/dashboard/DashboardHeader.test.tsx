@@ -2,18 +2,23 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
+import { inspectorSession } from '@/test/fixtures'
+import { QueryWrapper } from '@/test/queryWrapper'
 import { DashboardHeader } from './DashboardHeader'
 
 function renderHeader(props: Partial<Parameters<typeof DashboardHeader>[0]> = {}) {
   const onRefresh = vi.fn()
   render(
     <MemoryRouter>
-      <DashboardHeader
-        updatedAt={Date.parse('2026-09-28T08:30:05Z')}
-        refreshing={false}
-        onRefresh={onRefresh}
-        {...props}
-      />
+      <QueryWrapper>
+        <DashboardHeader
+          account={inspectorSession().account}
+          updatedAt={Date.parse('2026-09-28T08:30:05Z')}
+          refreshing={false}
+          onRefresh={onRefresh}
+          {...props}
+        />
+      </QueryWrapper>
     </MemoryRouter>,
   )
   return onRefresh
@@ -48,9 +53,10 @@ describe('DashboardHeader', () => {
     expect(screen.getByText('All case data simulated · demonstration system')).toBeInTheDocument()
   })
 
-  it('states that this view has no sign-in yet', () => {
+  it('names who is signed in and offers a way out', () => {
     renderHeader()
-    expect(screen.getByText(/no sign-in until phase 4/i)).toBeInTheDocument()
+    expect(screen.getByText(/signed in as/i)).toHaveTextContent('Signed in as Nimal Silva')
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument()
   })
 
   it('leads home from the wordmark', () => {

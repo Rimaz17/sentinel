@@ -1,24 +1,35 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { DISTRICTS, weeklyCounts } from '@/test/fixtures'
+import { resetSession } from '@/lib/api/session'
+import { DISTRICTS, inspectorSession, weeklyCounts } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import { AppRoutes } from './AppRoutes'
 
-// The dashboard's map needs a canvas jsdom does not have.
+// The maps need a canvas and layout jsdom does not have.
 vi.mock('@/features/dashboard/map/ReportMap', () => ({ ReportMap: () => null }))
+vi.mock('@/features/public/map/DistrictMap', () => ({ DistrictMap: () => null }))
+
+function requestedUrls(): string[] {
+  return vi.mocked(fetch).mock.calls.map(([url]) => url as string)
+}
 
 beforeEach(() => {
+  resetSession()
   vi.stubGlobal(
     'fetch',
     vi.fn((url: string) =>
       Promise.resolve(
         Response.json(
-          url.startsWith('/api/districts')
-            ? DISTRICTS
-            : url.startsWith('/api/reports/weekly-counts')
-              ? weeklyCounts()
-              : [],
+          url === '/api/auth/refresh'
+            ? inspectorSession()
+            : url.startsWith('/api/public/trends')
+              ? weeklyCounts(null)
+              : url.startsWith('/api/districts')
+                ? DISTRICTS
+                : url.startsWith('/api/reports/weekly-counts')
+                  ? weeklyCounts()
+                  : [],
         ),
       ),
     ),
@@ -47,33 +58,23 @@ describe('AppRoutes', () => {
     ).toBeInTheDocument()
   })
 
-  it.each([
-    ['/dashboard', /the public dashboard/i],
-    ['/signin', /sign in/i],
-    ['/register', /facility registration/i],
-    ['/submit', /submit a report/i],
-    ['/app/admin', /administration/i],
-    ['/app/admin/invite-codes', /administration/i],
-  ])('renders a planned page at %s', (path, heading) => {
-    renderAt(path)
-    expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
+  it('renders the public dashboard at /dashboard, without signing in', async () => {
+    resetSession()
+    renderAt('/dashboard')
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Sri Lanka, district by district' }),
+    ).toBeInTheDocument()
+    expect(requestedUrls()).not.toContain('/api/auth/refresh')
   })
 
-  it('marks every unbuilt route as not built yet rather than faking a product', () => {
-    for (const path of ['/dashboard', '/signin', '/register', '/submit', '/app/admin']) {
-      const { unmount } = renderAt(path)
-      expect(screen.getByText(/not built yet/i)).toBeInTheDocument()
-      unmount()
-    }
-  })
-
-  it('tells an inspector without an account to contact an administrator', () => {
+  it('tells an inspector without an account to contact an administrator', async () => {
     renderAt('/signin')
-    expect(screen.getByText(/contact their district administrator/i)).toBeInTheDocument()
+    expect(await screen.findByText(/contact their district administrator/i)).toBeInTheDocument()
   })
 
-  it('offers no registration link on the sign-in page', () => {
+  it('offers no registration link on the sign-in page', async () => {
     renderAt('/signin')
+    await screen.findByRole('heading', { level: 1, name: 'Staff sign-in' })
     // PHI accounts are admin-provisioned, so sign-in must not hand anyone a
     // registration route they cannot use.
     expect(screen.queryByRole('link', { name: /register/i })).not.toBeInTheDocument()
@@ -106,11 +107,18 @@ describe('AppRoutes', () => {
     ).toBeInTheDocument()
   })
 
-  it('gives every planned page a way back to the front page', () => {
-    renderAt('/dashboard')
+  it('gives an unknown address a way back to the front page', () => {
+    renderAt('/nope/not-a-route')
     expect(screen.getByRole('link', { name: /back to the front page/i })).toHaveAttribute(
       'href',
       '/',
     )
+  })
+
+  it('keeps administration from an inspector', async () => {
+    renderAt('/app/admin/facilities')
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'This page is not for your account.' }),
+    ).toBeInTheDocument()
   })
 })

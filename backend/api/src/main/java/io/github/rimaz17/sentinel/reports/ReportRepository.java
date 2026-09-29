@@ -1,6 +1,7 @@
 package io.github.rimaz17.sentinel.reports;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Limit;
@@ -14,21 +15,30 @@ interface ReportRepository extends JpaRepository<Report, UUID> {
   List<Report> findAllByOrderByReportedAtDescIdDesc(Limit limit);
 
   @EntityGraph(attributePaths = "facility")
-  List<Report> findByDistrictCodeOrderByReportedAtDescIdDesc(String districtCode, Limit limit);
+  List<Report> findByDistrictCodeInOrderByReportedAtDescIdDesc(
+      Collection<String> districtCodes, Limit limit);
 
-  /**
-   * Reports with a location that presented in [from, to), newest first, for the map. A null
-   * district means the whole country.
-   */
+  /** Reports with a location that presented in [from, to), newest first, for the map. */
   @Query(
       """
       select r from Report r join fetch r.facility
       where r.latitude is not null
         and r.reportedAt >= :from and r.reportedAt < :to
-        and (:district is null or r.districtCode = :district)
       order by r.reportedAt desc, r.id desc
       """)
-  List<Report> findLocated(Instant from, Instant to, String district, Limit limit);
+  List<Report> findLocated(Instant from, Instant to, Limit limit);
+
+  /** As {@link #findLocated}, in the given districts only. */
+  @Query(
+      """
+      select r from Report r join fetch r.facility
+      where r.latitude is not null
+        and r.reportedAt >= :from and r.reportedAt < :to
+        and r.districtCode in :districtCodes
+      order by r.reportedAt desc, r.id desc
+      """)
+  List<Report> findLocatedIn(
+      Instant from, Instant to, Collection<String> districtCodes, Limit limit);
 
   /**
    * Reports per district in [from, to), as {@code [districtCode, count]}; empty districts omitted.
@@ -44,8 +54,8 @@ interface ReportRepository extends JpaRepository<Report, UUID> {
   /**
    * Reports per symptom group and week in [start, end), as {@code [symptomGroup, weeksAgo, count]}.
    * Week 0 is [end - 7 days, end), week 1 the seven days before it, and so on: the detector's own
-   * bucketing (backend/detector/sentinel_detector/store.py). A null district counts the whole
-   * country.
+   * bucketing (backend/detector/sentinel_detector/store.py). {@code districtCodes} is a
+   * comma-separated list of the districts to count, or null for the whole country.
    */
   @Query(
       nativeQuery = true,
@@ -57,8 +67,27 @@ interface ReportRepository extends JpaRepository<Report, UUID> {
                  count(*)
           from reports
           where reported_at >= :start and reported_at < :end
-            and (cast(:district as text) is null or district_code = cast(:district as text))
+            and (cast(:districtCodes as text) is null
+                 or district_code = any(string_to_array(cast(:districtCodes as text), ',')))
           group by 1, 2
           """)
-  List<Object[]> countByGroupAndWeek(Instant start, Instant end, String district);
+  List<Object[]> countByGroupAndWeek(Instant start, Instant end, String districtCodes);
+
+  /**
+   * Reports per district and week in [start, end), as {@code [districtCode, weeksAgo, count]}, with
+   * the same weeks as {@link #countByGroupAndWeek}; districts and weeks with none omitted.
+   */
+  @Query(
+      nativeQuery = true,
+      value =
+          """
+          select district_code,
+                 cast(ceil(extract(epoch from (cast(:end as timestamptz) - reported_at)) / 604800)
+                      as integer) - 1 as weeks_ago,
+                 count(*)
+          from reports
+          where reported_at >= :start and reported_at < :end
+          group by 1, 2
+          """)
+  List<Object[]> countByDistrictAndWeek(Instant start, Instant end);
 }

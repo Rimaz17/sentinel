@@ -9,6 +9,8 @@ from sentinel_simulator import client as client_module
 from sentinel_simulator.client import ApiError, SentinelClient
 from sentinel_simulator.generator import SimulatedReport
 
+KEY = "a-feed-key-for-tests-only-0123456789"
+
 FACILITIES = [
     {
         "code": "LKY0001016",
@@ -40,6 +42,9 @@ class FakeApi(BaseHTTPRequestHandler):
 
     def do_GET(self):
         FakeApi.connections.add(self.client_address)
+        if self.headers.get("X-Feed-Key") != KEY:
+            self._reply(401, {"detail": "The feed key is not recognised."})
+            return
         self._reply(200, FACILITIES)
 
     def do_POST(self):
@@ -47,7 +52,9 @@ class FakeApi(BaseHTTPRequestHandler):
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         facility = self.headers.get("X-Facility-Code")
         FakeApi.received.append((facility, body))
-        if facility == "LXX9999999":
+        if self.headers.get("X-Feed-Key") != KEY:
+            self._reply(401, {"detail": "The feed key is not recognised."})
+        elif facility == "LXX9999999":
             self._reply(403, {"detail": "No registered facility has this code."})
         elif "latitude" in body and body["latitude"] > 10:
             self._reply(
@@ -101,7 +108,7 @@ def report(facility="LKY0001016", latitude=7.2663):
 
 
 def test_reads_the_facility_registry(api):
-    with SentinelClient(api) as client:
+    with SentinelClient(api, KEY) as client:
         facilities = client.facilities()
     assert [f.code for f in facilities] == ["LKY0001016", "LKY0001008"]
     assert facilities[0].latitude == 7.266279
@@ -109,7 +116,7 @@ def test_reads_the_facility_registry(api):
 
 
 def test_submits_a_report_as_its_facility(api):
-    with SentinelClient(api) as client:
+    with SentinelClient(api, KEY) as client:
         receipt = client.submit(report())
     assert receipt["reportId"]
     [(facility, body)] = FakeApi.received
@@ -120,7 +127,7 @@ def test_submits_a_report_as_its_facility(api):
 
 
 def test_reuses_one_connection_for_many_requests(api):
-    with SentinelClient(api) as client:
+    with SentinelClient(api, KEY) as client:
         client.facilities()
         for _ in range(5):
             client.submit(report())
@@ -128,7 +135,7 @@ def test_reuses_one_connection_for_many_requests(api):
 
 
 def test_replaces_a_connection_left_idle(api, monkeypatch):
-    with SentinelClient(api) as client:
+    with SentinelClient(api, KEY) as client:
         client.submit(report())
         monkeypatch.setattr(client_module, "MAX_IDLE_SECONDS", -1.0)
         client.submit(report())
@@ -136,14 +143,14 @@ def test_replaces_a_connection_left_idle(api, monkeypatch):
 
 
 def test_an_unknown_facility_is_an_api_error_with_the_apis_words(api):
-    with SentinelClient(api) as client, pytest.raises(ApiError) as error:
+    with SentinelClient(api, KEY) as client, pytest.raises(ApiError) as error:
         client.submit(report(facility="LXX9999999"))
     assert error.value.status == 403
     assert error.value.detail == "No registered facility has this code."
 
 
 def test_a_rejected_field_is_named_in_the_error(api):
-    with SentinelClient(api) as client, pytest.raises(ApiError) as error:
+    with SentinelClient(api, KEY) as client, pytest.raises(ApiError) as error:
         client.submit(report(latitude=12.5))
     assert error.value.status == 400
     assert "latitude must be at most 10.0" in error.value.detail
@@ -151,4 +158,10 @@ def test_a_rejected_field_is_named_in_the_error(api):
 
 def test_refuses_a_url_that_is_not_http():
     with pytest.raises(ValueError):
-        SentinelClient("localhost:8080")
+        SentinelClient("localhost:8080", KEY)
+
+
+def test_a_wrong_feed_key_is_refused_by_the_api(api):
+    with SentinelClient(api, "not-the-key") as client, pytest.raises(ApiError) as error:
+        client.facilities()
+    assert error.value.status == 401

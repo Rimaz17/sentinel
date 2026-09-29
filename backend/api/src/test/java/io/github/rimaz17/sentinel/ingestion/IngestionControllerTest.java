@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestAccounts;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -17,6 +18,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,10 +42,12 @@ class IngestionControllerTest {
 
   @Autowired MockMvc mvc;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestAccounts accounts;
 
   @BeforeEach
   void clear() {
     jdbc.update("delete from reports");
+    accounts.clear();
   }
 
   @Test
@@ -79,7 +83,7 @@ class IngestionControllerTest {
   }
 
   @Test
-  void takesTheFacilityFromTheSubmitterNeverFromTheBody() throws Exception {
+  void takesTheFeedsFacilityFromItsHeaderNeverFromTheBody() throws Exception {
     String claimingColombo =
         report(hoursAgo(2))
             .replace(
@@ -121,12 +125,84 @@ class IngestionControllerTest {
   }
 
   @Test
-  void refusesASubmissionWithNoFacility() throws Exception {
+  void refusesAFeedSubmissionThatNamesNoFacility() throws Exception {
     mvc.perform(
             post("/api/ingestion/reports")
+                .header(TestAccounts.FEED_KEY_HEADER, TestAccounts.FEED_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(report(hoursAgo(2))))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.detail").value(IngestionController.FEED_NEEDS_FACILITY));
+
+    assertNothingStored();
+  }
+
+  @Test
+  void storesADataProvidersReportUnderTheFacilityInTheirToken() throws Exception {
+    long provider = accounts.dataProvider("clinic@example.org", "a long password", KANDY_FACILITY);
+    String claimingColombo =
+        report(hoursAgo(2))
+            .replace(
+                "{", "{\"facilityCode\": \"" + COLOMBO_FACILITY + "\", \"districtCode\": \"CMB\",");
+
+    MvcResult result =
+        mvc.perform(
+                post("/api/ingestion/reports")
+                    .header(HttpHeaders.AUTHORIZATION, accounts.bearer(provider))
+                    .header("X-Facility-Code", COLOMBO_FACILITY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(claimingColombo))
+            .andExpect(status().isAccepted())
+            .andReturn();
+
+    Map<String, Object> row =
+        jdbc.queryForMap(
+            "select f.code, r.district_code from reports r join facilities f on f.id = r.facility_id"
+                + " where r.id = ?",
+            reportId(result));
+    assertThat(row.get("code")).isEqualTo(KANDY_FACILITY);
+    assertThat(row.get("district_code")).isEqualTo("KDY");
+  }
+
+  @Test
+  void refusesAnAnonymousSubmission() throws Exception {
+    mvc.perform(
+            post("/api/ingestion/reports")
+                .header("X-Facility-Code", KANDY_FACILITY)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(report(hoursAgo(2))))
+        .andExpect(status().isUnauthorized());
+
+    assertNothingStored();
+  }
+
+  @Test
+  void refusesAWrongFeedKey() throws Exception {
+    mvc.perform(
+            post("/api/ingestion/reports")
+                .header(TestAccounts.FEED_KEY_HEADER, "not-the-key-" + TestAccounts.FEED_KEY)
+                .header("X-Facility-Code", KANDY_FACILITY)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(report(hoursAgo(2))))
+        .andExpect(status().isUnauthorized());
+
+    assertNothingStored();
+  }
+
+  @Test
+  void refusesAnInspectorOrAnAdministrator() throws Exception {
+    long inspector = accounts.inspector("phi@example.org", "a long password", "*");
+    long admin = accounts.admin("admin@example.org", "a long password");
+
+    for (long account : new long[] {inspector, admin}) {
+      mvc.perform(
+              post("/api/ingestion/reports")
+                  .header(HttpHeaders.AUTHORIZATION, accounts.bearer(account))
+                  .header("X-Facility-Code", KANDY_FACILITY)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(report(hoursAgo(2))))
+          .andExpect(status().isForbidden());
+    }
 
     assertNothingStored();
   }
@@ -233,6 +309,7 @@ class IngestionControllerTest {
   private ResultActions submit(String facilityCode, String body) throws Exception {
     return mvc.perform(
         post("/api/ingestion/reports")
+            .header(TestAccounts.FEED_KEY_HEADER, TestAccounts.FEED_KEY)
             .header("X-Facility-Code", facilityCode)
             .contentType(MediaType.APPLICATION_JSON)
             .content(body));

@@ -10,6 +10,8 @@ import { scaleMax, type Series, seriesFor } from './series'
 type WeeklyChartProps = {
   query: UseQueryResult<WeeklyCounts>
   areaName: string
+  /** Public wording for a failed load; see QueryView. */
+  errorWords?: string
 }
 
 /**
@@ -19,11 +21,12 @@ type WeeklyChartProps = {
  * Every panel is named, so no group is identified by its colour alone, and the
  * same numbers are available as a table.
  */
-export function WeeklyChart({ query, areaName }: WeeklyChartProps) {
+export function WeeklyChart({ query, areaName, errorWords }: WeeklyChartProps) {
   return (
     <QueryView
       query={query}
       what="weekly counts"
+      {...(errorWords ? { errorWords } : {})}
       loading={<LoadingRows label="Loading weekly counts" rows={2} />}
     >
       {(weekly) => (
@@ -55,7 +58,9 @@ export function WeeklyChart({ query, areaName }: WeeklyChartProps) {
           </ul>
 
           <details className="border-t border-t-ink-14 pt-xs">
-            <summary className={cx(labelSm, caps, 'cursor-pointer text-ink-70 hover:text-ink')}>
+            <summary
+              className={cx(labelSm, caps, 'cursor-pointer py-2xs text-ink-70 hover:text-ink')}
+            >
               The numbers as a table
             </summary>
             <WeeklyTable weekly={weekly} areaName={areaName} />

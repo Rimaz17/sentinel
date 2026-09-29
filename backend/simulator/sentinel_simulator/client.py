@@ -16,6 +16,7 @@ from urllib.parse import urlsplit
 from sentinel_simulator.generator import Facility, SimulatedReport
 
 FACILITY_HEADER = "X-Facility-Code"
+FEED_KEY_HEADER = "X-Feed-Key"
 
 # Tomcat closes an idle keep-alive connection after 20 seconds by default.
 MAX_IDLE_SECONDS = 5.0
@@ -29,7 +30,9 @@ class ApiError(Exception):
 
 
 class SentinelClient:
-    def __init__(self, base_url: str, timeout: float = 10.0):
+    """Talks to the API as its trusted report feed, sending the feed key with every request."""
+
+    def __init__(self, base_url: str, feed_key: str, timeout: float = 10.0):
         parts = urlsplit(base_url)
         if parts.scheme not in ("http", "https") or not parts.hostname:
             raise ValueError(f"not an http(s) URL: {base_url}")
@@ -37,6 +40,7 @@ class SentinelClient:
         self._host = parts.hostname
         self._port = parts.port
         self._prefix = parts.path.rstrip("/")
+        self._feed_key = feed_key
         self._timeout = timeout
         self._connection: http.client.HTTPConnection | None = None
         self._last_used = 0.0
@@ -81,7 +85,12 @@ class SentinelClient:
     def _request(self, method, path, body=None, headers=None) -> tuple[int, bytes]:
         connection = self._open()
         try:
-            connection.request(method, self._prefix + path, body=body, headers=headers or {})
+            connection.request(
+                method,
+                self._prefix + path,
+                body=body,
+                headers={FEED_KEY_HEADER: self._feed_key, **(headers or {})},
+            )
             response = connection.getresponse()
             data = response.read()
         except (OSError, http.client.HTTPException):

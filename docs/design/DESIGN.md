@@ -54,7 +54,7 @@ does not exist on the page the reference was taken from.
 | `--color-ink` | `#15222b` | Body text, rules at full strength, the footer ground |
 | `--color-ochre` | `#8f6203` | The accent. Text-safe at 4.59:1 on paper |
 | `--color-ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces, 2.70:1 on paper, so never type there |
-| `--color-alert` | `#e0443e` | The alert vocabulary only: the mark beside an open alert, always with the word "Open" |
+| `--color-alert` | `#e0443e` | The alert vocabulary only: the mark beside an open or active alert, always with a word, and the fill of a public district with an active alert, always with a heavier outline |
 
 Ink alphas and their measured ratios on paper:
 
@@ -349,6 +349,59 @@ alerts name their group, and the map key's switches let a reader isolate a group
 Verified in the browser at 375px and 1440px against a live backfill: no
 horizontal overflow, one `<h1>`, every control named, and every visible text node
 at 4.5:1 or better.
+
+### Alert review
+
+Each alert in the queue ends with its actions as quiet buttons: the next step
+("Acknowledge", then "Start investigating"), the two verdicts and "Close". A
+verdict is final and one of them publishes the alert, so it asks once more in
+place, under a 2px ink rule, before anything is sent. A line under the figures
+says in words whether the public sees the alert and why.
+
+## The public dashboard
+
+`/dashboard`, in **Read** mode: a resident wants to know whether anything unusual
+is happening where they live, and then to leave. The same world as the landing
+page, spent more quietly still.
+
+- **The visitor's district first.** The page opens on the shared two-column
+  grid: the title, lede and simulated-data notice on the left; on the right the
+  national summary, a "figures updated" line, and a "Your district" picker. Once
+  a district is chosen, its answer sits directly under the picker, one sentence,
+  and takes focus, so a phone user sees it without scrolling and a screen reader
+  hears it.
+- **The alert vocabulary, publicly.** An active alert is the red square with the
+  word "Active" and the plain headline, which links to its district. Ended alerts
+  wait in a `<details>` for a season. Nothing public carries a count, a sigma or
+  an alert code.
+- **The map is a picture.** Twenty-five district outlines on paper-sunk, no tile
+  layer, no zoom control, no panning. A district with an active alert takes a
+  45% alert-red fill and a 2px ink outline, so the difference is in the line as
+  well as the hue; the one chosen is drawn at 3px. It is `aria-hidden` and out of
+  the tab order, because the table beside it says the same in words, and it
+  loads after the text so a slow phone reads the answer first. Its credit is a
+  mono caption in ink, not Leaflet's blue.
+- **The table is the map's equal.** Elevated districts first, status in words,
+  and the district chosen inked in (paper on ink), as the internal rail marks the
+  district in view.
+- **Failures speak to the public.** "The figures are unavailable at the moment.
+  Try again in a minute." rather than the staff wording about the API.
+
+## Staff pages
+
+Sign-in, registration, activation and report submission share one frame: the
+site header and footer around a single column of about 34rem. Administration and
+submission take a thin staff header instead: the wordmark, the section, "Signed in
+as", a quiet "Sign out", and the simulated-data notice beneath.
+
+- **Fields** are a mono caps label, an optional hint in ink-70, and a 1px ink-24
+  box on paper-raised. A refused field turns its box to full ink and says why
+  underneath, beside a 2px ink rule, never in colour alone.
+- **Submit** is the landing page's ruled box as a `<button>`, so forms add no
+  third action shape.
+- **A secret shown once**, an invite code or an activation link, sits between a
+  full-ink rule and a hairline, in mono, with "Copy" and "Done". It is never shown
+  again.
 
 ## Browser surfaces
 

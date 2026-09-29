@@ -1,6 +1,6 @@
 # 0002, Unbuilt routes render honest placeholders
 
-Status: accepted · 2026-09-22
+Status: accepted · 2026-09-22 · fulfilled in Phase 4, when the last of the routes it covered was built
 
 ## Context
 
