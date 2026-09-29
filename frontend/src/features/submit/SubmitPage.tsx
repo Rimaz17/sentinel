@@ -173,7 +173,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
         <legend id={groupLegendId} className={cx(labelSm, caps, 'mb-2xs text-ink-70')}>
           Symptom group
         </legend>
-        <div className="grid grid-cols-2 gap-2xs">
+        <div className="grid grid-cols-2 gap-2xs phone:grid-cols-1">
           {SYMPTOM_GROUPS.map((option) => (
             <label
               key={option}
@@ -189,11 +189,14 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
                 value={option}
                 checked={group === option}
                 onChange={() => setGroup(option)}
-                className="m-0 size-[1rem] cursor-pointer"
+                className="m-0 size-[1rem] shrink-0 cursor-pointer"
               />
               <span
                 aria-hidden="true"
-                className={cx('inline-block size-[0.6rem]', SYMPTOM_GROUP_STYLES[option].swatch)}
+                className={cx(
+                  'inline-block size-[0.6rem] shrink-0',
+                  SYMPTOM_GROUP_STYLES[option].swatch,
+                )}
               />
               {SYMPTOM_GROUP_STYLES[option].label}
             </label>
