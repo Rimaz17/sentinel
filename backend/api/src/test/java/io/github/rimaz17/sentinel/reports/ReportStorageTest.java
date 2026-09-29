@@ -90,7 +90,8 @@ class ReportStorageTest {
             "latitude",
             "longitude",
             "reported_at",
-            "received_at");
+            "received_at",
+            "stored_at");
   }
 
   private long facilityId(String code) {
