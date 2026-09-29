@@ -188,7 +188,12 @@ export function DashboardPage() {
         <div className="grid min-w-0 content-start gap-md">
           <Panel as="nav" labelledBy="districts-heading" className="hidden xl:grid">
             <PanelHeading id="districts-heading">Districts</PanelHeading>
-            <DistrictList query={districts} selected={selected} allLabel={allLabel} />
+            <DistrictList
+              query={districts}
+              selected={selected}
+              allLabel={allLabel}
+              showTotal={onlyDistrict === null}
+            />
           </Panel>
 
           {outOfScope || unknownDistrict ? null : (
