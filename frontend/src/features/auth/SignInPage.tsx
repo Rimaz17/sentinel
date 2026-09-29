@@ -1,12 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { type FormEvent, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { SubmitButton } from '@/components/ui/Action'
+import { Action, SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { ApiError, apiRequest } from '@/lib/api/client'
 import type { Session } from '@/lib/api/session'
 import { AuthPage, CheckingSession } from './AuthPage'
+import { RouteList } from './RouteRail'
 import { homeFor, mayOpen, ROLE_NAMES, signOut, startSession, useSession } from './session'
 
 /**
@@ -58,6 +59,15 @@ export function SignInPage() {
     <AuthPage
       title="Staff sign-in"
       intro={<p>For healthcare data providers and public health inspectors.</p>}
+      rail={
+        <RouteList
+          label="Where signing in takes you"
+          routes={[
+            { who: 'Healthcare data provider', where: 'Report submission' },
+            { who: 'Public health inspector', where: 'Internal dashboard' },
+          ]}
+        />
+      }
       aside={
         <>
           <p>
@@ -83,6 +93,7 @@ export function SignInPage() {
             label="Email address"
             type="email"
             name="email"
+            width="lg"
             autoComplete="username"
             required
             value={email}
@@ -92,6 +103,7 @@ export function SignInPage() {
             label="Password"
             type="password"
             name="password"
+            width="md"
             autoComplete="current-password"
             required
             value={password}
@@ -112,14 +124,12 @@ function SignedIn({ session }: { session: Session }) {
   const queryClient = useQueryClient()
   const { displayName, role } = session.account
   return (
-    <div className="grid gap-sm border-t border-t-ink pt-sm">
+    <div className="grid gap-sm">
       <p>
         Signed in as <span className="font-medium">{displayName}</span>, {ROLE_NAMES[role]}.
       </p>
       <div className="flex flex-wrap items-center gap-md">
-        <Link to={homeFor(role)} className="text-ink underline">
-          Continue
-        </Link>
+        <Action to={homeFor(role)}>Continue</Action>
         <QuietButton onClick={() => void signOut(queryClient)}>Sign out</QuietButton>
       </div>
     </div>

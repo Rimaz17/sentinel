@@ -8,7 +8,7 @@ import { SYMPTOM_GROUP_STYLES } from '@/features/dashboard/symptomGroups'
 import { StaffHeader } from '@/features/auth/AccountBar'
 import { useAccount } from '@/features/auth/session'
 import { ApiError, apiRequest } from '@/lib/api/client'
-import { caps, cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
+import { caps, cx, labelSm, sectionTitle, shell, split } from '@/styles/recipes'
 
 /** POST /api/ingestion/reports */
 type Receipt = { reportId: string; receivedAt: string }
@@ -41,13 +41,7 @@ export function SubmitPage() {
     <div className="flex min-h-screen flex-col">
       <SkipLink />
       <StaffHeader section="Report submission" account={account} />
-      <main
-        id="main"
-        className={cx(
-          shell,
-          'grid flex-1 gap-xl py-xl lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)]',
-        )}
-      >
+      <main id="main" className={cx(shell, split(), 'flex-1 content-start py-xl')}>
         <div className="grid content-start gap-lg">
           <div className="grid gap-xs">
             <h1 className={sectionTitle}>Submit a report</h1>
@@ -61,7 +55,10 @@ export function SubmitPage() {
           </div>
           <ReportForm onSubmitted={(report) => setSubmitted((earlier) => [report, ...earlier])} />
         </div>
-        <aside aria-labelledby="submitted-heading" className="grid content-start gap-sm">
+        <aside
+          aria-labelledby="submitted-heading"
+          className="grid content-start gap-sm border-t border-t-ink pt-md"
+        >
           <h2 id="submitted-heading" className="text-section font-medium tracking-tight">
             Submitted this session
           </h2>
@@ -71,7 +68,7 @@ export function SubmitPage() {
               can see it arrived.
             </p>
           ) : (
-            <ol className="border-t border-t-ink">
+            <ol className="border-t border-t-ink-14">
               {submitted.map((report) => (
                 <li key={report.id} className="grid gap-3xs border-b border-b-ink-14 py-xs">
                   <p className="text-small font-medium">
@@ -145,7 +142,11 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
   const unplaced = error?.fieldProblems.length === 0 ? error.message : null
 
   return (
-    <form onSubmit={(event) => void submit(event)} className="grid gap-md" noValidate>
+    <form
+      onSubmit={(event) => void submit(event)}
+      className="grid gap-md border-t border-t-ink pt-md"
+      noValidate
+    >
       <fieldset
         className="m-0 grid gap-2xs border-0 p-0"
         aria-describedby={missingGroup ? `${groupLegendId}-error` : undefined}
@@ -189,6 +190,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
         label="When the patient presented"
         type="datetime-local"
         name="reportedAt"
+        width="code"
         required
         value={presented}
         onChange={(event) => setPresented(event.target.value)}
@@ -198,6 +200,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
         label="Age in years"
         type="number"
         name="age"
+        width="sm"
         inputMode="numeric"
         min={0}
         max={130}
@@ -215,11 +218,12 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
           Decimal degrees. Rounded to about 100 m before it is stored, and never shown to the
           public.
         </p>
-        <div className="grid gap-sm md:grid-cols-2">
+        <div className="grid gap-sm md:grid-cols-[repeat(2,minmax(0,var(--container-field-code)))]">
           <Field
             label="Latitude"
             type="number"
             name="latitude"
+            width="code"
             inputMode="decimal"
             step="any"
             value={latitude}
@@ -230,6 +234,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
             label="Longitude"
             type="number"
             name="longitude"
+            width="code"
             inputMode="decimal"
             step="any"
             value={longitude}

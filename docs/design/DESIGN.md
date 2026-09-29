@@ -274,6 +274,14 @@ so on. The page gutter, `--spacing-gutter` (`px-gutter`), is
 `clamp(1rem, 0.55rem + 2vw, 2.5rem)` and never drops below 16px. Shell max width
 `84rem` (`max-w-shell`).
 
+**A rule learned from a shipped bug: never narrow the shell with a second
+max-width.** A max-width utility added beside the `shell` recipe loses to its
+`max-w-shell`, whatever order the classes are written in. The first staff frame
+asked for a `34rem` column that way; `max-w-shell` won, and every sign-in,
+registration and activation field ran the full `84rem` with a void beside it. A
+page that wants a narrower measure puts it on an element inside the shell, and a
+form sizes its fields, not its column.
+
 Easing is `cubic-bezier(0.16, 1, 0.3, 1)`, exponential ease-out, always from an
 already-visible default. Nothing on the page animates in from nothing.
 
@@ -389,26 +397,79 @@ page, spent more quietly still.
 
 ## Staff pages
 
-Sign-in, registration, activation and report submission share one frame: the
-site header and footer around a single column of about 34rem. Administration and
-submission take a thin staff header instead: the wordmark, the section, "Signed in
-as", a quiet "Sign out", and the simulated-data notice beneath.
+Sign-in, registration and activation share one frame, `AuthPage`: the site header
+and footer around the landing page's **shared 50/50 grid**, the same columns and
+the same `2xl` gap from `68rem`, so the staff pages line up with every other
+split on the site. Administration and submission take a thin staff header
+instead: the wordmark, the section, "Signed in as", a quiet "Sign out", and the
+simulated-data notice beneath.
 
-- **Fields** are a mono caps label, an optional hint in ink-70, and a 1px ink-24
+- **The frame.** From `68rem` the left column carries the title, the intro, the
+  rail and then the notes in small ink-70; the right column carries the form
+  under a full ink rule, and that rule starts level with the title, not below
+  it. Below `68rem` everything stacks in reading order: title, rail, form,
+  notes, and the notes take a hairline above them to part them from the form.
+- **Where you are, as a rail.** Registration and activation carry a `StepRail`:
+  the steps in order under a full ink rule, each a ruled row with a two-digit
+  mono number (`01`, `02`, `03`). A step is done, current or next. The current
+  step is inked in, paper on ink, as the dashboard's district rail marks the
+  district in view, and carries `aria-current="step"`; a next step drops to
+  ink-70; a done step shows what it settled in mono at the row's end (the invite
+  code, the account's email), truncated rather than wrapped. The state is also
+  said in words to a screen reader ("current step", "done", "still to come"),
+  never by the ground alone.
+- **Who goes where, as a key.** Sign-in carries a `RouteList` instead: the same
+  full ink rule and ruled rows, but unnumbered, because the roles are
+  alternatives, not a sequence, and with its text on the column edge rather than
+  inset. The rows go nowhere, so they read as a key, like the notes under them,
+  not as a menu to click.
+- **Fields are as wide as what goes in them**, never the column's width. Four
+  tokens, used as `max-w-field-*` through `Field`'s `width` prop:
+
+  | Token | Value | For |
+  |---|---|---|
+  | `--container-field-sm` | `9rem` | An age: a short number |
+  | `--container-field-code` | `16rem` | An invite code, a date and time, a latitude or longitude |
+  | `--container-field` | `20rem` | A name or a password. Below `48rem` it fills the column, level with the email field and the button, rather than stopping just short of them |
+  | `--container-field-lg` | `28rem` | An email address |
+
+  A field with no `width` takes its column.
+- **Hints sit beside a sized input** where there is room, centred against it, and
+  drop under it when the row cannot hold the input and a `12rem` hint. On a phone
+  the age hint still fits beside its box; the password hint goes under. A field
+  with no width keeps its hint under the input.
+- **Fields** are a mono caps label, the optional hint in ink-70, and a 1px ink-24
   box on paper-raised. A refused field turns its box to full ink and says why
   underneath, beside a 2px ink rule, never in colour alone.
+- **Values are set in the value face.** An email address, an invite code (in its
+  hint's example too) and a facility number are Geist Mono; the words around
+  them stay Schibsted.
 - **Submit** is the landing page's ruled box as a `<button>`, so forms add no
-  third action shape.
+  third action shape. When a visitor reaches sign-in already signed in,
+  "Continue" is that same ruled box (`<Action>`) beside a quiet "Sign out",
+  because continuing is the thing they came to do.
 - **A secret shown once**, an invite code or an activation link, sits between a
   full-ink rule and a hairline, in mono, with "Copy" and "Done". It is never shown
   again.
+
+**Report submission adapts the frame.** `/submit` has no rail: submission is a
+repeated single-screen task inside a shift, not a sequence, so a step rail there
+would be a costume. It keeps the rest: the shared grid through `split()`, the form
+in the left column and "Submitted this session" in the right, each under a full
+ink rule, and every field sized to its content (time and coordinates at
+`field-code`, age at `field-sm`). Its two column rules do not sit level: the
+form's rule falls under the title and the facility line, because that line
+belongs above the form, while the session list's rule sits at the column top.
+That offset is accepted, not a pattern to copy.
 
 ## Browser surfaces
 
 Themed from the palette rather than left to the platform, in the base layer:
 selection (ink ground, paper text), caret (ochre), `accent-color`, thin scrollbars
 in ink-24, one 2px ink focus ring at 2px offset for the whole page, and a `0.28em`
-underline offset on links.
+underline offset on links. The date and time picker's own glyph, which the
+platform draws in black, is taken down to 70% (the secondary ink) and back to full
+ink under the pointer or the input's focus.
 
 ## House style
 

@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { resetSession, sessionState } from '@/lib/api/session'
 import { QueryWrapper } from '@/test/queryWrapper'
+import { displayCode } from './inviteCode'
 import { RegisterPage } from './RegisterPage'
 
 const PREVIEW = {
@@ -112,6 +113,26 @@ describe('RegisterPage', () => {
 
     expect(await screen.findByText('Peradeniya')).toBeInTheDocument()
     expect(screen.getByText(/Kandy district/)).toBeInTheDocument()
+  })
+
+  it('shows which registration step the visitor is on, and what the first one settled', async () => {
+    renderPage()
+    const steps = () => within(screen.getByRole('list', { name: 'Registration steps' }))
+
+    expect(steps().getByText('Invite code').closest('li')).toHaveAttribute('aria-current', 'step')
+
+    await enterCode('KDY-7X2-M4QP')
+    await screen.findByLabelText('Your name')
+
+    expect(steps().getByText('Your account').closest('li')).toHaveAttribute('aria-current', 'step')
+    expect(steps().getByText('Invite code').closest('li')).toHaveTextContent('done')
+    expect(steps().getByText('KDY-7X2-M4QP')).toBeInTheDocument()
+  })
+
+  it('shows a code in its issued form however it was typed', () => {
+    expect(displayCode('kdyprnrudt')).toBe('KDY-PRN-RUDT')
+    expect(displayCode(' kdy-prn-rudt ')).toBe('KDY-PRN-RUDT')
+    expect(displayCode('kdy-prn')).toBe('KDY-PRN')
   })
 
   it('registers, signs in, and opens report submission', async () => {

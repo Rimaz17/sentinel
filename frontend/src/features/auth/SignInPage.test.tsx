@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
@@ -106,6 +106,16 @@ describe('SignInPage', () => {
     renderAt('/signin')
     expect(await screen.findByText(/contact their district administrator/i)).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /register/i })).not.toBeInTheDocument()
+  })
+
+  it('says where signing in takes each kind of staff', async () => {
+    renderAt('/signin')
+    const routes = within(await screen.findByRole('list', { name: 'Where signing in takes you' }))
+
+    expect(routes.getByText('Healthcare data provider')).toBeInTheDocument()
+    expect(routes.getByText('Report submission')).toBeInTheDocument()
+    expect(routes.getByText('Public health inspector')).toBeInTheDocument()
+    expect(routes.getByText('Internal dashboard')).toBeInTheDocument()
   })
 
   it('sends a signed-out visitor to sign in, then back where they were going', async () => {

@@ -157,6 +157,13 @@
   --container-measure-narrow: 46ch;
   --container-shell: 84rem;
 
+  /* Form fields are as wide as what goes in them, never the column's width:
+     an age, an invite code or a time, a name or a password, an email address. */
+  --container-field-sm: 9rem;
+  --container-field-code: 16rem;
+  --container-field: 20rem;
+  --container-field-lg: 28rem;
+
   /* ---- Spacing ----------------------------------------------------------
      A 4px-rooted scale. The larger steps are fluid so that vertical rhythm
      compresses on a phone instead of forcing the page into a long scroll of
@@ -309,6 +316,18 @@
     /* Thin scrollbars in the page's own greys rather than the platform's. */
     scrollbar-color: var(--color-ink-24) transparent;
     scrollbar-width: thin;
+  }
+
+  /* The date and time picker's own glyph, drawn by the platform in black. Taken
+     down to the secondary ink, and to full ink under the pointer or the focus. */
+  ::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  ::-webkit-calendar-picker-indicator:hover,
+  input:focus-visible::-webkit-calendar-picker-indicator {
+    opacity: 1;
   }
 
   ::-webkit-scrollbar {
