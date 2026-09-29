@@ -13,6 +13,8 @@ import org.apache.kafka.clients.admin.OffsetSpec;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.boot.test.context.TestComponent;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.core.KafkaAdmin;
 
@@ -28,16 +30,32 @@ public class TestReports {
 
   private final JdbcTemplate jdbc;
   private final KafkaAdmin kafkaAdmin;
+  private final StringRedisTemplate redis;
 
-  TestReports(JdbcTemplate jdbc, KafkaAdmin kafkaAdmin) {
+  TestReports(JdbcTemplate jdbc, KafkaAdmin kafkaAdmin, StringRedisTemplate redis) {
     this.jdbc = jdbc;
     this.kafkaAdmin = kafkaAdmin;
+    this.redis = redis;
   }
 
-  /** Waits for the stream to be stored, then removes every stored report. */
+  /**
+   * Waits for the stream to be stored, then removes every stored report and empties Redis, whose
+   * seven-day windows are rebuilt from the now empty store at the next count.
+   */
   public void clear() {
     awaitStreamStored();
     jdbc.update("delete from reports");
+    emptyRedis();
+  }
+
+  /** Empties Redis, as a restart would. */
+  public void emptyRedis() {
+    redis.execute(
+        (RedisCallback<Void>)
+            connection -> {
+              connection.serverCommands().flushDb();
+              return null;
+            });
   }
 
   /** Waits until the stream processor has handled every message on the reports topic. */

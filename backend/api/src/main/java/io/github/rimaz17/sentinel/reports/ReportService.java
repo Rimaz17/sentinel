@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @Transactional
@@ -20,30 +22,47 @@ public class ReportService {
   static final Duration WEEK = Duration.ofDays(7);
 
   private final ReportRepository reports;
+  private final ReportWindows windows;
   private final Clock clock;
 
-  ReportService(ReportRepository reports, Clock clock) {
+  ReportService(ReportRepository reports, ReportWindows windows, Clock clock) {
     this.reports = reports;
+    this.windows = windows;
     this.clock = clock;
   }
 
   /**
    * Stores a report that has already been through ingestion's anonymiser, noting when it was
-   * stored. A report already stored is left as it was. Returns whether this call stored it.
+   * stored, and once that is committed adds it to its seven-day window. A report already stored is
+   * left as it was, but still added to its window, in case an earlier attempt stored it and then
+   * failed to reach Redis. Returns whether this call stored it.
+   *
+   * <p>A failure to reach Redis is thrown after the commit, so the stream processor retries the
+   * report, which is then stored as it was and added again.
    */
   public boolean record(AnonymisedReport report) {
-    return reports.insertIfAbsent(
-            report.id(),
-            report.facilityId(),
-            report.districtCode(),
-            report.symptomGroup().name(),
-            report.ageBand().label(),
-            report.latitude(),
-            report.longitude(),
-            report.reportedAt(),
-            report.receivedAt(),
-            clock.instant())
-        == 1;
+    boolean stored =
+        reports.insertIfAbsent(
+                report.id(),
+                report.facilityId(),
+                report.districtCode(),
+                report.symptomGroup().name(),
+                report.ageBand().label(),
+                report.latitude(),
+                report.longitude(),
+                report.reportedAt(),
+                report.receivedAt(),
+                clock.instant())
+            == 1;
+    WindowEntry entry = WindowEntry.of(report);
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            windows.add(entry, clock.instant());
+          }
+        });
+    return stored;
   }
 
   /*
