@@ -3,6 +3,7 @@ package io.github.rimaz17.sentinel.publicview;
 import io.github.rimaz17.sentinel.alerts.Alert;
 import io.github.rimaz17.sentinel.alerts.AlertService;
 import io.github.rimaz17.sentinel.alerts.Verdict;
+import io.github.rimaz17.sentinel.districts.District;
 import io.github.rimaz17.sentinel.districts.DistrictService;
 import io.github.rimaz17.sentinel.publicview.PublicResponses.Basis;
 import io.github.rimaz17.sentinel.publicview.PublicResponses.DistrictStatus;
@@ -54,7 +55,11 @@ class PublicViewService {
         .toList();
   }
 
-  /** Every district, alphabetically, with the groups it has an active published alert for. */
+  /**
+   * Every district, alphabetically, with the groups it has an active published alert for. The last
+   * seven days come from the live windows, as the internal district list's do; the usual week is
+   * the eight weeks before them, from storage.
+   */
   List<PublicDistrict> districts() {
     Map<String, List<SymptomGroup>> elevated =
         alerts().stream()
@@ -63,24 +68,27 @@ class PublicViewService {
                 Collectors.groupingBy(
                     PublicAlert::districtCode,
                     Collectors.mapping(PublicAlert::symptomGroup, Collectors.toList())));
+    List<District> all = districts.all();
+    Map<String, Long> lastSevenDays =
+        reports.countsLast7Days(all.stream().map(District::getCode).toList());
     Map<String, long[]> weekly = reports.weeklyTotalsByDistrict(TREND_WEEKS);
-    return districts.all().stream()
+    return all.stream()
         .map(
             district -> {
               String code = district.getCode();
               List<SymptomGroup> groups =
                   elevated.getOrDefault(code, List.of()).stream().distinct().sorted().toList();
-              long[] weeks = weekly.getOrDefault(code, new long[TREND_WEEKS]);
-              double usual = usualWeek(weeks);
+              long current = lastSevenDays.getOrDefault(code, 0L);
+              double usual = usualWeek(weekly.getOrDefault(code, new long[TREND_WEEKS]));
               return new PublicDistrict(
                   code,
                   district.getName(),
                   district.getProvince(),
                   groups.isEmpty() ? DistrictStatus.USUAL : DistrictStatus.ELEVATED,
                   groups,
-                  weeks[0],
+                  current,
                   Math.round(usual * 10) / 10.0,
-                  usual > 0 ? (int) Math.round(weeks[0] * 100 / usual) : null);
+                  usual > 0 ? (int) Math.round(current * 100 / usual) : null);
             })
         .toList();
   }
