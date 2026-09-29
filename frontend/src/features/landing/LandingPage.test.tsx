@@ -196,6 +196,15 @@ describe('SiteHeader', () => {
     expect(sections.map((l) => l.getAttribute('href'))).toEqual(['/#mechanism', '/#privacy'])
   })
 
+  it('offers both staff routes: facility registration and sign-in', () => {
+    renderLanding()
+    const staff = within(screen.getByRole('navigation', { name: 'Staff' })).getAllByRole('link')
+    expect(staff.map((l) => [l.textContent, l.getAttribute('href')])).toEqual([
+      ['Facility registration', '/register'],
+      ['Staff sign-in', '/signin'],
+    ])
+  })
+
   it('points every header section link at a section that exists', () => {
     const { container } = renderLanding()
     const nav = screen.getByRole('navigation', { name: /sections/i })
