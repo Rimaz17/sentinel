@@ -34,7 +34,7 @@ const DistrictMap = lazy(() =>
 /** What the public is told when figures cannot be fetched: something they can act on. */
 export const PUBLIC_ERROR = 'The figures are unavailable at the moment. Try again in a minute.'
 
-const MAP_HEIGHT = 'h-[22rem] md:h-[36rem]'
+const MAP_HEIGHT = 'h-[22rem] md:h-[36rem] xl:h-full'
 
 /**
  * The public dashboard: the pattern, not the individuals. A visitor's question
@@ -126,7 +126,7 @@ export function PublicDashboardPage() {
           ) : null}
         </Panel>
 
-        <Panel labelledBy="alerts-heading">
+        <Panel labelledBy="alerts-heading" className="xl:self-start">
           <PanelHeading id="alerts-heading">Alerts</PanelHeading>
           <PublicAlerts query={alerts} errorWords={PUBLIC_ERROR} />
         </Panel>
@@ -145,8 +145,8 @@ export function PublicDashboardPage() {
             loading={<LoadingRows label="Loading districts" rows={6} />}
           >
             {(list) => (
-              <div className="grid gap-md xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start">
-                <div className="xl:sticky xl:top-[calc(var(--spacing-header)+var(--spacing-sm))]">
+              <div className="grid gap-md xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                <div className="xl:h-full">
                   <Suspense
                     fallback={
                       <div
