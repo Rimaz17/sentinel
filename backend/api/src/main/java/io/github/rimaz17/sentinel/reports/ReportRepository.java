@@ -70,16 +70,15 @@ interface ReportRepository extends JpaRepository<Report, UUID> {
   List<Report> findLocatedIn(
       Instant from, Instant to, Collection<String> districtCodes, Limit limit);
 
-  /**
-   * Reports per district in [from, to), as {@code [districtCode, count]}; empty districts omitted.
-   */
+  /** Every report that presented at or after {@code since}, as the seven-day windows hold it. */
   @Query(
       """
-      select r.districtCode, count(r) from Report r
-      where r.reportedAt >= :from and r.reportedAt < :to
-      group by r.districtCode
+      select new io.github.rimaz17.sentinel.reports.WindowEntry(
+          r.id, r.districtCode, r.symptomGroup, r.reportedAt)
+      from Report r
+      where r.reportedAt >= :since
       """)
-  List<Object[]> countByDistrict(Instant from, Instant to);
+  List<WindowEntry> findWindowEntriesSince(Instant since);
 
   /**
    * Reports per symptom group and week in [start, end), as {@code [symptomGroup, weeksAgo, count]}.
