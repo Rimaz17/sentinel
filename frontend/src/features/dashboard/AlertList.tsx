@@ -91,9 +91,9 @@ function AlertItem({
         </span>
       </p>
 
-      <p className={cx('text-small', tnum)}>
-        <span className="font-medium">{alert.observedCount} reports</span>,{' '}
-        {formatSigma(alert.zScore)} above baseline
+      <p className="text-small">
+        <span className={cx('font-medium', tnum)}>{alert.observedCount} reports</span>,{' '}
+        <span className={tnum}>{formatSigma(alert.zScore)}</span> above baseline
       </p>
 
       <dl className={cx(labelSm, 'grid grid-cols-[auto_1fr] gap-x-sm text-ink-70')}>
