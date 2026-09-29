@@ -1,6 +1,5 @@
 package io.github.rimaz17.sentinel.reports;
 
-import io.github.rimaz17.sentinel.facilities.FacilityService;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,18 +20,30 @@ public class ReportService {
   static final Duration WEEK = Duration.ofDays(7);
 
   private final ReportRepository reports;
-  private final FacilityService facilities;
   private final Clock clock;
 
-  ReportService(ReportRepository reports, FacilityService facilities, Clock clock) {
+  ReportService(ReportRepository reports, Clock clock) {
     this.reports = reports;
-    this.facilities = facilities;
     this.clock = clock;
   }
 
-  /** Stores a report that has already been through ingestion's anonymiser. */
-  public void record(AnonymisedReport report) {
-    reports.save(new Report(report, facilities.reference(report.facilityId())));
+  /**
+   * Stores a report that has already been through ingestion's anonymiser, noting when it was
+   * stored. A report already stored is left as it was. Returns whether this call stored it.
+   */
+  public boolean record(AnonymisedReport report) {
+    return reports.insertIfAbsent(
+            report.id(),
+            report.facilityId(),
+            report.districtCode(),
+            report.symptomGroup().name(),
+            report.ageBand().label(),
+            report.latitude(),
+            report.longitude(),
+            report.reportedAt(),
+            report.receivedAt(),
+            clock.instant())
+        == 1;
   }
 
   /*

@@ -29,9 +29,4 @@ public class FacilityService {
   public Optional<Facility> findByCode(String code) {
     return facilities.findByCode(code);
   }
-
-  /** A reference for use as a foreign key, without loading the row. */
-  public Facility reference(long id) {
-    return facilities.getReferenceById(id);
-  }
 }

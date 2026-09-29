@@ -9,22 +9,20 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PostLoad;
-import jakarta.persistence.PostPersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
-import org.springframework.data.domain.Persistable;
+import org.hibernate.annotations.Immutable;
 
 /**
- * A stored, anonymised report. Its id is assigned at ingestion, so it is persisted as new rather
- * than merged; reports are never updated.
+ * A stored, anonymised report, as the queries read it. Reports are written only by {@link
+ * ReportService#record}, with an id assigned at ingestion, and never updated.
  */
 @Entity
+@Immutable
 @Table(name = "reports")
-public class Report implements Persistable<UUID> {
+public class Report {
 
   @Id private UUID id;
 
@@ -52,36 +50,10 @@ public class Report implements Persistable<UUID> {
   @Column(name = "received_at", nullable = false)
   private Instant receivedAt;
 
-  @Transient private boolean isNew = true;
-
   protected Report() {}
 
-  Report(AnonymisedReport report, Facility facility) {
-    this.id = report.id();
-    this.facility = facility;
-    this.districtCode = report.districtCode();
-    this.symptomGroup = report.symptomGroup();
-    this.ageBand = report.ageBand();
-    this.latitude = report.latitude();
-    this.longitude = report.longitude();
-    this.reportedAt = report.reportedAt();
-    this.receivedAt = report.receivedAt();
-  }
-
-  @Override
   public UUID getId() {
     return id;
-  }
-
-  @Override
-  public boolean isNew() {
-    return isNew;
-  }
-
-  @PostLoad
-  @PostPersist
-  void markStored() {
-    isNew = false;
   }
 
   public Facility getFacility() {
