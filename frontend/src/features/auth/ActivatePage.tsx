@@ -6,6 +6,7 @@ import { Field, FormError } from '@/components/ui/Field'
 import { ApiError, apiRequest } from '@/lib/api/client'
 import type { Role, Session } from '@/lib/api/session'
 import { AuthPage } from './AuthPage'
+import { StepRail } from './RouteRail'
 import { homeFor, ROLE_NAMES, startSession } from './session'
 
 /** POST /api/auth/activation/check */
@@ -50,6 +51,16 @@ export function ActivatePage() {
       title={owner.data ? `Welcome, ${owner.data.displayName}.` : 'Set your password'}
       intro={
         <p>{owner.data ? intro : 'This page opens from a link an administrator gives you.'}</p>
+      }
+      rail={
+        <StepRail
+          label="Activation steps"
+          steps={[
+            { label: 'Your link', state: owner.data ? 'done' : 'current' },
+            { label: 'Your password', state: owner.data ? 'current' : 'next' },
+            { label: 'Sign in', state: 'next' },
+          ]}
+        />
       }
     >
       {token === null ? (
@@ -121,6 +132,7 @@ function PasswordForm({
         label="Password"
         type="password"
         name="password"
+        width="md"
         autoComplete="new-password"
         hint="At least 12 characters. A few words together are easier to remember than symbols."
         required
@@ -132,6 +144,7 @@ function PasswordForm({
         label="The same password again"
         type="password"
         name="again"
+        width="md"
         autoComplete="new-password"
         required
         value={again}
