@@ -3,9 +3,12 @@
 <!-- Written from the built landing page, not ahead of it. Every value here is
      one that ships in the Tailwind theme in `sentinel/frontend/src/index.css`. -->
 
-Sentinel's surfaces are **ink on paper, ruled**. Structure is carried by hairlines
-and weight, never by cards, shadows or rounded containers. A single ochre carries
-the page's attention, and is spent in exactly two places.
+Sentinel's surfaces are **ink on paper**. The landing page is ruled: its structure
+is carried by hairlines and weight, never by cards, shadows or rounded containers.
+The working pages (both dashboards and report submission) are set as panels, soft
+rounded sheets on a low shadow, and the staff sign-in pages box their two halves
+in a square ink rule; see Components. A single ochre carries the page's attention,
+and is spent in exactly two places.
 
 ## Implementation
 
@@ -32,10 +35,13 @@ widths and under forced hover and focus, found no difference that draws.
 ## The world in one paragraph
 
 A survey sheet. A set headline, a column of measured annotations in letter-spaced
-monospace, and content separated by rules rather than boxed into panels. What keeps
-it from being editorial pastiche is that the annotations are real, every mono
-string on the page is a count, a window, a threshold or a district figure. If a
-mono string is not a measured value, it is in the wrong face.
+monospace, and, on the landing page, content separated by rules rather than boxed
+into panels. What keeps it from being editorial pastiche is that the annotations
+are real: every mono string in running text is a count, a window, a threshold or a
+district figure. The one other use of mono is the small caps label that names a
+field, a column or a disclosure ("Email address", "District", "The numbers as a
+table"), the form's own register; a mono string that is neither a measured value
+nor such a label is in the wrong face.
 
 Every section that splits in two uses **one shared grid**, the same 50/50 ratio
 and the same gap, so the column edges line up from the header to the footer.
@@ -344,9 +350,12 @@ the landing page, set as sheet panels.
   8-week average as a dashed rule, scaled to its own range so a change of a few
   percent still shows. Under it: "This week is 124% of the 8-week average".
 - **The district list** sits in its own panel: a search ("Find a district") once
-  there are more than six districts, a full-ink rule, then ruled rows scrolling
-  within `26rem`. Each row carries the week's count in mono and a bar scaled to
-  the busiest district's week; the total row has no bar. The district in view
+  there are more than six districts, a full-ink rule, then every district as a
+  ruled row, the whole list at full length: an inner scroll that stopped on a row
+  boundary read as a list that had ended. Each row carries the week's count in
+  mono and a bar scaled to the busiest district's week; the total row has no bar,
+  and an inspector who covers one district gets no total row, since it would
+  only repeat their district. The district in view
   takes an ink-08 ground and medium weight and carries `aria-current="page"`.
 - **The alert queue** is a ruled list under a full-ink top rule inside its panel.
 - **Alert state is words first.** "Open · New", "Ended · New" or "Closed", with a
@@ -395,10 +404,11 @@ says in words whether the public sees the alert and why.
 is happening where they live, and then to leave. Set as sheet panels, like the
 internal dashboard.
 
-- **Three rows of panels.** From `68rem`: the summary beside the alerts, the two
-  the same height; then "Every district" across the full width, the map beside
-  the table, the map held in view (`sticky`) while the table scrolls past it;
-  then the weekly reports across the full width, the four groups in one row.
+- **Three rows of panels.** From `68rem`: the summary beside the alerts, the alerts
+  panel sized to its own content rather than stretched into an empty sheet; then
+  "Every district" across the full width, the map beside the table and as tall as
+  it, so neither half leaves a void; then the weekly reports across the full
+  width, the four groups in one row.
   Below `68rem` one column in that order.
 - **The visitor's district first.** The summary panel carries the title, lede
   and simulated-data notice, then under a hairline the national summary, a
@@ -456,15 +466,19 @@ beneath.
 
   | Token | Value | For |
   |---|---|---|
-  | `--container-field-sm` | `9rem` | An age: a short number |
-  | `--container-field-code` | `16rem` | An invite code, a date and time, a latitude or longitude |
-  | `--container-field` | `20rem` | A name or a password. Below `48rem` it fills the column, level with the email field and the button, rather than stopping just short of them |
-  | `--container-field-lg` | `28rem` | An email address |
+  | `--container-field-sm` | `9rem` | A short number. Unused since report submission set its fields in a grid, where each fills its cell |
+  | `--container-field-code` | `16rem` | An invite code |
+  | `--container-field` | `20rem` | A password being set on activation. Below `48rem` it fills the column, level with the button |
+  | `--container-field-lg` | `28rem` | An email address, and the fields sharing a box with one |
 
-  A field with no `width` takes its column.
+  A field with no `width` takes its column. Where fields stand one above another
+  in a sign-in or registration box, they share one width (`field-lg`), so their
+  right edges line up; the widths differ only where fields do not stack together.
+  A field packs to the top of its grid cell, so two fields side by side keep their
+  inputs on one edge even when only one has a hint.
 - **Hints sit beside a sized input** where there is room, centred against it, and
-  drop under it when the row cannot hold the input and a `12rem` hint. On a phone
-  the age hint still fits beside its box; the password hint goes under. A field
+  drop under it when the row cannot hold the input and a `12rem` hint. The invite
+  code's hint sits beside its box on a wide screen and under it on a phone. A field
   with no width keeps its hint under the input.
 - **Fields** are a mono caps label, the optional hint in ink-70, and a 1px ink-24
   box on paper-raised. A refused field turns its box to full ink and says why
