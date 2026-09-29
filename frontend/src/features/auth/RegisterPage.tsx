@@ -7,6 +7,7 @@ import { ApiError, apiRequest } from '@/lib/api/client'
 import type { Session } from '@/lib/api/session'
 import { caps, cx, labelSm } from '@/styles/recipes'
 import { AuthPage } from './AuthPage'
+import { displayCode } from './inviteCode'
 import { StepRail } from './RouteRail'
 import { startSession } from './session'
 
@@ -46,7 +47,7 @@ export function RegisterPage() {
           label="Registration steps"
           steps={[
             preview
-              ? { label: 'Invite code', state: 'done', value: preview.code.toUpperCase() }
+              ? { label: 'Invite code', state: 'done', value: displayCode(preview.code) }
               : { label: 'Invite code', state: 'current' },
             { label: 'Your account', state: preview ? 'current' : 'next' },
             { label: 'Submit reports', state: 'next' },
