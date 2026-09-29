@@ -1,6 +1,7 @@
 package io.github.rimaz17.sentinel.ingestion;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -9,7 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
+import io.github.rimaz17.sentinel.TestReports;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
@@ -43,10 +46,11 @@ class IngestionControllerTest {
   @Autowired MockMvc mvc;
   @Autowired JdbcTemplate jdbc;
   @Autowired TestAccounts accounts;
+  @Autowired TestReports testReports;
 
   @BeforeEach
   void clear() {
-    jdbc.update("delete from reports");
+    testReports.clear();
     accounts.clear();
   }
 
@@ -76,7 +80,7 @@ class IngestionControllerTest {
         jdbc.queryForObject(
             "select row_to_json(r)::text from reports r where id = ?",
             String.class,
-            reportId(result));
+            awaitStored(result));
     assertThat(row)
         .doesNotContain(NAME, NIC, DATE_OF_BIRTH, PHONE, ADDRESS, "7.2912345", "80.6337499")
         .doesNotContain("\"age\"");
@@ -96,7 +100,7 @@ class IngestionControllerTest {
         jdbc.queryForMap(
             "select f.code, r.district_code from reports r join facilities f on f.id = r.facility_id"
                 + " where r.id = ?",
-            reportId(result));
+            awaitStored(result));
     assertThat(row.get("code")).isEqualTo(KANDY_FACILITY);
     assertThat(row.get("district_code")).isEqualTo("KDY");
   }
@@ -159,7 +163,7 @@ class IngestionControllerTest {
         jdbc.queryForMap(
             "select f.code, r.district_code from reports r join facilities f on f.id = r.facility_id"
                 + " where r.id = ?",
-            reportId(result));
+            awaitStored(result));
     assertThat(row.get("code")).isEqualTo(KANDY_FACILITY);
     assertThat(row.get("district_code")).isEqualTo("KDY");
   }
@@ -344,11 +348,25 @@ class IngestionControllerTest {
     return UUID.fromString(body.replaceAll(".*\"reportId\":\"([^\"]+)\".*", "$1"));
   }
 
-  private Map<String, Object> storedRow(MvcResult result) throws Exception {
-    return jdbc.queryForMap("select * from reports where id = ?", reportId(result));
+  /** The id of an accepted report, once the stream processor has stored it. */
+  private UUID awaitStored(MvcResult result) throws Exception {
+    UUID id = reportId(result);
+    await()
+        .atMost(Duration.ofSeconds(30))
+        .until(
+            () ->
+                jdbc.queryForObject("select count(*) from reports where id = ?", Long.class, id)
+                    == 1);
+    return id;
   }
 
+  private Map<String, Object> storedRow(MvcResult result) throws Exception {
+    return jdbc.queryForMap("select * from reports where id = ?", awaitStored(result));
+  }
+
+  /** Nothing is stored even once everything on the stream has been. */
   private void assertNothingStored() {
+    testReports.awaitStreamStored();
     assertThat(jdbc.queryForObject("select count(*) from reports", Long.class)).isZero();
   }
 }

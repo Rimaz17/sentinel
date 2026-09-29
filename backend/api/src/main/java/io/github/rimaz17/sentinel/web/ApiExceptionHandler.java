@@ -1,6 +1,7 @@
 package io.github.rimaz17.sentinel.web;
 
 import io.github.rimaz17.sentinel.ingestion.InvalidReportException;
+import io.github.rimaz17.sentinel.ingestion.ReportsUnavailableException;
 import io.github.rimaz17.sentinel.ingestion.UnknownFacilityException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,6 +68,11 @@ class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(UnknownFacilityException.class)
   ResponseEntity<Object> unknownFacility(UnknownFacilityException ex) {
     return problem(HttpStatus.FORBIDDEN, ex.getMessage(), List.of());
+  }
+
+  @ExceptionHandler(ReportsUnavailableException.class)
+  ResponseEntity<Object> reportsUnavailable(ReportsUnavailableException ex) {
+    return problem(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), List.of());
   }
 
   @ExceptionHandler(InvalidFieldException.class)
