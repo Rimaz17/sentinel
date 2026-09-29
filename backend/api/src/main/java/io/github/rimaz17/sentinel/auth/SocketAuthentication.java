@@ -30,9 +30,10 @@ public class SocketAuthentication implements ChannelInterceptor {
   /** The one destination a connection may subscribe to: its own queue of alert changes. */
   public static final String ALERTS = "/user/queue/alerts";
 
-  static final String SIGN_IN = "Sign in as an inspector to receive alerts.";
-  static final String ALERTS_ONLY = "The only subscription on offer is " + ALERTS + ".";
-  static final String RECEIVE_ONLY = "Nothing may be sent on this connection; it only receives.";
+  public static final String SIGN_IN = "Sign in as an inspector to receive alerts.";
+  public static final String ALERTS_ONLY = "The only subscription on offer is " + ALERTS + ".";
+  public static final String RECEIVE_ONLY =
+      "Nothing may be sent on this connection; it only receives.";
 
   private static final String BEARER = "Bearer ";
 

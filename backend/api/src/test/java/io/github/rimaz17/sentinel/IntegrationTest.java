@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(
+    // A real server, so the alert socket can be connected to; MockMvc still serves the rest.
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
       "sentinel.auth.jwt-secret=integration-tests-only-signing-key-0123456789",
       "sentinel.feed.key=" + TestAccounts.FEED_KEY,
