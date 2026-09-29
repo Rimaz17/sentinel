@@ -11,23 +11,29 @@ import { DistrictList, DistrictPicker } from './DistrictList'
 function Harness({
   districts,
   selected,
+  showTotal,
 }: {
   districts: Promise<DistrictSummary[]>
   selected: string | null
+  showTotal: boolean
 }) {
   const query = useQuery({ queryKey: ['districts'], queryFn: () => districts })
   return (
     <nav aria-label="Districts">
-      <DistrictList query={query} selected={selected} />
+      <DistrictList query={query} selected={selected} showTotal={showTotal} />
     </nav>
   )
 }
 
-function renderList(selected: string | null, districts = Promise.resolve(DISTRICTS)) {
+function renderList(
+  selected: string | null,
+  districts = Promise.resolve(DISTRICTS),
+  showTotal = true,
+) {
   return render(
     <MemoryRouter>
       <QueryWrapper>
-        <Harness districts={districts} selected={selected} />
+        <Harness districts={districts} selected={selected} showTotal={showTotal} />
       </QueryWrapper>
     </MemoryRouter>,
   )
@@ -81,6 +87,13 @@ describe('DistrictList', () => {
     expect(screen.getByRole('link', { name: /all of sri lanka/i })).not.toHaveAttribute(
       'aria-current',
     )
+  })
+
+  it('leaves out the total row for an inspector who covers one district', async () => {
+    renderList('KDY', Promise.resolve([district()]), false)
+
+    const links = await screen.findAllByRole('link')
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/app/districts/KDY'])
   })
 
   it('offers no search for a short list', async () => {
