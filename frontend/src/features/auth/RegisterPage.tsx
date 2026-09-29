@@ -107,7 +107,12 @@ function CodeStep({ onFound }: { onFound: (code: string, facility: InvitePreview
     <form onSubmit={(event) => void submit(event)} className="grid gap-md" noValidate>
       <Field
         label="Facility invite code"
-        hint="Three letters for the district, then seven more, as in KDY-7X2-M4QP. Capitals and dashes do not matter."
+        hint={
+          <>
+            Three letters for the district, then seven more, as in{' '}
+            <span className="font-mono">KDY-7X2-M4QP</span>. Capitals and dashes do not matter.
+          </>
+        }
         name="inviteCode"
         width="code"
         autoComplete="off"
