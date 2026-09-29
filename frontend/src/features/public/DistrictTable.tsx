@@ -54,7 +54,7 @@ export function DistrictTable({
                   to={publicDistrictPath(district.code)}
                   aria-current={district.code === selected ? 'page' : undefined}
                   className={cx(
-                    'inline-block py-xs underline',
+                    'inline-block py-2xs underline',
                     district.code === selected ? 'font-medium text-paper' : 'text-ink',
                   )}
                 >
