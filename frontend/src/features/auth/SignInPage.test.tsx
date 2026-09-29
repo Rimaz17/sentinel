@@ -4,8 +4,9 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { resetSession, type Session } from '@/lib/api/session'
 import { QueryWrapper } from '@/test/queryWrapper'
+import { AccountMenu } from './AccountBar'
 import { RequireRole } from './RequireRole'
-import { aRole, mayOpen } from './session'
+import { afterSignIn, aRole, mayOpen, useAccount } from './session'
 import { SignInPage } from './SignInPage'
 
 function session(role: Session['account']['role']): Session {
@@ -23,6 +24,21 @@ function session(role: Session['account']['role']): Session {
   }
 }
 
+/** An inspector covering every district, a different account from the Kandy one. */
+function nationalSession(): Session {
+  const kandy = session('PHI')
+  return {
+    ...kandy,
+    account: {
+      ...kandy.account,
+      id: 2,
+      email: 'national@example.org',
+      displayName: 'Kamala Perera',
+      districts: ['*'],
+    },
+  }
+}
+
 let fetchMock: Mock<(url: string, init?: RequestInit) => Promise<Response>>
 
 function signedOut(url: string, init?: RequestInit): Promise<Response> {
@@ -30,10 +46,13 @@ function signedOut(url: string, init?: RequestInit): Promise<Response> {
     return Promise.resolve(Response.json({ detail: 'Not signed in.' }, { status: 401 }))
   }
   if (url === '/api/auth/signin') {
-    const { password } = JSON.parse(init?.body as string) as { password: string }
+    const { email, password } = JSON.parse(init?.body as string) as {
+      email: string
+      password: string
+    }
     return Promise.resolve(
       password === 'the right password'
-        ? Response.json(session('PHI'))
+        ? Response.json(email === 'national@example.org' ? nationalSession() : session('PHI'))
         : Response.json({ detail: 'The email address or password is not right.' }, { status: 401 }),
     )
   }
@@ -61,7 +80,7 @@ function renderAt(path: string) {
             path="/app/districts/:code"
             element={
               <RequireRole allow="PHI">
-                <p>Kandy for inspectors</p>
+                <KandyPage />
               </RequireRole>
             }
           />
@@ -79,8 +98,18 @@ function renderAt(path: string) {
   )
 }
 
-async function signIn(password: string) {
-  await userEvent.type(await screen.findByLabelText('Email address'), 'phi@example.org')
+function KandyPage() {
+  const account = useAccount()
+  return (
+    <>
+      <p>Kandy for inspectors</p>
+      <AccountMenu account={account} />
+    </>
+  )
+}
+
+async function signIn(password: string, email = 'phi@example.org') {
+  await userEvent.type(await screen.findByLabelText('Email address'), email)
   await userEvent.type(screen.getByLabelText('Password'), password)
   await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
 }
@@ -122,6 +151,33 @@ describe('SignInPage', () => {
     renderAt('/app/districts/KDY')
 
     expect(await screen.findByRole('heading', { name: 'Staff sign-in' })).toBeInTheDocument()
+    await signIn('the right password')
+    expect(await screen.findByText('Kandy for inspectors')).toBeInTheDocument()
+  })
+
+  it('starts the next account at home, not in the district the last one signed out of', async () => {
+    fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+      url === '/api/auth/refresh'
+        ? Promise.resolve(Response.json(session('PHI')))
+        : signedOut(url, init),
+    )
+    renderAt('/app/districts/KDY')
+    await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
+
+    await signIn('the right password', 'national@example.org')
+    expect(await screen.findByText('Inspector dashboard')).toBeInTheDocument()
+    expect(screen.queryByText('Kandy for inspectors')).not.toBeInTheDocument()
+  })
+
+  it('brings the same account back to the page it signed out of', async () => {
+    fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+      url === '/api/auth/refresh'
+        ? Promise.resolve(Response.json(session('PHI')))
+        : signedOut(url, init),
+    )
+    renderAt('/app/districts/KDY')
+    await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
+
     await signIn('the right password')
     expect(await screen.findByText('Kandy for inspectors')).toBeInTheDocument()
   })
@@ -171,6 +227,32 @@ describe('SignInPage', () => {
     await signIn('the right password')
 
     expect(await screen.findByText('Inspector dashboard')).toBeInTheDocument()
+  })
+})
+
+describe('afterSignIn', () => {
+  const kandy = session('PHI').account
+  const national = nationalSession().account
+
+  it('returns to a page left when nobody was signed in', () => {
+    expect(afterSignIn(national, { from: '/app/districts/KDY', leftBy: null })).toBe(
+      '/app/districts/KDY',
+    )
+  })
+
+  it('returns the account that left a page to it', () => {
+    expect(afterSignIn(kandy, { from: '/app/districts/KDY', leftBy: kandy.id })).toBe(
+      '/app/districts/KDY',
+    )
+  })
+
+  it('sends a different account home, even one whose role may open the page', () => {
+    expect(afterSignIn(national, { from: '/app/districts/KDY', leftBy: kandy.id })).toBe('/app')
+  })
+
+  it('sends an account home with no page left, or one its role may not open', () => {
+    expect(afterSignIn(kandy, null)).toBe('/app')
+    expect(afterSignIn(kandy, { from: '/app/admin', leftBy: null })).toBe('/app')
   })
 })
 
