@@ -1,0 +1,5 @@
+# Development tools, as the other Python projects pin them.
+-r requirements.txt
+pytest==9.1.1
+ruff==0.16.9
+black==26.5.1
