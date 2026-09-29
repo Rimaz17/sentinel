@@ -206,6 +206,7 @@ pushed over WebSocket as the detector commits it.
 | Event stream | Kafka |
 | Database | PostgreSQL + PostGIS, Flyway |
 | Live counters | Redis |
+| Realtime | WebSocket (STOMP) for alert push |
 | Frontend | React + TypeScript + Vite, Tailwind CSS, TanStack Query |
 | Maps | Leaflet with OpenStreetMap tiles |
 | Local stack | Docker Compose |
@@ -251,8 +252,10 @@ them elsewhere.
 To try it end to end: sign in as the administrator from `.env`, create an
 inspector at `/app/admin` and open the link it gives you, then issue a facility a
 code under **Facilities and invite codes** and register with it at `/register`.
-Every internal panel polls every 30 seconds while the tab is visible, and
-**Refresh now** asks at once; the public dashboard refreshes every minute.
+Alerts reach the internal dashboard over a WebSocket the moment they are raised
+or change, and are polled only while it is not open; the header says which.
+Every other internal panel polls every 30 seconds while the tab is visible, and
+**Refresh now** asks at once. The public dashboard refreshes every minute.
 
 ### Frontend scripts
 
@@ -273,11 +276,12 @@ Every internal panel polls every 30 seconds while the tab is visible, and
 Requires **Docker**, **Java 17** and, for the simulator, **Python 3.12 or later**.
 Maven is not needed; the Maven wrapper fetches it.
 
-**1. Start the database.** From the repository root, copy the example settings,
-then start PostgreSQL. In `.env`, change the database password and fill in the
-four Phase 4 settings with real values: `SENTINEL_JWT_SECRET` and
-`SENTINEL_FEED_KEY` each from `openssl rand -base64 48`, and an address and a
-password of 12 characters or more for the administrator.
+**1. Start the database, Kafka and Redis.** From the repository root, copy the
+example settings, then start the three. In `.env`, change the database password
+and fill in the four Phase 4 settings with real values: `SENTINEL_JWT_SECRET`
+and `SENTINEL_FEED_KEY` each from `openssl rand -base64 48`, and an address and
+a password of 12 characters or more for the administrator. An `.env` from before
+Phase 5 needs the four Kafka and Redis settings added from `infra/.env.example`.
 
 ```bash
 cp infra/.env.example .env
@@ -287,14 +291,18 @@ cp infra/.env.example .env
 docker compose --env-file .env -f infra/docker-compose.yml up -d
 ```
 
-It listens on `localhost:5433`, so it does not collide with a PostgreSQL already
-installed on the default port.
+PostgreSQL listens on `localhost:5433`, Kafka on `localhost:9094` and Redis on
+`localhost:6380`, each one above its usual port, so none collides with one
+already installed. Kafka keeps its messages on a volume; Redis keeps nothing on
+disk, because the API rebuilds its windows from PostgreSQL
+([ADR 0015](docs/adr/0015-seven-day-windows-in-redis.md)).
 
 **2. Start the API.** It reads the repository's `.env`, applies the database
 migrations, seeds the facility registry, and on first start creates the
 administrator named in `SENTINEL_ADMIN_EMAIL`; it never changes that account
 afterwards. It refuses to start without a `SENTINEL_JWT_SECRET` of at least 32
-bytes. On Windows, use `mvnw.cmd`.
+bytes, or without Kafka, whose topics it creates as it starts. On Windows, use
+`mvnw.cmd`.
 
 ```bash
 cd backend/api
