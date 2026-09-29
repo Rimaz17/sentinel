@@ -103,7 +103,7 @@ export function SignInPage() {
             label="Password"
             type="password"
             name="password"
-            width="md"
+            width="lg"
             autoComplete="current-password"
             required
             value={password}

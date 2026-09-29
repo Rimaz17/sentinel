@@ -181,7 +181,7 @@ function AccountStep({
         <Field
           label="Your name"
           name="displayName"
-          width="md"
+          width="lg"
           autoComplete="name"
           required
           value={displayName}
@@ -203,7 +203,7 @@ function AccountStep({
           label="Password"
           type="password"
           name="password"
-          width="md"
+          width="lg"
           autoComplete="new-password"
           hint="At least 12 characters. A few words together are easier to remember than symbols."
           required
