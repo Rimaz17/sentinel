@@ -48,12 +48,7 @@ export function AreaSummary({
             <LoadingRows label="Loading the area's figures" rows={1} />
           ) : (
             <p className="grid">
-              <span
-                className={cx(
-                  'text-[clamp(2.5rem,2rem+2vw,3.5rem)] leading-display font-medium tracking-display',
-                  tnum,
-                )}
-              >
+              <span className="text-[clamp(2.5rem,2rem+2vw,3.5rem)] leading-display font-medium tracking-display">
                 {formatCount(reports)}
               </span>{' '}
               <span className="text-small text-ink-70">reports in the last 7 days</span>
@@ -92,7 +87,7 @@ export function AreaSummary({
                           <span className={cx('font-mono text-ink', tnum)}>
                             {Math.round((series.current / series.average) * 100)}%
                           </span>{' '}
-                          of the 8-week average
+                          of the <span className="whitespace-nowrap">8-week average</span>
                         </>
                       ) : (
                         'No 8-week average yet'
