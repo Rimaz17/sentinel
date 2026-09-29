@@ -304,9 +304,23 @@ screens. The theme restores a plain `:hover` so the page behaves as it always ha
   for everything else. A filled button would be a third voice.
 - **The mono label** (the `labelSm` recipe, plus `caps` for terms) is the only
   place mono appears, and it always carries a measured value.
-- **Rules, not cards.** Every rule is a 1px border in an ink alpha: hairline
-  `border-ink-14`, faint `border-ink-08`, firm `border-ink-24`, full `border-ink`.
-  There are no elevation tokens because nothing is elevated.
+- **Rules on the landing page, panels on the working pages.** Every rule is a 1px
+  border in an ink alpha: hairline `border-ink-14`, faint `border-ink-08`, firm
+  `border-ink-24`, full `border-ink`. The landing page stays ruled, with nothing
+  elevated. The working pages (both dashboards and report submission) are set as
+  panels, at the user's direction from a reference layout, so a page reads as a
+  set of sheets rather than one long column with wide gaps. One component,
+  `Panel`, in two tones:
+
+  | Tone | Look | Where |
+  |---|---|---|
+  | `sheet` | `--color-card` (`#f7f9f9`) ground, 1px `ink-08` border, `--radius-panel` (`0.875rem`), `--shadow-panel` (a 1px contact shadow and a low, wide shadow offset downward) | The dashboards and report submission |
+  | `ruled` | The same ground in a square 1px full-ink box, flat | The staff sign-in pages, as the user drew them |
+
+  Ink on the card ground is 15.34:1 and ink-70 5.82:1. Controls inside a panel
+  (the district search, the map frame, the symptom tiles) take
+  `--radius-control` (`0.5rem`). A panel is named by its heading (`PanelHeading`),
+  so each is a labelled region.
 - **The privacy register is a description list.** Three bands, Removed entirely,
   Generalised and Kept, each a `<dt>` naming the fate and a `<dd>` whose fields run
   along the band rather than stacking into a narrow column. From `68rem` the fate
@@ -315,17 +329,26 @@ screens. The theme restores a plain `:hover` so the page behaves as it always ha
 ## The internal dashboard
 
 `/app` and `/app/districts/:code`, in **Operate** mode: the inspector is working,
-so scanability and consistency outrank expression. It is the same world as the
-landing page, ink on paper and ruled, spent differently.
+so scanability and consistency outrank expression. The same palette and type as
+the landing page, set as sheet panels.
 
-- **Layout.** From `68rem`: a `15rem` district rail, then the main column with
-  the alert queue (`21rem`) beside the map, and the weekly chart under both.
-  Reading order is districts, area heading, alerts, map, chart; alerts come
-  first because acting on them is the inspector's job. Below `68rem` the rail
-  becomes a labelled `<select>`, and below `60rem` everything stacks.
-- **Rows, not cards.** The district list and the alert queue are ruled lists
-  under a full-ink top rule. The district in view is inked in (paper on ink),
-  the page's selection colours, and carries `aria-current="page"`.
+- **Layout.** From `68rem`, two equal columns of panels: on the left the area
+  summary, the alerts and the weekly reports; on the right the districts and the
+  map. Alerts come straight after the summary because acting on them is the
+  inspector's job. Below `68rem` one column in that order, the district list
+  hidden and a labelled `<select>` in the summary panel instead.
+- **The area summary** leads: the area's name as the `<h1>`, the province and
+  code in mono caps, the last seven days as one large figure (proportional
+  digits, so its comma sits tight), the open alerts in words beside a red or
+  hollow square, and a sparkline of the area's nine weekly totals with the
+  8-week average as a dashed rule, scaled to its own range so a change of a few
+  percent still shows. Under it: "This week is 124% of the 8-week average".
+- **The district list** sits in its own panel: a search ("Find a district") once
+  there are more than six districts, a full-ink rule, then ruled rows scrolling
+  within `26rem`. Each row carries the week's count in mono and a bar scaled to
+  the busiest district's week; the total row has no bar. The district in view
+  takes an ink-08 ground and medium weight and carries `aria-current="page"`.
+- **The alert queue** is a ruled list under a full-ink top rule inside its panel.
 - **Alert state is words first.** "Open · New", "Ended · New" or "Closed", with a
   filled alert-red square while open and a hollow ink-40 square after. Wording is
   the internal register: "A-1003, 55 reports, 4.3σ above baseline".
@@ -369,15 +392,19 @@ says in words whether the public sees the alert and why.
 ## The public dashboard
 
 `/dashboard`, in **Read** mode: a resident wants to know whether anything unusual
-is happening where they live, and then to leave. The same world as the landing
-page, spent more quietly still.
+is happening where they live, and then to leave. Set as sheet panels, like the
+internal dashboard.
 
-- **The visitor's district first.** The page opens on the shared two-column
-  grid: the title, lede and simulated-data notice on the left; on the right the
-  national summary, a "figures updated" line, and a "Your district" picker. Once
-  a district is chosen, its answer sits directly under the picker, one sentence,
-  and takes focus, so a phone user sees it without scrolling and a screen reader
-  hears it.
+- **Three rows of panels.** From `68rem`: the summary beside the alerts, the two
+  the same height; then "Every district" across the full width, the map beside
+  the table, the map held in view (`sticky`) while the table scrolls past it;
+  then the weekly reports across the full width, the four groups in one row.
+  Below `68rem` one column in that order.
+- **The visitor's district first.** The summary panel carries the title, lede
+  and simulated-data notice, then under a hairline the national summary, a
+  "figures updated" line and the "Your district" picker. Once a district is
+  chosen, its answer sits directly under them, one sentence, and takes focus, so
+  a phone user sees it without scrolling and a screen reader hears it.
 - **The alert vocabulary, publicly.** An active alert is the red square with the
   word "Active" and the plain headline, which links to its district. Ended alerts
   wait in a `<details>` for a season. Nothing public carries a count, a sigma or
@@ -398,17 +425,18 @@ page, spent more quietly still.
 ## Staff pages
 
 Sign-in, registration and activation share one frame, `AuthPage`: the site header
-and footer around the landing page's **shared 50/50 grid**, the same columns and
-the same `2xl` gap from `68rem`, so the staff pages line up with every other
-split on the site. Administration and submission take a thin staff header
-instead: the wordmark, the section, "Signed in as", a quiet "Sign out", and the
-simulated-data notice beneath.
+and footer around the landing page's **shared 50/50 grid** with an `lg` gap, `lg`
+below the header rather than `2xl`, so the two halves start close under it.
+Administration and submission take a thin staff header instead: the wordmark, the
+section, "Signed in as", a quiet "Sign out", and the simulated-data notice
+beneath.
 
-- **The frame.** From `68rem` the left column carries the title, the intro, the
-  rail and then the notes in small ink-70; the right column carries the form
-  under a full ink rule, and that rule starts level with the title, not below
-  it. Below `68rem` everything stacks in reading order: title, rail, form,
-  notes, and the notes take a hairline above them to part them from the form.
+- **The frame: two boxes.** Each half is a `ruled` panel, a square 1px full-ink
+  box on the card ground, as the user sketched them. From `68rem` they stand side
+  by side, their tops and feet level (the grid stretches both to one height): the
+  left box carries the title, the intro, the rail and then the notes in small
+  ink-70; the right box carries the form. Below `68rem` the form's box follows
+  the other.
 - **Where you are, as a rail.** Registration and activation carry a `StepRail`:
   the steps in order under a full ink rule, each a ruled row with a two-digit
   mono number (`01`, `02`, `03`). A step is done, current or next. The current
@@ -452,15 +480,24 @@ simulated-data notice beneath.
   full-ink rule and a hairline, in mono, with "Copy" and "Done". It is never shown
   again.
 
-**Report submission adapts the frame.** `/submit` has no rail: submission is a
+**Report submission is one form panel.** `/submit` has no rail: submission is a
 repeated single-screen task inside a shift, not a sequence, so a step rail there
-would be a costume. It keeps the rest: the shared grid through `split()`, the form
-in the left column and "Submitted this session" in the right, each under a full
-ink rule, and every field sized to its content (time and coordinates at
-`field-code`, age at `field-sm`). Its two column rules do not sit level: the
-form's rule falls under the title and the facility line, because that line
-belongs above the form, while the session list's rule sits at the column top.
-That offset is accepted, not a pattern to copy.
+would be a costume. From `68rem` a wide sheet panel (3 parts to 2) holds the form
+beside a narrower "Submitted this session" panel, which counts the reports sent.
+Inside the form, sections part at hairlines and every field fills its grid cell,
+so all edges line up:
+
+1. the symptom group as four tiles, two by two (one per row on a phone): each a
+   rounded, ruled box with its radio, its group swatch and its name; the chosen
+   tile takes a full-ink border, an ink-08 ground and medium weight;
+2. "When the patient presented" beside "Age in years";
+3. "Where the patient lives, if known", latitude beside longitude;
+4. a footer bar: the privacy sentence on the left, the ruled "Submit report" box
+   on the right.
+
+Every field input is one height (`2.75rem`), so the date control sits level with
+the number beside it. The location group's rule is on a wrapper, not the
+fieldset, where browsers draw the legend through the line.
 
 ## Browser surfaces
 
