@@ -21,6 +21,20 @@ export function seriesFor(weekly: WeeklyCounts, group: SymptomGroup): Series {
   return { counts, current: counts.at(-1) ?? 0, average }
 }
 
+/**
+ * Every symptom group together, week by week: the area's whole report load,
+ * with the same current week and baseline average as a single group's series.
+ */
+export function totalSeries(weekly: WeeklyCounts): Series {
+  const counts = weekly.weeks.map((week) =>
+    Object.values(week.counts).reduce((sum, count) => sum + count, 0),
+  )
+  const baseline = counts.slice(0, -1)
+  const average =
+    baseline.length === 0 ? 0 : baseline.reduce((sum, count) => sum + count, 0) / baseline.length
+  return { counts, current: counts.at(-1) ?? 0, average }
+}
+
 /** A top for the y axis with a little headroom, never zero. */
 export function scaleMax(series: Series): number {
   return Math.max(1, ...series.counts, series.average) * 1.15
