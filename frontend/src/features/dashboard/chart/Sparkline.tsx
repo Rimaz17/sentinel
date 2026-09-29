@@ -13,10 +13,16 @@ const PAD = 4
  */
 export function Sparkline({ series, areaName }: { series: Series; areaName: string }) {
   const { counts } = series
-  const top = Math.max(1, ...counts, series.average) * 1.1
+  // Scaled between the quietest and busiest week, the average included, with a margin, so a
+  // change of a few percent still reads as a change rather than a flat line.
+  const high = Math.max(1, ...counts, series.average)
+  const low = Math.min(...counts, series.average)
+  const margin = Math.max(1, (high - low) * 0.15)
+  const floor = Math.max(0, low - margin)
+  const span = high + margin - floor
   const step = counts.length > 1 ? (WIDTH - PAD * 2) / (counts.length - 1) : 0
   const x = (index: number) => PAD + index * step
-  const y = (count: number) => HEIGHT - PAD - (count / top) * (HEIGHT - PAD * 2)
+  const y = (count: number) => HEIGHT - PAD - ((count - floor) / span) * (HEIGHT - PAD * 2)
   const points = counts.map((count, index) => `${x(index)},${y(count)}`)
   const last = counts.length - 1
 
