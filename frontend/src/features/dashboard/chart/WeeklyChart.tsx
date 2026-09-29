@@ -12,6 +12,8 @@ type WeeklyChartProps = {
   areaName: string
   /** Public wording for a failed load; see QueryView. */
   errorWords?: string
+  /** Set across a full-width panel: the four groups in one row from 68rem. */
+  wide?: boolean
 }
 
 /**
@@ -21,7 +23,7 @@ type WeeklyChartProps = {
  * Every panel is named, so no group is identified by its colour alone, and the
  * same numbers are available as a table.
  */
-export function WeeklyChart({ query, areaName, errorWords }: WeeklyChartProps) {
+export function WeeklyChart({ query, areaName, errorWords, wide = false }: WeeklyChartProps) {
   return (
     <QueryView
       query={query}
@@ -49,7 +51,7 @@ export function WeeklyChart({ query, areaName, errorWords }: WeeklyChartProps) {
             </span>
           </p>
 
-          <ul className="grid gap-x-lg gap-y-md md:grid-cols-2">
+          <ul className={cx('grid gap-x-lg gap-y-md md:grid-cols-2', wide && 'xl:grid-cols-4')}>
             {SYMPTOM_GROUPS.map((group) => (
               <li key={group}>
                 <GroupPanel group={group} weekly={weekly} areaName={areaName} />
