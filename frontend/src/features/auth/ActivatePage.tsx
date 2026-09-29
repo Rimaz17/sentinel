@@ -56,7 +56,9 @@ export function ActivatePage() {
         <StepRail
           label="Activation steps"
           steps={[
-            { label: 'Your link', state: owner.data ? 'done' : 'current' },
+            owner.data
+              ? { label: 'Your link', state: 'done', value: owner.data.email }
+              : { label: 'Your link', state: 'current' },
             { label: 'Your password', state: owner.data ? 'current' : 'next' },
             { label: 'Sign in', state: 'next' },
           ]}
