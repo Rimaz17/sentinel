@@ -318,6 +318,18 @@
     scrollbar-width: thin;
   }
 
+  /* The date and time picker's own glyph, drawn by the platform in black. Taken
+     down to the secondary ink, and to full ink under the pointer or the focus. */
+  ::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  ::-webkit-calendar-picker-indicator:hover,
+  input:focus-visible::-webkit-calendar-picker-indicator {
+    opacity: 1;
+  }
+
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
