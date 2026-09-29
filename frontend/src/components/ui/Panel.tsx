@@ -6,8 +6,9 @@ type PanelTone = 'sheet' | 'ruled'
 const TONES: Record<PanelTone, string> = {
   /* The dashboards and the report form: a rounded sheet on a low shadow. */
   sheet: 'rounded-panel border border-ink-08 bg-card shadow-panel',
-  /* The staff sign-in pages: a square box in a 1px ink rule, flat. */
-  ruled: 'border border-ink bg-card',
+  /* The staff sign-in pages: a square box in a 2px ink rule on the page's own
+     paper, flat, so the box is drawn by its line alone. */
+  ruled: 'border-2 border-ink bg-paper',
 }
 
 type PanelProps = {
