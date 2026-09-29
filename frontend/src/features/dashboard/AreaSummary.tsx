@@ -42,7 +42,7 @@ export function AreaSummary({
         {picker ? <div className="w-full max-w-[18rem] xl:hidden">{picker}</div> : null}
       </div>
 
-      <div className="grid gap-md border-t border-t-ink-14 pt-md md:grid-cols-[minmax(0,1fr)_minmax(0,16rem)] md:items-end">
+      <div className="grid gap-md border-t border-t-ink-14 pt-md md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:items-end">
         <div className="grid gap-xs">
           {reports === undefined ? (
             <LoadingRows label="Loading the area's figures" rows={1} />
@@ -80,7 +80,7 @@ export function AreaSummary({
                 return (
                   <>
                     <Sparkline series={series} areaName={areaName} />
-                    <p className="text-small text-ink-70 md:text-end">
+                    <p className="text-small text-ink-70 md:text-end md:whitespace-nowrap">
                       {series.average > 0 ? (
                         <>
                           This week is{' '}
