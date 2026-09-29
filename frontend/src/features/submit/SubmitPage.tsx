@@ -2,13 +2,14 @@ import { type FormEvent, useEffect, useId, useState } from 'react'
 import { SkipLink } from '@/components/layout/SkipLink'
 import { SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
+import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { SYMPTOM_GROUPS, type SymptomGroup } from '@/features/dashboard/api/types'
 import { formatDateTime } from '@/features/dashboard/format'
 import { SYMPTOM_GROUP_STYLES } from '@/features/dashboard/symptomGroups'
 import { StaffHeader } from '@/features/auth/AccountBar'
 import { useAccount } from '@/features/auth/session'
 import { ApiError, apiRequest } from '@/lib/api/client'
-import { caps, cx, labelSm, sectionTitle, shell, split } from '@/styles/recipes'
+import { caps, cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
 
 /** POST /api/ingestion/reports */
 type Receipt = { reportId: string; receivedAt: string }
@@ -41,10 +42,18 @@ export function SubmitPage() {
     <div className="flex min-h-screen flex-col">
       <SkipLink />
       <StaffHeader section="Report submission" account={account} />
-      <main id="main" className={cx(shell, split(), 'flex-1 content-start py-xl')}>
-        <div className="grid content-start gap-lg">
+      <main
+        id="main"
+        className={cx(
+          shell,
+          'grid flex-1 content-start gap-md py-md xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:items-start',
+        )}
+      >
+        <Panel labelledBy="report-heading" className="gap-md md:p-lg">
           <div className="grid gap-xs">
-            <h1 className={sectionTitle}>Submit a report</h1>
+            <h1 id="report-heading" className={sectionTitle}>
+              Submit a report
+            </h1>
             {facility ? (
               <p className="text-body text-ink-70">
                 For <span className="font-medium text-ink">{facility.name}</span>{' '}
@@ -54,14 +63,18 @@ export function SubmitPage() {
             ) : null}
           </div>
           <ReportForm onSubmitted={(report) => setSubmitted((earlier) => [report, ...earlier])} />
-        </div>
-        <aside
-          aria-labelledby="submitted-heading"
-          className="grid content-start gap-sm border-t border-t-ink pt-md"
-        >
-          <h2 id="submitted-heading" className="text-section font-medium tracking-tight">
+        </Panel>
+        <Panel as="aside" labelledBy="submitted-heading">
+          <PanelHeading
+            id="submitted-heading"
+            aside={
+              submitted.length > 0 ? (
+                <span className={cx(labelSm, 'text-ink-70')}>{submitted.length}</span>
+              ) : null
+            }
+          >
             Submitted this session
-          </h2>
+          </PanelHeading>
           {submitted.length === 0 ? (
             <p className="max-w-measure-narrow text-small text-ink-70">
               Nothing yet. Each report you submit is listed here until you leave the page, so you
@@ -70,11 +83,21 @@ export function SubmitPage() {
           ) : (
             <ol className="border-t border-t-ink-14">
               {submitted.map((report) => (
-                <li key={report.id} className="grid gap-3xs border-b border-b-ink-14 py-xs">
+                <li
+                  key={report.id}
+                  className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-xs gap-y-3xs border-b border-b-ink-14 py-xs"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cx(
+                      'inline-block size-[0.6rem] self-center',
+                      SYMPTOM_GROUP_STYLES[report.group].swatch,
+                    )}
+                  />
                   <p className="text-small font-medium">
                     {SYMPTOM_GROUP_STYLES[report.group].label}
                   </p>
-                  <p className={cx(labelSm, 'text-ink-70')}>
+                  <p className={cx(labelSm, 'col-start-2 text-ink-70')}>
                     Presented {formatDateTime(report.reportedAt)} · received{' '}
                     {formatDateTime(report.receivedAt)}
                   </p>
@@ -82,7 +105,7 @@ export function SubmitPage() {
               ))}
             </ol>
           )}
-        </aside>
+        </Panel>
       </main>
     </div>
   )
@@ -142,23 +165,23 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
   const unplaced = error?.fieldProblems.length === 0 ? error.message : null
 
   return (
-    <form
-      onSubmit={(event) => void submit(event)}
-      className="grid gap-md border-t border-t-ink pt-md"
-      noValidate
-    >
+    <form onSubmit={(event) => void submit(event)} className="grid gap-md" noValidate>
       <fieldset
         className="m-0 grid gap-2xs border-0 p-0"
         aria-describedby={missingGroup ? `${groupLegendId}-error` : undefined}
       >
-        <legend id={groupLegendId} className={cx(labelSm, caps, 'mb-3xs text-ink-70')}>
+        <legend id={groupLegendId} className={cx(labelSm, caps, 'mb-2xs text-ink-70')}>
           Symptom group
         </legend>
-        <div className="grid gap-x-md gap-y-2xs md:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2xs phone:grid-cols-1">
           {SYMPTOM_GROUPS.map((option) => (
             <label
               key={option}
-              className="inline-flex cursor-pointer items-center gap-xs text-body"
+              className={cx(
+                'flex cursor-pointer items-center gap-xs rounded-control border border-ink-24 bg-paper-raised px-xs py-sm text-small',
+                'transition-colors duration-(--dur-fast) ease-out hover:border-ink-70',
+                'has-checked:border-ink has-checked:bg-ink-08 has-checked:font-medium',
+              )}
             >
               <input
                 type="radio"
@@ -166,11 +189,14 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
                 value={option}
                 checked={group === option}
                 onChange={() => setGroup(option)}
-                className="m-0 size-[1rem] cursor-pointer"
+                className="m-0 size-[1rem] shrink-0 cursor-pointer"
               />
               <span
                 aria-hidden="true"
-                className={cx('inline-block size-[0.6rem]', SYMPTOM_GROUP_STYLES[option].swatch)}
+                className={cx(
+                  'inline-block size-[0.6rem] shrink-0',
+                  SYMPTOM_GROUP_STYLES[option].swatch,
+                )}
               />
               {SYMPTOM_GROUP_STYLES[option].label}
             </label>
@@ -186,75 +212,75 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
         ) : null}
       </fieldset>
 
-      <Field
-        label="When the patient presented"
-        type="datetime-local"
-        name="reportedAt"
-        width="code"
-        required
-        value={presented}
-        onChange={(event) => setPresented(event.target.value)}
-        error={error?.problemWith('reportedAt')}
-      />
-      <Field
-        label="Age in years"
-        type="number"
-        name="age"
-        width="sm"
-        inputMode="numeric"
-        min={0}
-        max={130}
-        hint="Kept only as a ten-year band, such as 30 to 39."
-        value={age}
-        onChange={(event) => setAge(event.target.value)}
-        required
-        error={missingAge ? 'Enter the patient’s age in years.' : error?.problemWith('age')}
-      />
-      <fieldset className="m-0 grid gap-xs border-0 p-0">
-        <legend className={cx(labelSm, caps, 'mb-3xs text-ink-70')}>
-          Where the patient lives, if known
-        </legend>
-        <p className="text-small text-ink-70">
-          Decimal degrees. Rounded to about 100 m before it is stored, and never shown to the
-          public.
-        </p>
-        <div className="grid gap-sm md:grid-cols-[repeat(2,minmax(0,var(--container-field-code)))]">
-          <Field
-            label="Latitude"
-            type="number"
-            name="latitude"
-            width="code"
-            inputMode="decimal"
-            step="any"
-            value={latitude}
-            onChange={(event) => setLatitude(event.target.value)}
-            error={error?.problemWith('latitude') ?? locationProblem}
-          />
-          <Field
-            label="Longitude"
-            type="number"
-            name="longitude"
-            width="code"
-            inputMode="decimal"
-            step="any"
-            value={longitude}
-            onChange={(event) => setLongitude(event.target.value)}
-            error={error?.problemWith('longitude')}
-          />
-        </div>
-      </fieldset>
+      <div className="grid gap-md border-t border-t-ink-14 pt-md md:grid-cols-2">
+        <Field
+          label="When the patient presented"
+          type="datetime-local"
+          name="reportedAt"
+          required
+          value={presented}
+          onChange={(event) => setPresented(event.target.value)}
+          error={error?.problemWith('reportedAt')}
+        />
+        <Field
+          label="Age in years"
+          type="number"
+          name="age"
+          inputMode="numeric"
+          min={0}
+          max={130}
+          hint="Kept only as a ten-year band, such as 30 to 39."
+          value={age}
+          onChange={(event) => setAge(event.target.value)}
+          required
+          error={missingAge ? 'Enter the patient’s age in years.' : error?.problemWith('age')}
+        />
+      </div>
+      <div className="border-t border-t-ink-14 pt-md">
+        <fieldset className="m-0 grid gap-xs border-0 p-0">
+          <legend className={cx(labelSm, caps, 'mb-3xs text-ink-70')}>
+            Where the patient lives, if known
+          </legend>
+          <p className="text-small text-ink-70">
+            Decimal degrees. Rounded to about 100 m before it is stored, and never shown to the
+            public.
+          </p>
+          <div className="grid gap-md md:grid-cols-2">
+            <Field
+              label="Latitude"
+              type="number"
+              name="latitude"
+              inputMode="decimal"
+              step="any"
+              value={latitude}
+              onChange={(event) => setLatitude(event.target.value)}
+              error={error?.problemWith('latitude') ?? locationProblem}
+            />
+            <Field
+              label="Longitude"
+              type="number"
+              name="longitude"
+              inputMode="decimal"
+              step="any"
+              value={longitude}
+              onChange={(event) => setLongitude(event.target.value)}
+              error={error?.problemWith('longitude')}
+            />
+          </div>
+        </fieldset>
+      </div>
 
-      <p className="text-small text-ink-70">
-        Sentinel never asks for a patient’s name, NIC number, date of birth, phone number or
-        address.
-      </p>
       {unplaced ? <FormError>{unplaced}</FormError> : null}
       {confirmation ? (
         <p role="status" className="border-t border-t-ink pt-xs text-small font-medium">
           {confirmation}
         </p>
       ) : null}
-      <div>
+      <div className="flex flex-wrap items-center justify-between gap-md border-t border-t-ink-14 pt-md">
+        <p className="max-w-[34ch] text-small text-ink-70">
+          Sentinel never asks for a patient’s name, NIC number, date of birth, phone number or
+          address.
+        </p>
         <SubmitButton busy={busy}>{busy ? 'Submitting' : 'Submit report'}</SubmitButton>
       </div>
     </form>

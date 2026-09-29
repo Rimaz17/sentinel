@@ -91,7 +91,7 @@ function AlertItem({
         </span>
       </p>
 
-      <p className={cx('text-small', tnum)}>
+      <p className="text-small">
         <span className="font-medium">{alert.observedCount} reports</span>,{' '}
         {formatSigma(alert.zScore)} above baseline
       </p>

@@ -12,10 +12,18 @@ const SECTIONS = [
   { href: '/#privacy', label: 'Privacy' },
 ]
 
+/** The two staff routes: registering with a facility's invite code, and signing in. */
+const STAFF = [
+  { to: '/register', label: 'Facility registration', from: 'hidden md:block' },
+  { to: '/signin', label: 'Staff sign-in', from: undefined },
+]
+
 /**
- * A thin ruled header. The staff route sits apart from the section links and
- * stays quiet: most visitors are members of the public, and the page's weight
- * belongs to them.
+ * A thin ruled header. The staff routes sit apart from the section links and
+ * stay quiet: most visitors are members of the public, and the page's weight
+ * belongs to them. Narrow screens keep only the sign-in; the section links
+ * return from 60rem and registration from 48rem, so the row never wraps, and
+ * the footer carries every route at any width.
  *
  * The blur is an effect, not decoration: it exists so the ridges can pass under
  * the header without the wordmark losing contrast. Where it is unsupported, the
@@ -35,7 +43,7 @@ export function SiteHeader() {
 
         {/* The section links sit to the right, beside the staff route, so the
             whole navigation reads as one group opposite the wordmark. */}
-        <nav className="ms-auto hidden md:block" aria-label="Sections">
+        <nav className="ms-auto hidden lg:block" aria-label="Sections">
           <ul className="flex items-center gap-lg">
             {SECTIONS.map((section) => (
               <li key={section.href}>
@@ -55,21 +63,27 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        {/* Pushed right on its own below md, where the section links hide; from
-            md the links group is already pushed right, so this only holds the
-            staff route a little apart from them. */}
-        <nav className="ms-auto md:ms-sm" aria-label="Staff">
-          <Link
-            to="/signin"
-            className={cx(
-              monoLink,
-              'border-b border-b-ink-24 py-[0.35rem] font-medium text-ink-70 no-underline',
-              'transition-[color,border-color] duration-(--dur-fast) ease-out',
-              'hover:border-b-ink hover:text-ink focus-visible:border-b-ink focus-visible:text-ink',
-            )}
-          >
-            Staff sign-in
-          </Link>
+        {/* Pushed right on its own below lg, where the section links hide; from
+            lg the links group is already pushed right, so this only holds the
+            staff routes a little apart from them. */}
+        <nav className="ms-auto lg:ms-sm" aria-label="Staff">
+          <ul className="flex items-center gap-lg">
+            {STAFF.map((route) => (
+              <li key={route.to} className={route.from}>
+                <Link
+                  to={route.to}
+                  className={cx(
+                    monoLink,
+                    'border-b border-b-ink-24 py-[0.35rem] font-medium text-ink-70 no-underline',
+                    'transition-[color,border-color] duration-(--dur-fast) ease-out',
+                    'hover:border-b-ink hover:text-ink focus-visible:border-b-ink focus-visible:text-ink',
+                  )}
+                >
+                  {route.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </nav>
       </div>
     </header>

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { SkipLink } from '@/components/layout/SkipLink'
+import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
 import { WeeklyChart } from '@/features/dashboard/chart/WeeklyChart'
 import { formatClock, formatCount, formatDay } from '@/features/dashboard/format'
@@ -30,12 +31,10 @@ const DistrictMap = lazy(() =>
   import('./map/DistrictMap').then((module) => ({ default: module.DistrictMap })),
 )
 
-const panelTitle = 'text-section leading-snug font-medium tracking-tight'
-
 /** What the public is told when figures cannot be fetched: something they can act on. */
 export const PUBLIC_ERROR = 'The figures are unavailable at the moment. Try again in a minute.'
 
-const MAP_HEIGHT = 'h-[22rem] md:h-[34rem]'
+const MAP_HEIGHT = 'h-[22rem] md:h-[36rem] xl:h-full'
 
 /**
  * The public dashboard: the pattern, not the individuals. A visitor's question
@@ -78,72 +77,70 @@ export function PublicDashboardPage() {
       <SkipLink />
       <SiteHeader />
 
-      <main id="main" className={cx(shell, 'grid flex-1 content-start gap-2xl py-xl')}>
-        <div className="grid gap-lg xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:gap-2xl">
-          <div className="grid content-start gap-sm">
+      <main
+        id="main"
+        className={cx(shell, 'grid flex-1 content-start gap-md py-md xl:grid-cols-2')}
+      >
+        <Panel as="div" className="gap-md xl:row-span-2">
+          <div className="grid gap-sm">
             <h1 className={cx(sectionTitle, 'max-w-[22ch]')}>Sri Lanka, district by district</h1>
-            <p className="max-w-measure text-body-lg text-ink-70">
+            <p className="max-w-measure text-body text-ink-70">
               Reports of four symptom patterns from hospitals and clinics, each district compared
               with its own usual level. Only district totals are shown here, never where a report
               came from.
             </p>
-            <SimulatedNotice />
+            <div>
+              <SimulatedNotice />
+            </div>
           </div>
-
-          <div className="grid content-start gap-md">
-            <QueryView
-              query={districts}
-              what="district status"
-              errorWords={PUBLIC_ERROR}
-              loading={<LoadingRows label="Checking district status" rows={1} />}
-            >
-              {(list) => (
-                <div className="grid gap-md">
-                  <div className="grid gap-3xs border-t border-t-ink pt-xs">
-                    <StatusSummary elevated={list.filter((d) => d.status === 'ELEVATED').length} />
-                    <p className={cx(labelSm, 'text-ink-70')}>
-                      Updated{' '}
-                      <time dateTime={new Date(districts.dataUpdatedAt).toISOString()}>
-                        {formatClock(districts.dataUpdatedAt)}
-                      </time>{' '}
-                      Sri Lanka time · refreshed every minute
-                    </p>
-                  </div>
-                  <DistrictPicker districts={list} selected={selected} onChoose={choose} />
+          <QueryView
+            query={districts}
+            what="district status"
+            errorWords={PUBLIC_ERROR}
+            loading={<LoadingRows label="Checking district status" rows={1} />}
+          >
+            {(list) => (
+              <div className="grid gap-md border-t border-t-ink-14 pt-md md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:items-end">
+                <div className="grid gap-3xs">
+                  <StatusSummary elevated={list.filter((d) => d.status === 'ELEVATED').length} />
+                  <p className={cx(labelSm, 'text-ink-70')}>
+                    Updated{' '}
+                    <time dateTime={new Date(districts.dataUpdatedAt).toISOString()}>
+                      {formatClock(districts.dataUpdatedAt)}
+                    </time>{' '}
+                    Sri Lanka time · refreshed every minute
+                  </p>
                 </div>
+                <DistrictPicker districts={list} selected={selected} onChoose={choose} />
+              </div>
+            )}
+          </QueryView>
+        </Panel>
+
+        {district ? (
+          <Panel as="div">
+            <DistrictStatus
+              district={district}
+              takeFocus={chosenHere}
+              alerts={(alerts.data ?? []).filter(
+                (alert) => alert.active && alert.districtCode === district.code,
               )}
-            </QueryView>
-            {district ? (
-              <DistrictStatus
-                district={district}
-                takeFocus={chosenHere}
-                alerts={(alerts.data ?? []).filter(
-                  (alert) => alert.active && alert.districtCode === district.code,
-                )}
-              />
-            ) : null}
-          </div>
-        </div>
+            />
+          </Panel>
+        ) : null}
 
-        <section aria-labelledby="alerts-heading" className="grid max-w-measure gap-sm">
-          <h2 id="alerts-heading" className={panelTitle}>
-            Alerts
-          </h2>
+        <Panel labelledBy="alerts-heading" className="xl:self-start">
+          <PanelHeading id="alerts-heading">Alerts</PanelHeading>
           <PublicAlerts query={alerts} errorWords={PUBLIC_ERROR} />
-        </section>
+        </Panel>
 
-        <section aria-labelledby="districts-heading" className="grid gap-sm">
-          <div className="grid gap-2xs">
-            <h2 id="districts-heading" className={panelTitle}>
-              Every district
-            </h2>
-            <p className="max-w-measure text-small text-ink-70">
-              A district is shaded, with a heavier outline, while it has an active alert. Each
-              district’s last 7 days are set against its own usual week, the average of the 8 weeks
-              before, never against another district’s: Colombo’s usual week is several times
-              Kandy’s.
-            </p>
-          </div>
+        <Panel labelledBy="districts-heading" className="gap-md xl:col-span-2">
+          <PanelHeading
+            id="districts-heading"
+            description="A district is shaded, with a heavier outline, while it has an active alert. Each district’s last 7 days are set against its own usual week, the average of the 8 weeks before, never against another district’s: Colombo’s usual week is several times Kandy’s."
+          >
+            Every district
+          </PanelHeading>
           <QueryView
             query={districts}
             what="districts"
@@ -151,35 +148,40 @@ export function PublicDashboardPage() {
             loading={<LoadingRows label="Loading districts" rows={6} />}
           >
             {(list) => (
-              <div className="grid gap-xl xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start">
-                <Suspense
-                  fallback={<div aria-hidden="true" className={cx(MAP_HEIGHT, 'bg-paper-sunk')} />}
-                >
-                  <DistrictMap
-                    districts={list}
-                    selected={selected}
-                    onSelect={choose}
-                    className={MAP_HEIGHT}
-                  />
-                </Suspense>
+              <div className="grid gap-md xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                <div className="xl:h-full">
+                  <Suspense
+                    fallback={
+                      <div
+                        aria-hidden="true"
+                        className={cx(MAP_HEIGHT, 'rounded-control bg-paper-sunk')}
+                      />
+                    }
+                  >
+                    <DistrictMap
+                      districts={list}
+                      selected={selected}
+                      onSelect={choose}
+                      className={`${MAP_HEIGHT} overflow-hidden rounded-control`}
+                    />
+                  </Suspense>
+                </div>
                 <DistrictTable districts={list} selected={selected} />
               </div>
             )}
           </QueryView>
-        </section>
+        </Panel>
 
-        <section aria-labelledby="trends-heading" className="grid gap-sm">
-          <div className="grid gap-2xs">
-            <h2 id="trends-heading" tabIndex={-1} className={panelTitle}>
-              Weekly reports, {areaName}
-            </h2>
-            <p className="max-w-measure text-small text-ink-70">
-              Each symptom group’s last 7 days against the 8 weeks before. A report is a patient
-              whose symptoms fit a pattern, not a confirmed diagnosis.
-            </p>
-          </div>
-          <WeeklyChart query={trends} areaName={areaName} errorWords={PUBLIC_ERROR} />
-        </section>
+        <Panel labelledBy="trends-heading" className="gap-md xl:col-span-2">
+          <PanelHeading
+            id="trends-heading"
+            focusable
+            description="Each symptom group’s last 7 days against the 8 weeks before. A report is a patient whose symptoms fit a pattern, not a confirmed diagnosis."
+          >
+            Weekly reports, {areaName}
+          </PanelHeading>
+          <WeeklyChart query={trends} areaName={areaName} errorWords={PUBLIC_ERROR} wide />
+        </Panel>
       </main>
 
       <SiteFooter />
@@ -263,9 +265,12 @@ function DistrictStatus({
       ref={ref}
       tabIndex={-1}
       aria-labelledby="district-status-heading"
-      className="grid gap-2xs border-t border-t-ink pt-xs"
+      className="grid gap-2xs"
     >
-      <h2 id="district-status-heading" className={panelTitle}>
+      <h2
+        id="district-status-heading"
+        className="text-section leading-snug font-medium tracking-tight"
+      >
         {district.name}
       </h2>
       {elevated ? (

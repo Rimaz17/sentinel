@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { weeklyCounts } from '@/test/fixtures'
-import { scaleMax, seriesFor } from './series'
+import { scaleMax, seriesFor, totalSeries } from './series'
 
 describe('seriesFor', () => {
   it("takes one group's nine weeks, oldest first", () => {
@@ -20,6 +20,15 @@ describe('seriesFor', () => {
       current: 0,
       average: 0,
     })
+  })
+})
+
+describe('totalSeries', () => {
+  it('adds every symptom group together, week by week', () => {
+    const series = totalSeries(weeklyCounts())
+    expect(series.counts).toEqual([42, 47, 45, 44, 48, 43, 46, 45, 61])
+    expect(series.current).toBe(61)
+    expect(series.average).toBe(45)
   })
 })
 

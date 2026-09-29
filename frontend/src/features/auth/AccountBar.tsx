@@ -50,14 +50,11 @@ export function StaffHeader({
           <AccountMenu account={account} />
         </div>
       </div>
-      <div
-        className={cx(
-          shell,
-          'flex flex-wrap items-center gap-x-md gap-y-2xs border-t border-t-ink-08 py-xs',
-        )}
-      >
-        <SimulatedNotice />
-        {children}
+      <div className="border-t border-t-ink-08">
+        <div className={cx(shell, 'flex flex-wrap items-center gap-x-md gap-y-2xs py-xs')}>
+          <SimulatedNotice />
+          {children}
+        </div>
       </div>
     </header>
   )

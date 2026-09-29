@@ -73,7 +73,7 @@ export function DistrictMap({ districts, selected, onSelect, className }: Distri
   }
 
   return (
-    <figure className="m-0 grid gap-2xs">
+    <figure className="m-0 grid h-full grid-rows-[minmax(0,1fr)_auto] gap-2xs">
       {/* isolate: Leaflet's panes sit at z-index 400 and up, and would otherwise
           paint over the sticky site header as the page scrolls past. */}
       <div aria-hidden="true" className={cx('isolate border border-ink-14', className)}>

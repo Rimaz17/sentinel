@@ -38,7 +38,7 @@ export function Field({ label, hint, error, width, className, ...input }: FieldP
   const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ')
 
   return (
-    <div className={cx('grid gap-3xs', className)}>
+    <div className={cx('grid content-start gap-3xs', className)}>
       <label htmlFor={id} className={cx(labelSm, caps, 'text-ink-70')}>
         {label}
       </label>
@@ -48,7 +48,8 @@ export function Field({ label, hint, error, width, className, ...input }: FieldP
           aria-describedby={describedBy || undefined}
           aria-invalid={error ? true : undefined}
           className={cx(
-            'w-full border bg-paper-raised px-xs py-2xs text-body',
+            // One height for every kind, so a date beside a number sits level with it.
+            'h-[2.75rem] w-full border bg-paper-raised px-xs py-2xs text-body',
             width ? WIDTHS[width] : null,
             error ? 'border-ink' : 'border-ink-24',
           )}
