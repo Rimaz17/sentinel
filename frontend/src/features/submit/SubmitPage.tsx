@@ -173,7 +173,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
         <legend id={groupLegendId} className={cx(labelSm, caps, 'mb-2xs text-ink-70')}>
           Symptom group
         </legend>
-        <div className="grid grid-cols-2 gap-2xs md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2xs">
           {SYMPTOM_GROUPS.map((option) => (
             <label
               key={option}
@@ -233,37 +233,39 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
           error={missingAge ? 'Enter the patient’s age in years.' : error?.problemWith('age')}
         />
       </div>
-      <fieldset className="m-0 grid gap-xs border-0 border-t border-t-ink-14 p-0 pt-md">
-        <legend className={cx(labelSm, caps, 'mb-3xs text-ink-70')}>
-          Where the patient lives, if known
-        </legend>
-        <p className="text-small text-ink-70">
-          Decimal degrees. Rounded to about 100 m before it is stored, and never shown to the
-          public.
-        </p>
-        <div className="grid gap-md md:grid-cols-2">
-          <Field
-            label="Latitude"
-            type="number"
-            name="latitude"
-            inputMode="decimal"
-            step="any"
-            value={latitude}
-            onChange={(event) => setLatitude(event.target.value)}
-            error={error?.problemWith('latitude') ?? locationProblem}
-          />
-          <Field
-            label="Longitude"
-            type="number"
-            name="longitude"
-            inputMode="decimal"
-            step="any"
-            value={longitude}
-            onChange={(event) => setLongitude(event.target.value)}
-            error={error?.problemWith('longitude')}
-          />
-        </div>
-      </fieldset>
+      <div className="border-t border-t-ink-14 pt-md">
+        <fieldset className="m-0 grid gap-xs border-0 p-0">
+          <legend className={cx(labelSm, caps, 'mb-3xs text-ink-70')}>
+            Where the patient lives, if known
+          </legend>
+          <p className="text-small text-ink-70">
+            Decimal degrees. Rounded to about 100 m before it is stored, and never shown to the
+            public.
+          </p>
+          <div className="grid gap-md md:grid-cols-2">
+            <Field
+              label="Latitude"
+              type="number"
+              name="latitude"
+              inputMode="decimal"
+              step="any"
+              value={latitude}
+              onChange={(event) => setLatitude(event.target.value)}
+              error={error?.problemWith('latitude') ?? locationProblem}
+            />
+            <Field
+              label="Longitude"
+              type="number"
+              name="longitude"
+              inputMode="decimal"
+              step="any"
+              value={longitude}
+              onChange={(event) => setLongitude(event.target.value)}
+              error={error?.problemWith('longitude')}
+            />
+          </div>
+        </fieldset>
+      </div>
 
       {unplaced ? <FormError>{unplaced}</FormError> : null}
       {confirmation ? (
