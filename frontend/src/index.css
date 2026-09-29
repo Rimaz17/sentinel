@@ -53,6 +53,9 @@
   --color-paper: #eaeeee;
   --color-paper-raised: #f1f4f4;
   --color-paper-sunk: #dfe4e4;
+  /* The ground of a panel on the working pages: a step lighter than the page,
+     so a panel reads as a sheet laid on it. Ink on it is 15.34:1, ink-70 5.82:1. */
+  --color-card: #f7f9f9;
   --color-ink: #15222b;
 
   /* Ink at fixed alphas, measured on paper:
@@ -163,6 +166,14 @@
   --container-field-code: 16rem;
   --container-field: 20rem;
   --container-field-lg: 28rem;
+
+  /* Panels on the dashboards and the report form: a softly rounded sheet with a
+     low, wide shadow, offset downward, so it sits on the page rather than
+     glowing. The staff sign-in pages box their two halves in a square ink rule
+     instead, and take neither. */
+  --radius-panel: 0.875rem;
+  --radius-control: 0.5rem;
+  --shadow-panel: 0 1px 2px rgb(21 34 43 / 0.06), 0 12px 28px -18px rgb(21 34 43 / 0.38);
 
   /* ---- Spacing ----------------------------------------------------------
      A 4px-rooted scale. The larger steps are fluid so that vertical rhythm
