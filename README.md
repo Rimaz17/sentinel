@@ -491,6 +491,8 @@ The submission page at `/submit` never asks for any identity field at all.
 | `pip install -r requirements-dev.txt` | `backend/detector` | Install the detector's packages with pytest, Ruff, Black and Testcontainers |
 | `pytest` · `ruff check .` · `black .` | `backend/detector` | Test (the integration tests need Docker), lint and format |
 | `python -m sentinel_detector evaluate` | `backend/detector` | Measure detection against simulated outbreaks, as in [Measured detection](#measured-detection); `--seed N` for another run |
+| `python measure_pipeline.py` | `scripts/measure-pipeline` | Measure throughput and latency against a running stack, as in [Measured pipeline](#measured-pipeline); it adds reports, so use a throwaway one. See [its README](scripts/measure-pipeline/README.md) |
+| `pytest` · `ruff check .` · `black .` | `scripts/measure-pipeline` | Test, lint and format the measurement |
 
 ## Repository layout
 
@@ -498,8 +500,9 @@ The submission page at `/submit` never asks for any identity field at all.
 sentinel/
 ├── backend/
 │   ├── api/               Spring Boot: accounts and sign-in, facility registry and invite
-│   │                      codes, ingestion, reports, districts, alerts, administration,
-│   │                      and the public API
+│   │                      codes, ingestion onto Kafka, the stream processor storing
+│   │                      reports, the Redis windows, districts, alerts and their
+│   │                      WebSocket push, administration, and the public API
 │   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
 │   ├── detector/          Python: hourly z-score check, alerts, evaluation
 │   └── simulator/         Python: simulated reports and outbreaks, backfill and live modes
@@ -511,13 +514,11 @@ sentinel/
 │           ├── public/    The public dashboard at /dashboard, and the district outlines
 │           ├── auth/      Sign-in, registration, activation, the session and route guards
 │           ├── submit/    Report submission for data providers
-| `python measure_pipeline.py` | `scripts/measure-pipeline` | Measure throughput and latency against a running stack, as in [Measured pipeline](#measured-pipeline); it adds reports, so use a throwaway one. See [its README](scripts/measure-pipeline/README.md) |
-| `pytest` · `ruff check .` · `black .` | `scripts/measure-pipeline` | Test, lint and format the measurement |
 │           ├── admin/     Inspector accounts and facility invite codes
 │           └── dashboard/ The internal dashboard at /app: alert list and review,
-│                          district list, Leaflet map, weekly chart
+│                          district list, Leaflet map, weekly chart, and the alert socket
 ├── infra/
-│   ├── docker-compose.yml Local PostgreSQL
+│   ├── docker-compose.yml Local PostgreSQL, Kafka and Redis
 │   └── .env.example       Local settings, dummy values; copy to .env at the root
 ├── docs/
 │   ├── adr/               Architecture decision records
@@ -529,6 +530,7 @@ sentinel/
 │   ├── build-images.py    Regenerates frontend/src/assets from the originals
 │   ├── district-boundaries/ Builds the public map's district outlines from geoBoundaries
 │   ├── facility-registry/ Builds the registry seed from the Ministry of Health list
+│   ├── measure-pipeline/  Measures the pipeline's throughput and latency
 │   └── git-hooks/         commit-msg hook
 └── README.md
 ```
