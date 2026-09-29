@@ -47,6 +47,8 @@ export function DistrictList({
         const total = districts.reduce((sum, district) => sum + district.reportsLast7Days, 0)
         const open = districts.reduce((sum, district) => sum + district.openAlerts, 0)
         const busiest = Math.max(1, ...districts.map((district) => district.reportsLast7Days))
+        // Wide enough from 80rem for two columns of names, counts and bars without cutting a name.
+        const twoColumns = districts.length > SEARCH_FROM
         const wanted = search.trim().toLowerCase()
         const shown = wanted
           ? districts.filter((district) => district.name.toLowerCase().includes(wanted))
@@ -69,18 +71,32 @@ export function DistrictList({
                 />
               </div>
             ) : null}
-            <p
+            <div
               aria-hidden="true"
               className={cx(
                 labelSm,
                 caps,
-                'grid grid-cols-[minmax(0,1fr)_3.5rem_4.5rem] gap-x-sm px-2xs text-ink-70',
+                'grid gap-x-md text-ink-70',
+                twoColumns && 'min-[80rem]:grid-cols-2',
               )}
             >
-              <span>District</span>
-              <span className="col-span-2">Reports · 7 days</span>
-            </p>
-            <ul className="border-t border-t-ink">
+              <p className="grid grid-cols-[minmax(0,1fr)_3.5rem_4.5rem] gap-x-sm px-2xs">
+                <span>District</span>
+                <span className="col-span-2">Reports · 7 days</span>
+              </p>
+              {twoColumns ? (
+                <p className="hidden grid-cols-[minmax(0,1fr)_3.5rem_4.5rem] gap-x-sm px-2xs min-[80rem]:grid">
+                  <span>District</span>
+                  <span className="col-span-2">Reports · 7 days</span>
+                </p>
+              ) : null}
+            </div>
+            <ul
+              className={cx(
+                'border-t border-t-ink',
+                twoColumns && 'min-[80rem]:columns-2 min-[80rem]:gap-x-md',
+              )}
+            >
               {showTotal ? (
                 <DistrictRow
                   to={districtPath(null)}
@@ -132,7 +148,7 @@ function DistrictRow({
   const alerts =
     openAlerts === 0 ? '' : openAlerts === 1 ? ', 1 open alert' : `, ${openAlerts} open alerts`
   return (
-    <li className="border-b border-b-ink-14">
+    <li className="break-inside-avoid border-b border-b-ink-14">
       <Link
         to={to}
         aria-current={current ? 'page' : undefined}
