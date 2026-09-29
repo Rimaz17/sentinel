@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { DISTRICTS } from '@/test/fixtures'
+import { district, DISTRICTS } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import type { DistrictSummary } from './api/types'
 import { DistrictList, DistrictPicker } from './DistrictList'
@@ -81,6 +81,45 @@ describe('DistrictList', () => {
     expect(screen.getByRole('link', { name: /all of sri lanka/i })).not.toHaveAttribute(
       'aria-current',
     )
+  })
+
+  it('offers no search for a short list', async () => {
+    renderList(null)
+    await screen.findAllByRole('link')
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  })
+
+  it('narrows a national list by name, keeping the whole-country row', async () => {
+    const many = [
+      ...DISTRICTS,
+      district({ code: 'GAL', name: 'Galle', openAlerts: 0 }),
+      district({ code: 'GMP', name: 'Gampaha', openAlerts: 0 }),
+      district({ code: 'JAF', name: 'Jaffna', openAlerts: 0 }),
+    ]
+    renderList(null, Promise.resolve(many))
+
+    await userEvent.type(await screen.findByRole('searchbox', { name: 'Find a district' }), 'ga')
+
+    expect(screen.getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
+      '/app',
+      '/app/districts/GAL',
+      '/app/districts/GMP',
+    ])
+
+    await userEvent.clear(screen.getByRole('searchbox'))
+    await userEvent.type(screen.getByRole('searchbox'), 'zzz')
+    expect(screen.getByText('No district matches “zzz”.')).toBeInTheDocument()
+  })
+
+  it("draws each district's week against the busiest district's", async () => {
+    renderList(null)
+    const colombo = await screen.findByRole('link', { name: /colombo/i })
+    const kandy = screen.getByRole('link', { name: /kandy/i })
+
+    const bar = (link: HTMLElement) =>
+      (link.querySelector('[aria-hidden="true"] > span') as HTMLElement | null)?.style.width
+    expect(bar(colombo)).toBe('100%')
+    expect(bar(kandy)).toBe('19%')
   })
 
   it('shows a loading state before the first response', () => {
