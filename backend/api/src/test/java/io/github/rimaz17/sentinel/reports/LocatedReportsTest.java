@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
+import io.github.rimaz17.sentinel.TestReports;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
@@ -31,10 +32,11 @@ class LocatedReportsTest {
   @Autowired TestAccounts testAccounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestReports testReports;
 
   @BeforeEach
   void storeReports() {
-    jdbc.update("delete from reports");
+    testReports.clear();
     store("KDY", Duration.ofHours(2), true);
     store("KDY", Duration.ofDays(3), true);
     store("KDY", Duration.ofHours(1), false);

@@ -3,6 +3,7 @@ package io.github.rimaz17.sentinel.reports;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestReports;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -18,10 +19,11 @@ class ReportStorageTest {
 
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestReports testReports;
 
   @BeforeEach
   void clear() {
-    jdbc.update("delete from reports");
+    testReports.clear();
   }
 
   @Test
