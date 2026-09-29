@@ -55,7 +55,10 @@ export function SubmitPage() {
           </div>
           <ReportForm onSubmitted={(report) => setSubmitted((earlier) => [report, ...earlier])} />
         </div>
-        <aside aria-labelledby="submitted-heading" className="grid content-start gap-sm">
+        <aside
+          aria-labelledby="submitted-heading"
+          className="grid content-start gap-sm border-t border-t-ink pt-md"
+        >
           <h2 id="submitted-heading" className="text-section font-medium tracking-tight">
             Submitted this session
           </h2>
@@ -65,7 +68,7 @@ export function SubmitPage() {
               can see it arrived.
             </p>
           ) : (
-            <ol className="border-t border-t-ink">
+            <ol className="border-t border-t-ink-14">
               {submitted.map((report) => (
                 <li key={report.id} className="grid gap-3xs border-b border-b-ink-14 py-xs">
                   <p className="text-small font-medium">
@@ -139,7 +142,11 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
   const unplaced = error?.fieldProblems.length === 0 ? error.message : null
 
   return (
-    <form onSubmit={(event) => void submit(event)} className="grid gap-md" noValidate>
+    <form
+      onSubmit={(event) => void submit(event)}
+      className="grid gap-md border-t border-t-ink pt-md"
+      noValidate
+    >
       <fieldset
         className="m-0 grid gap-2xs border-0 p-0"
         aria-describedby={missingGroup ? `${groupLegendId}-error` : undefined}
