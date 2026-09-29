@@ -81,7 +81,16 @@ describe('DashboardPage', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'All of Sri Lanka' }),
     ).toBeInTheDocument()
-    expect(await screen.findByText('292 reports in the last 7 days · 1 open alert')).toBeVisible()
+    expect(
+      await screen.findByText(
+        (_, element) =>
+          element?.tagName === 'P' && element.textContent === '292 reports in the last 7 days',
+      ),
+    ).toBeVisible()
+    expect(screen.getByText('1 open alert', { selector: 'p' })).toBeVisible()
+    expect(
+      await screen.findByRole('img', { name: /weekly reports, all of sri lanka, over 9 weeks/i }),
+    ).toBeInTheDocument()
     expect(await screen.findByRole('article', { name: 'A-1001' })).toBeInTheDocument()
     expect(requested('/api/alerts')).toContain('/api/alerts?limit=50')
     expect(requested('/api/facilities')).toEqual([])
