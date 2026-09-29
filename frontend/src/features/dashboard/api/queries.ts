@@ -13,8 +13,8 @@ import type {
 /**
  * How often the dashboard asks the API again. Reports arrive continuously and
  * the detector checks hourly; half a minute keeps a new report's dot and count
- * close to live without load worth measuring. Phase 5 replaces polling with a
- * WebSocket push for alerts.
+ * close to live without load worth measuring. Alerts are pushed over the alert
+ * socket instead, and polled only while it is not open.
  */
 export const POLL_INTERVAL_MS = 30_000
 
@@ -37,12 +37,17 @@ export function useDistricts() {
   })
 }
 
-/** The most recently detected alerts, for one district or the whole country. */
-export function useAlerts(district: string | null) {
+/**
+ * The most recently detected alerts, for one district or the whole country.
+ * While `pushed`, the alert socket is open and refreshes them on every change,
+ * so they are not polled; otherwise they poll like everything else.
+ */
+export function useAlerts(district: string | null, pushed = false) {
   return useQuery({
     queryKey: ['alerts', district],
     queryFn: ({ signal }) => getJson<Alert[]>('/alerts', { district, limit: 50 }, signal),
     ...polling,
+    refetchInterval: pushed ? false : POLL_INTERVAL_MS,
   })
 }
 
@@ -83,8 +88,8 @@ export type AlertAction = { status: AlertStatus } | { verdict: Verdict }
 
 /**
  * Acts on an alert, then refreshes the alert list and the district counts at
- * once rather than waiting for the next poll, since closing an alert changes
- * both.
+ * once rather than waiting for the socket or the next poll, since closing an
+ * alert changes both.
  */
 export function useAlertAction(code: string) {
   const queryClient = useQueryClient()
