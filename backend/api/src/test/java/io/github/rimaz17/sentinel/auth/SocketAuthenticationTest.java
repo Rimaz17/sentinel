@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,8 @@ class SocketAuthenticationTest {
     assertThat(first.scope().includes("KDY")).isTrue();
     assertThat(first.scope().includes("CMB")).isFalse();
     assertThat(first.expiresAt()).isEqualTo(expiresAt);
-    assertThat(first.getName()).isNotEqualTo(second.getName()).doesNotContain("42");
+    // A name of the connection's own, never the account's.
+    assertThat(UUID.fromString(first.getName())).isNotEqualTo(UUID.fromString(second.getName()));
   }
 
   @Test
