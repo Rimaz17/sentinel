@@ -23,5 +23,5 @@ import org.springframework.context.annotation.Import;
       "sentinel.rate-limit.ingestion-per-minute=100000"
     })
 @AutoConfigureMockMvc
-@Import({TestcontainersConfiguration.class, TestAccounts.class})
+@Import({TestcontainersConfiguration.class, TestAccounts.class, TestReports.class})
 public @interface IntegrationTest {}
