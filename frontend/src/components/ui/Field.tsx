@@ -38,7 +38,7 @@ export function Field({ label, hint, error, width, className, ...input }: FieldP
   const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ')
 
   return (
-    <div className={cx('grid gap-3xs', className)}>
+    <div className={cx('grid content-start gap-3xs', className)}>
       <label htmlFor={id} className={cx(labelSm, caps, 'text-ink-70')}>
         {label}
       </label>
