@@ -418,7 +418,7 @@ activation are limited to 10 requests a minute from one address.
 
 | Endpoint | What it does |
 |---|---|
-| `POST /api/ingestion/reports` | Submits a report. A data provider's facility is the one in their token; the feed names it in `X-Facility-Code`. Answers `202 Accepted` with the report's id. Limited to 120 a minute per data provider. |
+| `POST /api/ingestion/reports` | Submits a report. A data provider's facility is the one in their token; the feed names it in `X-Facility-Code`. Answers `202 Accepted` with the report's id once Kafka has it, and `503` if Kafka cannot take it; the report is stored a moment later. Limited to 120 a minute per data provider. |
 | `GET /api/facilities` | The registry, for the feed and for inspectors' maps. |
 
 **Inspectors**, within their districts; anything outside them is 403:
@@ -434,6 +434,18 @@ activation are limited to 10 requests a minute from one address.
 | `GET /api/reports/weekly-counts` | Reports per symptom group in each of the last nine weeks, bucketed as the detector buckets them. |
 
 Without `?district=`, an inspector's requests cover every district they may see.
+Each district's reports over the last seven days, here and in the public API,
+are read from Redis; while Redis cannot be reached those two endpoints answer
+`503` and the rest of the API carries on.
+
+**Alerts over WebSocket**, for inspectors
+([ADR 0016](docs/adr/0016-alerts-pushed-over-websocket.md)):
+
+| What | How |
+|---|---|
+| Connect | STOMP over a plain WebSocket at `/api/ws`, from the API's own origin. The CONNECT frame carries `Authorization: Bearer <access token>`; only an inspector's token is accepted. |
+| Subscribe | `/user/queue/alerts`, and nothing else. Nothing may be sent. |
+| Receive | `{"change": "RAISED" or "UPDATED", "alert": {...}}`, the alert as `GET /api/alerts` returns it, for alerts in the inspector's districts only; or `{"change": "RESYNC", "alert": null}`, read every alert again. Nothing arrives once the token has expired, so reconnect with each renewed token. |
 
 **The administrator:**
 
@@ -472,7 +484,7 @@ The submission page at `/submit` never asks for any identity field at all.
 
 | Command | Run from | What it does |
 |---|---|---|
-| `./mvnw verify` | `backend/api` | Formatting check, unit tests, and integration tests against a real PostgreSQL started by Testcontainers (needs Docker) |
+| `./mvnw verify` | `backend/api` | Formatting check, unit tests, and integration tests against a real PostgreSQL, Kafka and Redis started by Testcontainers (needs Docker) |
 | `./mvnw spotless:apply` | `backend/api` | Format the Java sources |
 | `pip install -r requirements-dev.txt` | `backend/simulator` | Install pytest, Ruff and Black |
 | `pytest` · `ruff check .` · `black .` | `backend/simulator` or `scripts/facility-registry` | Test, lint and format either Python project |
