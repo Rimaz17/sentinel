@@ -1,10 +1,11 @@
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useId, useState } from 'react'
 import { SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
 import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { ACTIVATE_PATH } from '@/features/auth/ActivatePage'
-import { ROLE_NAMES, useAccount } from '@/features/auth/session'
+import { useAccount } from '@/features/auth/session'
+import type { Role } from '@/lib/api/session'
 import { formatCount, formatDateTime } from '@/features/dashboard/format'
 import { EmptyState, LoadingRows, QueryView } from '@/features/dashboard/QueryView'
 import { ApiError } from '@/lib/api/client'
@@ -209,6 +210,16 @@ function NewInspectorForm({
   )
 }
 
+/** The roles in the order the list shows them: inspectors first, the accounts this page is for. */
+const GROUPS: { role: Role; title: string }[] = [
+  { role: 'PHI', title: 'Public health inspectors' },
+  { role: 'DATA_PROVIDER', title: 'Data providers' },
+  { role: 'ADMIN', title: 'Administrators' },
+]
+
+/** More accounts than this, and the list offers a search. */
+const SEARCH_FROM = 6
+
 function AccountList({
   districts,
   onLinkIssued,
@@ -217,6 +228,9 @@ function AccountList({
   onLinkIssued: (issued: IssuedAccount) => void
 }) {
   const accounts = useAccounts()
+  const [search, setSearch] = useState('')
+  const searchId = useId()
+
   return (
     <>
       <PanelHeading
@@ -240,15 +254,63 @@ function AccountList({
         isEmpty={(list) => list.length === 0}
         empty={<EmptyState title="No accounts yet.">Create an inspector to begin.</EmptyState>}
       >
-        {(list) => (
-          <ul className="border-t border-t-ink">
-            {list.map((account) => (
-              <li key={account.id}>
-                <AccountRow account={account} districts={districts} onLinkIssued={onLinkIssued} />
-              </li>
-            ))}
-          </ul>
-        )}
+        {(list) => {
+          const wanted = search.trim().toLowerCase()
+          const shown = list.filter(
+            (account) =>
+              account.displayName.toLowerCase().includes(wanted) || account.email.includes(wanted),
+          )
+          return (
+            <div className="grid gap-md">
+              {list.length > SEARCH_FROM ? (
+                <div>
+                  <label htmlFor={searchId} className="sr-only">
+                    Find an account
+                  </label>
+                  <input
+                    id={searchId}
+                    type="search"
+                    placeholder="Find an account by name or email"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    className="w-full rounded-control border border-ink-24 bg-paper-raised px-xs py-2xs text-small placeholder:text-ink-70"
+                  />
+                </div>
+              ) : null}
+              {shown.length === 0 ? (
+                <p className="text-small text-ink-70">No account matches “{search.trim()}”.</p>
+              ) : (
+                GROUPS.map(({ role, title }) => {
+                  const members = shown.filter((account) => account.role === role)
+                  return members.length === 0 ? null : (
+                    <section key={role} aria-labelledby={`${searchId}-${role}`} className="grid">
+                      <h3
+                        id={`${searchId}-${role}`}
+                        className="flex items-baseline justify-between gap-x-sm border-b border-b-ink pb-2xs text-small font-medium"
+                      >
+                        {title}
+                        <span className={cx(labelSm, 'font-normal text-ink-70')}>
+                          {formatCount(members.length)}
+                        </span>
+                      </h3>
+                      <ul>
+                        {members.map((account) => (
+                          <li key={account.id}>
+                            <AccountRow
+                              account={account}
+                              districts={districts}
+                              onLinkIssued={onLinkIssued}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )
+                })
+              )}
+            </div>
+          )
+        }}
       </QueryView>
     </>
   )
@@ -267,24 +329,32 @@ function AccountRow({
   const change = useChangeAccount()
   const newLink = useNewLink()
   const failed = change.error ?? newLink.error
+  const reach = covers(account, districts)
 
   return (
     <article
       aria-label={account.displayName}
-      className="grid gap-2xs border-b border-b-ink-14 py-sm"
+      className="grid gap-x-md gap-y-xs border-b border-b-ink-14 py-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
     >
-      <div className="flex flex-wrap items-baseline gap-x-sm">
-        <h3 className="text-body font-medium">{account.displayName}</h3>
-        <p className="text-small text-ink-70">{account.email}</p>
+      <div className="grid min-w-0 gap-3xs">
+        <div className="flex flex-wrap items-baseline gap-x-sm gap-y-3xs">
+          <h4 className={cx('text-body font-medium', account.enabled ? null : 'text-ink-70')}>
+            {account.displayName}
+          </h4>
+          <p className="font-mono text-small break-all text-ink-70">{account.email}</p>
+        </div>
+        {reach ? <p className="text-small">{reach}</p> : null}
+        <p className={cx(labelSm, 'text-ink-70')}>{state(account)}</p>
+        {failed ? (
+          <p role="alert" className={cx(labelSm, 'text-ink')}>
+            {failed.message}
+          </p>
+        ) : null}
       </div>
-      <p className="text-small">
-        {capitalise(ROLE_NAMES[account.role])} · {covers(account, districts)}
-      </p>
-      <p className={cx(labelSm, 'text-ink-70')}>{state(account)}</p>
       {account.id === me.id ? (
         <p className={cx(labelSm, 'text-ink-70')}>Your own account</p>
       ) : (
-        <div className="flex flex-wrap gap-x-md gap-y-3xs">
+        <div className="flex flex-wrap gap-x-md gap-y-3xs md:justify-end">
           <QuietButton
             onClick={() => change.mutate({ id: account.id, enabled: !account.enabled })}
             disabled={change.isPending}
@@ -301,27 +371,23 @@ function AccountRow({
           ) : null}
         </div>
       )}
-      {failed ? (
-        <p role="alert" className={cx(labelSm, 'text-ink')}>
-          {failed.message}
-        </p>
-      ) : null}
     </article>
   )
 }
 
-function covers(account: AdminAccount, districts: DistrictName[]): string {
+/** What an account reaches, in words; the group it sits in already names its role. */
+function covers(account: AdminAccount, districts: DistrictName[]): string | null {
   if (account.role === 'DATA_PROVIDER') {
-    return account.facilityName ?? account.facilityCode ?? 'no facility'
+    return `Reports for ${account.facilityName ?? account.facilityCode ?? 'no facility'}`
   }
   if (account.role !== 'PHI') {
-    return 'administration'
+    return null
   }
   if (account.districts.includes('*')) {
-    return 'every district'
+    return 'Covers every district'
   }
   const names = new Map(districts.map((district) => [district.code, district.name]))
-  return account.districts.map((code) => names.get(code) ?? code).join(', ')
+  return `Covers ${account.districts.map((code) => names.get(code) ?? code).join(', ')}`
 }
 
 function state(account: AdminAccount): string {
@@ -334,8 +400,4 @@ function state(account: AdminAccount): string {
       : 'Not activated · no link outstanding'
   }
   return `Active · created ${formatDateTime(account.createdAt)}`
-}
-
-function capitalise(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1)
 }

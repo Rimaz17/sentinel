@@ -116,8 +116,44 @@ describe('AdminPage: accounts', () => {
     renderAt('/app/admin')
 
     const row = await screen.findByRole('article', { name: 'Nimal Silva' })
-    expect(within(row).getByText('Public health inspector · Kandy')).toBeInTheDocument()
+    expect(within(row).getByText('Covers Kandy')).toBeInTheDocument()
     expect(within(row).getByText(/^Active/)).toBeInTheDocument()
+  })
+
+  it('groups the accounts by role, inspectors first', async () => {
+    renderAt('/app/admin')
+
+    await screen.findByRole('article', { name: 'Nimal Silva' })
+    const groups = screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
+    expect(groups).toEqual(['Public health inspectors1', 'Administrators1'])
+    const inspectors = screen.getByRole('region', { name: /^Public health inspectors/ })
+    expect(within(inspectors).getByRole('article', { name: 'Nimal Silva' })).toBeInTheDocument()
+  })
+
+  it('offers a search once the list is long, matching names and emails', async () => {
+    const many = Array.from({ length: 7 }, (_, index) =>
+      account({
+        id: 20 + index,
+        displayName: `Inspector ${index}`,
+        email: `i${index}@example.org`,
+      }),
+    )
+    fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+      Promise.resolve(
+        url === '/api/admin/accounts'
+          ? Response.json([...many, account({ displayName: 'Kumari Perera', email: 'kp@x.org' })])
+          : respond(url, init),
+      ),
+    )
+    renderAt('/app/admin')
+
+    await userEvent.type(await screen.findByLabelText('Find an account'), 'kp@x')
+    expect(screen.getByRole('article', { name: 'Kumari Perera' })).toBeInTheDocument()
+    expect(screen.queryByRole('article', { name: 'Inspector 0' })).not.toBeInTheDocument()
+
+    await userEvent.clear(screen.getByLabelText('Find an account'))
+    await userEvent.type(screen.getByLabelText('Find an account'), 'nobody')
+    expect(screen.getByText('No account matches “nobody”.')).toBeInTheDocument()
   })
 
   it('never offers an administrator a way to disable their own account', async () => {
