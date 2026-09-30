@@ -5,10 +5,10 @@
 
 Sentinel's surfaces are **ink on paper**. The landing page is ruled: its structure
 is carried by hairlines and weight, never by cards, shadows or rounded containers.
-The working pages (both dashboards and report submission) are set as panels, soft
-rounded sheets on a low shadow, and the staff sign-in pages box their two halves
-in a square ink rule; see Components. A single ochre carries the page's attention,
-and is spent in exactly two places.
+Every working page (both dashboards, report submission, the staff sign-in pages
+and administration) is set as panels, soft rounded sheets on a low shadow; see
+Components. A single ochre carries the page's attention, and is spent in exactly
+two places.
 
 ## Implementation
 
@@ -313,15 +313,18 @@ screens. The theme restores a plain `:hover` so the page behaves as it always ha
 - **Rules on the landing page, panels on the working pages.** Every rule is a 1px
   border in an ink alpha: hairline `border-ink-14`, faint `border-ink-08`, firm
   `border-ink-24`, full `border-ink`. The landing page stays ruled, with nothing
-  elevated. The working pages (both dashboards and report submission) are set as
-  panels, at the user's direction from a reference layout, so a page reads as a
-  set of sheets rather than one long column with wide gaps. One component,
-  `Panel`, in two tones:
+  elevated. The working pages (both dashboards, report submission, the staff
+  sign-in pages and administration) are set as panels, at the user's direction
+  from a reference layout, so a page reads as a set of sheets rather than one
+  long column with wide gaps. One component, `Panel`, in one look: a
+  `--color-card` (`#f7f9f9`) ground, a 1px `ink-08` border, `--radius-panel`
+  (`0.875rem`) and `--shadow-panel` (a 1px contact shadow and a low, wide shadow
+  offset downward).
 
-  | Tone | Look | Where |
-  |---|---|---|
-  | `sheet` | `--color-card` (`#f7f9f9`) ground, 1px `ink-08` border, `--radius-panel` (`0.875rem`), `--shadow-panel` (a 1px contact shadow and a low, wide shadow offset downward) | The dashboards and report submission |
-  | `ruled` | The page's own paper (`--color-paper`) in a square 2px full-ink box, flat, so the box is drawn by its line alone | The staff sign-in pages, as the user drew them |
+  The sign-in pages were once boxed in a square 2px ink rule on the page's own
+  paper, a second tone drawn from an early sketch. The user asked for them to
+  match the dashboards instead (2026-10-01), and the tone was removed, so there
+  is one kind of panel everywhere.
 
   Ink on the card ground is 15.34:1 and ink-70 5.82:1. Controls inside a panel
   (the district search, the map frame, the symptom tiles) take
@@ -446,12 +449,11 @@ Administration and submission take a thin staff header instead: the wordmark, th
 section, "Signed in as", a quiet "Sign out", and the simulated-data notice
 beneath.
 
-- **The frame: two boxes.** Each half is a `ruled` panel, a square 2px full-ink
-  box on the page's own paper, as the user sketched them. From `68rem` they stand side
-  by side, their tops and feet level (the grid stretches both to one height): the
-  left box carries the title, the intro, the rail and then the notes in small
-  ink-70; the right box carries the form. Below `68rem` the form's box follows
-  the other.
+- **The frame: two sheets.** Each half is a sheet panel, as on the dashboards.
+  From `68rem` they stand side by side, their tops and feet level (the grid
+  stretches both to one height): the left sheet carries the title, the intro, the
+  rail and then the notes in small ink-70; the right sheet carries the form.
+  Below `68rem` the form's sheet follows the other.
 - **Where you are, as a rail.** Registration and activation carry a `StepRail`:
   the steps in order under a full ink rule, each a ruled row with a two-digit
   mono number (`01`, `02`, `03`). A step is done, current or next. The current
@@ -495,9 +497,34 @@ beneath.
   third action shape. When a visitor reaches sign-in already signed in,
   "Continue" is that same ruled box (`<Action>`) beside a quiet "Sign out",
   because continuing is the thing they came to do.
-- **A secret shown once**, an invite code or an activation link, sits between a
-  full-ink rule and a hairline, in mono, with "Copy" and "Done". It is never shown
-  again.
+- **A secret shown once**, an invite code or an activation link, sits on its own
+  panel, headed with what it is and "Shown once" in mono caps: the value in mono
+  in a full-ink rounded box, who it is for, then "Copy" and "Done". The panel takes
+  focus as it appears, so a secret issued from a row far down a list is scrolled
+  to and read out. It is never shown again.
+
+**Administration is two panels a section.** `/app/admin` and
+`/app/admin/facilities` sit under a pair of section tabs, each a rounded control
+chip in mono caps; the section in view is inked in, paper on ink, as the step
+rail marks the current step, and carries `aria-current="page"`. Each section is
+then the same pair of panels, from `68rem` 2 parts to 3:
+
+- **Left, what you do.** The section's `<h1>` and its intro, then under a hairline
+  the new inspector form, or the district and name filters. The filters' panel is
+  sticky from `68rem`, so they stay in reach while a district's seventy-odd
+  facilities scroll beside them.
+- **Right, what there is.** A panel headed "Accounts" or "Facilities in Colombo"
+  with its count in mono at the heading's end, and above it, while one is
+  showing, the secret shown once. Accounts are grouped by role, inspectors
+  first, each group a small heading with its count over a full-ink rule; past six
+  accounts a "Find an account" search filters by name or email. A row carries
+  the name, the email in mono, what the account reaches in words ("Covers Kandy",
+  "Reports for Infectious Diseases Hospital, Angoda"), its state in mono, and its
+  actions as quiet buttons at the row's end from `48rem`.
+- **Choosing districts.** "Every district: a national inspector" is a tile, like
+  the symptom group tiles, because it is the either-or that decides the rest;
+  under it all 25 districts show at once in three columns (two on a phone), with
+  no inner scroll, and a mono count of those chosen.
 
 **Report submission is one form panel.** `/submit` has no rail: submission is a
 repeated single-screen task inside a shift, not a sequence, so a step rail there
