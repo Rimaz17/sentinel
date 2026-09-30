@@ -5,6 +5,7 @@ import io.github.rimaz17.sentinel.accounts.AccountService;
 import io.github.rimaz17.sentinel.accounts.Role;
 import io.github.rimaz17.sentinel.auth.ActivationLinks;
 import io.github.rimaz17.sentinel.auth.Caller;
+import io.github.rimaz17.sentinel.demo.DemoGuard;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -35,10 +36,12 @@ class AdminAccountController {
 
   private final AccountService accounts;
   private final ActivationLinks activationLinks;
+  private final DemoGuard demo;
 
-  AdminAccountController(AccountService accounts, ActivationLinks activationLinks) {
+  AdminAccountController(AccountService accounts, ActivationLinks activationLinks, DemoGuard demo) {
     this.accounts = accounts;
     this.activationLinks = activationLinks;
+    this.demo = demo;
   }
 
   /**
@@ -61,19 +64,31 @@ class AdminAccountController {
   }
 
   @GetMapping("/accounts")
-  List<AdminAccountResponse> list(@RequestParam(required = false) Role role) {
+  List<AdminAccountResponse> list(Caller.Staff admin, @RequestParam(required = false) Role role) {
+    boolean restricted = demo.restricts(admin.accountId());
     List<Account> found = accounts.list(role);
     Map<Long, Instant> links =
         activationLinks.expiryByAccount(found.stream().map(Account::getId).toList());
     return found.stream()
-        .map(account -> AdminAccountResponse.from(account, links.get(account.getId())))
+        .map(
+            account ->
+                AdminAccountResponse.from(
+                    account,
+                    links.get(account.getId()),
+                    DemoGuard.accountLocked(restricted, account)))
         .toList();
   }
 
+  /** An inspector the demo administrator creates is a visitor's, and goes at the nightly reset. */
   @PostMapping("/inspectors")
-  ResponseEntity<IssuedAccount> createInspector(@Valid @RequestBody NewInspector request) {
+  ResponseEntity<IssuedAccount> createInspector(
+      Caller.Staff admin, @Valid @RequestBody NewInspector request) {
     Account inspector =
-        accounts.createInspector(request.email(), request.displayName(), request.districts());
+        accounts.createInspector(
+            request.email(),
+            request.displayName(),
+            request.districts(),
+            demo.madeInDemo(admin.accountId()));
     return issued(inspector, HttpStatus.CREATED);
   }
 
@@ -83,8 +98,10 @@ class AdminAccountController {
   @PatchMapping("/accounts/{id}")
   AdminAccountResponse update(
       Caller.Staff admin, @PathVariable long id, @Valid @RequestBody AccountChange change) {
+    demo.requireAccountChangeable(admin.accountId(), id);
     Account account = accounts.update(id, change.enabled(), change.districts(), admin.accountId());
-    return AdminAccountResponse.from(account, activationLinks.expiryByAccount(List.of(id)).get(id));
+    return AdminAccountResponse.from(
+        account, activationLinks.expiryByAccount(List.of(id)).get(id), false);
   }
 
   /**
@@ -92,7 +109,8 @@ class AdminAccountController {
    * activated gets another chance, and how anyone who has forgotten their password sets a new one.
    */
   @PostMapping("/accounts/{id}/activation")
-  ResponseEntity<IssuedAccount> reissueLink(@PathVariable long id) {
+  ResponseEntity<IssuedAccount> reissueLink(Caller.Staff admin, @PathVariable long id) {
+    demo.requireAccountChangeable(admin.accountId(), id);
     return issued(accounts.requireLinkable(id), HttpStatus.OK);
   }
 
@@ -102,7 +120,7 @@ class AdminAccountController {
         .cacheControl(CacheControl.noStore())
         .body(
             new IssuedAccount(
-                AdminAccountResponse.from(account, link.expiresAt()),
+                AdminAccountResponse.from(account, link.expiresAt(), false),
                 link.token(),
                 link.expiresAt()));
   }

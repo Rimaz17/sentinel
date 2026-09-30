@@ -74,17 +74,24 @@ public class AccountService {
   /**
    * A data provider for a facility whose invite code the caller has already proved they hold. The
    * account is linked to that facility for good.
+   *
+   * @param madeInDemo whether a visitor to the public demonstration is registering, so the demo's
+   *     nightly reset removes the account
    */
   @Transactional
   public Account registerDataProvider(
-      String email, String displayName, String password, Facility facility) {
+      String email, String displayName, String password, Facility facility, boolean madeInDemo) {
     requireAcceptable(password);
     if (accounts.existsByEmail(Account.normaliseEmail(email))) {
       throw new ApiProblem(HttpStatus.CONFLICT, EMAIL_TAKEN);
     }
-    return accounts.save(
+    Account account =
         Account.dataProvider(
-            email, displayName, passwords.encode(password), facility, clock.instant()));
+            email, displayName, passwords.encode(password), facility, clock.instant());
+    if (madeInDemo) {
+      account.markMadeInDemo();
+    }
+    return accounts.save(account);
   }
 
   /** Sets an account's password, after checking it against the policy. */
@@ -99,14 +106,22 @@ public class AccountService {
   /**
    * An inspector created by an administrator, covering the given districts or, with {@code *},
    * every district. They have no password until they follow their activation link.
+   *
+   * @param madeInDemo whether the demo administrator is creating it, so the demo's nightly reset
+   *     removes the account
    */
   @Transactional
-  public Account createInspector(String email, String displayName, List<String> districtEntries) {
+  public Account createInspector(
+      String email, String displayName, List<String> districtEntries, boolean madeInDemo) {
     DistrictScope scope = scopeOf(districtEntries);
     if (accounts.existsByEmail(Account.normaliseEmail(email))) {
       throw new ApiProblem(HttpStatus.CONFLICT, EMAIL_TAKEN);
     }
-    return accounts.save(Account.inspector(email, displayName, scope, clock.instant()));
+    Account inspector = Account.inspector(email, displayName, scope, clock.instant());
+    if (madeInDemo) {
+      inspector.markMadeInDemo();
+    }
+    return accounts.save(inspector);
   }
 
   /**

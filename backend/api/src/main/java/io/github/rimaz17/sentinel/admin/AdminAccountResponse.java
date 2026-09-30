@@ -13,6 +13,8 @@ import java.util.List;
  * @param districts an inspector's districts, {@code ["*"]} for every district; empty otherwise
  * @param activated whether the account has a password yet
  * @param activationExpiresAt when its outstanding activation link expires; null if it has none
+ * @param lockedInDemo whether the administrator asking is the demo administrator and must leave
+ *     this account as it is; see DemoGuard
  */
 record AdminAccountResponse(
     long id,
@@ -25,9 +27,11 @@ record AdminAccountResponse(
     boolean enabled,
     boolean activated,
     Instant createdAt,
-    Instant activationExpiresAt) {
+    Instant activationExpiresAt,
+    boolean lockedInDemo) {
 
-  static AdminAccountResponse from(Account account, Instant activationExpiresAt) {
+  static AdminAccountResponse from(
+      Account account, Instant activationExpiresAt, boolean lockedInDemo) {
     Facility facility = account.getFacility();
     return new AdminAccountResponse(
         account.getId(),
@@ -40,6 +44,7 @@ record AdminAccountResponse(
         account.isEnabled(),
         account.isActivated(),
         account.getCreatedAt(),
-        activationExpiresAt);
+        activationExpiresAt,
+        lockedInDemo);
   }
 }

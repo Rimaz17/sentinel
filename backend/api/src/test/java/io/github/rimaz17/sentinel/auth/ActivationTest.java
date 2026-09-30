@@ -39,7 +39,8 @@ class ActivationTest {
   @BeforeEach
   void createInspectorWithALink() {
     accounts.clear();
-    inspector = accountService.createInspector("phi@example.org", "Nimal Silva", List.of("KDY"));
+    inspector =
+        accountService.createInspector("phi@example.org", "Nimal Silva", List.of("KDY"), false);
     token = links.issue(inspector).token();
   }
 
