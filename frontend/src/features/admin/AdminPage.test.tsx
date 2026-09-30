@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { resetSession, type Session, setSession } from '@/lib/api/session'
+import { DEMO } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import type { AdminAccount, AdminFacility } from './api'
 import { AdminPage } from './AdminPage'
@@ -33,6 +34,7 @@ function account(overrides: Partial<AdminAccount> = {}): AdminAccount {
     activated: true,
     createdAt: '2026-09-20T04:00:00Z',
     activationExpiresAt: null,
+    lockedInDemo: false,
     ...overrides,
   }
 }
@@ -45,12 +47,17 @@ const PERADENIYA: AdminFacility = {
   institutionType: 'Teaching',
   inviteIssuedAt: null,
   dataProviderAccounts: 0,
+  lockedInDemo: false,
 }
 
 let fetchMock: Mock<(url: string, init?: RequestInit) => Promise<Response>>
+let demoMode = false
 
 function respond(url: string, init?: RequestInit): Response {
   const method = init?.method ?? 'GET'
+  if (url === '/api/public/demo') {
+    return demoMode ? Response.json(DEMO) : Response.json({ detail: 'Not found.' }, { status: 404 })
+  }
   if (url === '/api/public/districts') {
     return Response.json([
       { code: 'KDY', name: 'Kandy' },
@@ -89,6 +96,7 @@ function respond(url: string, init?: RequestInit): Response {
 }
 
 beforeEach(() => {
+  demoMode = false
   resetSession()
   setSession(ADMIN)
   fetchMock = vi.fn((url: string, init?: RequestInit) => Promise.resolve(respond(url, init)))
@@ -232,5 +240,68 @@ describe('AdminPage: facilities', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Inspectors and accounts' }),
     ).toBeInTheDocument()
+  })
+})
+
+describe('AdminPage: the demo administrator', () => {
+  const DEMO_ADMIN: Session = {
+    ...ADMIN,
+    account: { ...ADMIN.account, email: 'admin@demo.sentinel.test' },
+  }
+
+  function asDemoAdministrator(accounts: AdminAccount[], facilities: AdminFacility[] = []) {
+    demoMode = true
+    setSession(DEMO_ADMIN)
+    fetchMock.mockImplementation((url: string, init?: RequestInit) =>
+      Promise.resolve(
+        url === '/api/admin/accounts'
+          ? Response.json(accounts)
+          : url.startsWith('/api/admin/facilities?')
+            ? Response.json(facilities)
+            : respond(url, init),
+      ),
+    )
+  }
+
+  it('says which changes are switched off, and leaves them visible but disabled', async () => {
+    asDemoAdministrator([
+      account({ id: 6, displayName: 'Demo inspector, Colombo', lockedInDemo: true }),
+      account({ id: 7, displayName: 'A visitor’s inspector' }),
+    ])
+    renderAt('/app/admin')
+
+    const locked = await screen.findByRole('article', { name: 'Demo inspector, Colombo' })
+    expect(within(locked).getByText('Switched off in the demo')).toBeInTheDocument()
+    expect(within(locked).getByRole('button', { name: 'Disable' })).toBeDisabled()
+    expect(within(locked).getByRole('button', { name: 'New password link' })).toBeDisabled()
+
+    const open = screen.getByRole('article', { name: 'A visitor’s inspector' })
+    expect(within(open).queryByText('Switched off in the demo')).not.toBeInTheDocument()
+    expect(within(open).getByRole('button', { name: 'Disable' })).toBeEnabled()
+
+    expect(await screen.findByText(/You are the demo administrator/)).toBeInTheDocument()
+    expect(screen.getByText(/Use a made-up name and email address/)).toBeInTheDocument()
+  })
+
+  it('leaves the published invite code disabled', async () => {
+    asDemoAdministrator(
+      [],
+      [{ ...PERADENIYA, inviteIssuedAt: '2026-09-28T04:00:00Z', lockedInDemo: true }],
+    )
+    renderAt('/app/admin/facilities')
+
+    const row = await screen.findByRole('article', { name: 'Peradeniya' })
+    expect(within(row).getByText('Switched off in the demo')).toBeInTheDocument()
+    expect(within(row).getByRole('button', { name: 'Issue a new code' })).toBeDisabled()
+    expect(within(row).getByRole('button', { name: 'Revoke' })).toBeDisabled()
+  })
+
+  it('tells no other administrator anything about the demo', async () => {
+    demoMode = true
+    renderAt('/app/admin')
+
+    await screen.findByRole('article', { name: 'Nimal Silva' })
+    expect(screen.queryByText(/demo administrator/)).not.toBeInTheDocument()
+    expect(screen.queryByText('Switched off in the demo')).not.toBeInTheDocument()
   })
 })

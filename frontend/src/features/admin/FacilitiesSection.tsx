@@ -12,6 +12,7 @@ import {
   useIssueCode,
   useRevokeCode,
 } from './api'
+import { SwitchedOff } from './AccountsSection'
 import { ShownOnce } from './ShownOnce'
 
 /**
@@ -189,15 +190,19 @@ function FacilityRow({
           </p>
         ) : null}
       </div>
-      <div className="flex flex-wrap gap-x-md gap-y-3xs md:justify-end">
+      <div className="flex flex-wrap items-baseline gap-x-md gap-y-3xs md:justify-end">
+        {facility.lockedInDemo ? <SwitchedOff /> : null}
         <QuietButton
           onClick={() => issue.mutate(facility.code, { onSuccess: onIssued })}
-          disabled={busy}
+          disabled={busy || facility.lockedInDemo}
         >
           {facility.inviteIssuedAt ? 'Issue a new code' : 'Issue a code'}
         </QuietButton>
         {facility.inviteIssuedAt ? (
-          <QuietButton onClick={() => revoke.mutate(facility.code)} disabled={busy}>
+          <QuietButton
+            onClick={() => revoke.mutate(facility.code)}
+            disabled={busy || facility.lockedInDemo}
+          >
             Revoke
           </QuietButton>
         ) : null}

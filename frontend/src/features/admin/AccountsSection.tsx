@@ -5,6 +5,7 @@ import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { ACTIVATE_PATH } from '@/features/auth/ActivatePage'
 import { useAccount } from '@/features/auth/session'
+import { isDemoAdministrator, useDemo } from '@/features/demo/api'
 import type { Role } from '@/lib/api/session'
 import { formatCount, formatDateTime } from '@/features/dashboard/format'
 import { EmptyState, LoadingRows, QueryView } from '@/features/dashboard/QueryView'
@@ -41,6 +42,9 @@ function activationLink(token: string): string {
 export function AccountsSection() {
   const [issued, setIssued] = useState<IssuedAccount | null>(null)
   const districtNames = useDistrictNames()
+  const me = useAccount()
+  const demo = useDemo()
+  const demoAdministrator = isDemoAdministrator(demo.data, me.email)
 
   return (
     <div className="grid gap-md xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] xl:items-start">
@@ -59,6 +63,12 @@ export function AccountsSection() {
           <h2 id="new-inspector" className={panelTitle}>
             New inspector
           </h2>
+          {demoAdministrator ? (
+            <p className="max-w-measure text-small font-medium">
+              Use a made-up name and email address. Other visitors signed in as the demo
+              administrator can see this list until the nightly reset removes what visitors made.
+            </p>
+          ) : null}
           <NewInspectorForm districts={districtNames.data ?? []} onCreated={setIssued} />
         </section>
       </Panel>
@@ -354,17 +364,18 @@ function AccountRow({
       {account.id === me.id ? (
         <p className={cx(labelSm, 'text-ink-70')}>Your own account</p>
       ) : (
-        <div className="flex flex-wrap gap-x-md gap-y-3xs md:justify-end">
+        <div className="flex flex-wrap items-baseline gap-x-md gap-y-3xs md:justify-end">
+          {account.lockedInDemo ? <SwitchedOff /> : null}
           <QuietButton
             onClick={() => change.mutate({ id: account.id, enabled: !account.enabled })}
-            disabled={change.isPending}
+            disabled={change.isPending || account.lockedInDemo}
           >
             {account.enabled ? 'Disable' : 'Enable'}
           </QuietButton>
           {account.enabled ? (
             <QuietButton
               onClick={() => newLink.mutate(account.id, { onSuccess: onLinkIssued })}
-              disabled={newLink.isPending}
+              disabled={newLink.isPending || account.lockedInDemo}
             >
               {account.activated ? 'New password link' : 'New activation link'}
             </QuietButton>
@@ -373,6 +384,11 @@ function AccountRow({
       )}
     </article>
   )
+}
+
+/** Said beside the actions the demo administrator may not take, which stay visible but disabled. */
+export function SwitchedOff() {
+  return <p className={cx(labelSm, 'text-ink-70')}>Switched off in the demo</p>
 }
 
 /** What an account reaches, in words; the group it sits in already names its role. */

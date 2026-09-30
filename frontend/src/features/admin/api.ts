@@ -18,6 +18,8 @@ export type AdminAccount = {
   createdAt: string
   /** When its outstanding activation link expires; null if it has none. */
   activationExpiresAt: string | null
+  /** Whether the demo administrator, asking, must leave this account as it is. */
+  lockedInDemo: boolean
 }
 
 /** A new account or link, with the link's secret, shown to the administrator this once. */
@@ -37,6 +39,8 @@ export type AdminFacility = {
   /** When its current invite code was issued; null if it has none. */
   inviteIssuedAt: string | null
   dataProviderAccounts: number
+  /** Whether the demo administrator, asking, must leave this facility's code as it is. */
+  lockedInDemo: boolean
 }
 
 /** POST /api/admin/facilities/{code}/invite-code, shown this once. */
