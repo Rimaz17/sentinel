@@ -74,3 +74,11 @@ sentinel:
   admin:
     email: ${SENTINEL_ADMIN_EMAIL:}
     password: ${SENTINEL_ADMIN_PASSWORD:}
+  # The public demonstration: published demo accounts, a published invite code,
+  # and a nightly reset. Off unless switched on. See docs/adr/0017-public-demo-mode.md.
+  demo:
+    enabled: ${SENTINEL_DEMO_MODE:false}
+    password: ${SENTINEL_DEMO_PASSWORD:}
+    invite-code: ${SENTINEL_DEMO_INVITE_CODE:}
+    # Sri Lanka time.
+    reset-at: "03:00"
