@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { formatCount, formatDateTime } from '@/features/dashboard/format'
 import { EmptyState, LoadingRows, QueryView } from '@/features/dashboard/QueryView'
@@ -18,6 +19,10 @@ import { ShownOnce } from './ShownOnce'
  * code. A code is the only way a data provider can register: it is shown once
  * when issued, delivered to the facility directly, and can be replaced or
  * revoked here. Accounts already registered with a code keep working either way.
+ *
+ * Two sheet panels: the title and the district and name filters on the left,
+ * held in view from 68rem while the list beside them scrolls, and the
+ * district's facilities on the right.
  */
 export function FacilitiesSection() {
   const [district, setDistrict] = useState('KDY')
@@ -27,97 +32,125 @@ export function FacilitiesSection() {
   const facilities = useFacilities(district)
   const districtId = useId()
   const filterId = useId()
+  const options = districtNames.data ?? [{ code: 'KDY', name: 'Kandy' }]
+  const districtName = options.find((option) => option.code === district)?.name ?? district
 
   return (
-    <>
-      <div className="grid gap-xs">
-        <h1 className={sectionTitle}>Facilities and invite codes</h1>
-        <p className="max-w-measure text-body text-ink-70">
-          One code per facility, shared by its staff. Give it to the facility directly, by phone or
-          by hand. Issuing a new code stops the old one working for anyone who has not registered
-          yet.
-        </p>
-      </div>
+    <div className="grid gap-md xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] xl:items-start">
+      <Panel as="div" className="gap-md md:p-lg xl:sticky xl:top-md">
+        <div className="grid gap-xs">
+          <h1 className={sectionTitle}>Facilities and invite codes</h1>
+          <p className="max-w-measure text-body text-ink-70">
+            One code per facility, shared by its staff. Give it to the facility directly, by phone
+            or by hand. Issuing a new code stops the old one working for anyone who has not
+            registered yet.
+          </p>
+        </div>
+        <div className="grid gap-sm border-t border-t-ink-14 pt-md">
+          <div className="grid gap-3xs">
+            <label htmlFor={districtId} className={cx(labelSm, caps, 'text-ink-70')}>
+              District
+            </label>
+            <select
+              id={districtId}
+              value={district}
+              onChange={(event) => setDistrict(event.target.value)}
+              className="h-[2.75rem] w-full max-w-field-lg rounded-control border border-ink-24 bg-paper-raised px-xs text-body"
+            >
+              {options.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="grid gap-3xs">
+            <label htmlFor={filterId} className={cx(labelSm, caps, 'text-ink-70')}>
+              Name contains
+            </label>
+            <input
+              id={filterId}
+              type="search"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+              className="h-[2.75rem] w-full max-w-field-lg rounded-control border border-ink-24 bg-paper-raised px-xs text-body"
+            />
+          </div>
+        </div>
+      </Panel>
 
-      {issued ? (
-        <ShownOnce
-          title="Invite code"
-          value={issued.code.inviteCode}
-          onDismiss={() => setIssued(null)}
-        >
-          For <span className="font-medium text-ink">{issued.facility}</span>,{' '}
-          <span className="font-mono">{issued.code.facilityCode}</span>. Only a hash is kept, so it
-          cannot be shown again; issue a new one if it is lost.
-        </ShownOnce>
-      ) : null}
-
-      <div className="flex flex-wrap items-end gap-md">
-        <div className="grid gap-3xs">
-          <label htmlFor={districtId} className={cx(labelSm, caps, 'text-ink-70')}>
-            District
-          </label>
-          <select
-            id={districtId}
-            value={district}
-            onChange={(event) => setDistrict(event.target.value)}
-            className="border border-ink-24 bg-paper-raised px-xs py-2xs text-small"
+      <div className="grid min-w-0 content-start gap-md">
+        {issued ? (
+          <ShownOnce
+            key={issued.code.inviteCode}
+            title="Invite code"
+            value={issued.code.inviteCode}
+            onDismiss={() => setIssued(null)}
           >
-            {(districtNames.data ?? [{ code: 'KDY', name: 'Kandy' }]).map((option) => (
-              <option key={option.code} value={option.code}>
-                {option.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="grid gap-3xs">
-          <label htmlFor={filterId} className={cx(labelSm, caps, 'text-ink-70')}>
-            Name contains
-          </label>
-          <input
-            id={filterId}
-            type="search"
-            value={filter}
-            onChange={(event) => setFilter(event.target.value)}
-            className="border border-ink-24 bg-paper-raised px-xs py-2xs text-small"
-          />
-        </div>
+            For <span className="font-medium text-ink">{issued.facility}</span>,{' '}
+            <span className="font-mono">{issued.code.facilityCode}</span>. Only a hash is kept, so
+            it cannot be shown again; issue a new one if it is lost.
+          </ShownOnce>
+        ) : null}
+        <Panel labelledBy="facilities-heading">
+          <PanelHeading
+            id="facilities-heading"
+            aside={
+              facilities.data ? (
+                <span className={cx(labelSm, 'text-ink-70')}>
+                  {formatCount(facilities.data.length)} facilities ·{' '}
+                  {formatCount(
+                    facilities.data.filter((facility) => facility.inviteIssuedAt !== null).length,
+                  )}{' '}
+                  with a code
+                </span>
+              ) : null
+            }
+          >
+            Facilities in {districtName}
+          </PanelHeading>
+          <QueryView
+            query={facilities}
+            what="facilities"
+            loading={<LoadingRows label="Loading facilities" rows={6} />}
+            isEmpty={(list) => list.length === 0}
+            empty={
+              <EmptyState title="No facilities in this district.">
+                Choose another district.
+              </EmptyState>
+            }
+          >
+            {(list) => {
+              const wanted = filter.trim().toLowerCase()
+              const shown = list.filter((facility) => facility.name.toLowerCase().includes(wanted))
+              return shown.length === 0 ? (
+                <p className="border-t border-t-ink pt-sm text-small text-ink-70">
+                  No facility in {districtName} has a name containing “{filter.trim()}”.
+                </p>
+              ) : (
+                <div className="grid gap-2xs">
+                  {shown.length < list.length ? (
+                    <p className={cx(labelSm, 'text-ink-70')}>
+                      {formatCount(shown.length)} of {formatCount(list.length)} shown
+                    </p>
+                  ) : null}
+                  <ul className="border-t border-t-ink">
+                    {shown.map((facility) => (
+                      <li key={facility.code}>
+                        <FacilityRow
+                          facility={facility}
+                          onIssued={(code) => setIssued({ code, facility: facility.name })}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            }}
+          </QueryView>
+        </Panel>
       </div>
-
-      <QueryView
-        query={facilities}
-        what="facilities"
-        loading={<LoadingRows label="Loading facilities" rows={6} />}
-        isEmpty={(list) => list.length === 0}
-        empty={
-          <EmptyState title="No facilities in this district.">Choose another district.</EmptyState>
-        }
-      >
-        {(list) => {
-          const shown = list.filter((facility) =>
-            facility.name.toLowerCase().includes(filter.trim().toLowerCase()),
-          )
-          const withCodes = list.filter((facility) => facility.inviteIssuedAt !== null).length
-          return (
-            <div className="grid gap-xs">
-              <p className={cx(labelSm, 'text-ink-70')}>
-                {formatCount(list.length)} facilities · {formatCount(withCodes)} with a code
-                {shown.length < list.length ? ` · ${formatCount(shown.length)} shown` : ''}
-              </p>
-              <ul className="border-t border-t-ink">
-                {shown.map((facility) => (
-                  <li key={facility.code}>
-                    <FacilityRow
-                      facility={facility}
-                      onIssued={(code) => setIssued({ code, facility: facility.name })}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )
-        }}
-      </QueryView>
-    </>
+    </div>
   )
 }
 
@@ -136,10 +169,10 @@ function FacilityRow({
   return (
     <article
       aria-label={facility.name}
-      className="grid gap-x-md gap-y-2xs border-b border-b-ink-14 py-xs md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+      className="grid gap-x-md gap-y-xs border-b border-b-ink-14 py-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
     >
       <div className="grid gap-3xs">
-        <p className="text-small font-medium">{facility.name}</p>
+        <h3 className="text-body font-medium">{facility.name}</h3>
         <p className={cx(labelSm, 'text-ink-70', tnum)}>
           {facility.institutionType} · {facility.code} ·{' '}
           {facility.inviteIssuedAt
@@ -156,7 +189,7 @@ function FacilityRow({
           </p>
         ) : null}
       </div>
-      <div className="flex flex-wrap gap-x-md gap-y-3xs">
+      <div className="flex flex-wrap gap-x-md gap-y-3xs md:justify-end">
         <QuietButton
           onClick={() => issue.mutate(facility.code, { onSuccess: onIssued })}
           disabled={busy}
