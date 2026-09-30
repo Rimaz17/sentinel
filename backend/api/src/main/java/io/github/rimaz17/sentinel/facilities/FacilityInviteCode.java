@@ -38,6 +38,10 @@ class FacilityInviteCode {
     return issuedAt;
   }
 
+  Long getIssuedBy() {
+    return issuedBy;
+  }
+
   /** Replaces whatever code the facility had. */
   void reissue(String codeHash, Instant issuedAt, long issuedBy) {
     this.codeHash = codeHash;

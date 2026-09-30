@@ -53,13 +53,28 @@ public class InviteCodes {
     }
   }
 
+  /** A valid code: the facility it belongs to, and the administrator who issued it. */
+  public record Invite(Facility facility, long issuedBy) {}
+
   /** Issues a facility a new code, replacing any it had. */
   public IssuedCode issue(String facilityCode, long administratorId) {
     Facility facility =
         facilities
             .findByCode(facilityCode)
             .orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, NO_SUCH_FACILITY));
-    String code = generate(facility.getDistrictCode());
+    return replace(facility, generate(facility.getDistrictCode()), administratorId);
+  }
+
+  /**
+   * Gives a facility a code chosen in advance rather than drawn at random, replacing any it had.
+   * Only the public demonstration does this, for the code it publishes on the registration page.
+   */
+  public IssuedCode issueKnown(String facilityCode, String code, long administratorId) {
+    Facility facility = facilities.findByCode(facilityCode).orElseThrow();
+    return replace(facility, code, administratorId);
+  }
+
+  private IssuedCode replace(Facility facility, String code, long administratorId) {
     Instant now = clock.instant();
     FacilityInviteCode row =
         codes.findById(facility.getId()).orElseGet(() -> new FacilityInviteCode(facility.getId()));
@@ -84,12 +99,22 @@ public class InviteCodes {
   /** The facility a code belongs to, however the person typed its case, spaces and dashes. */
   @Transactional(readOnly = true)
   public Optional<Facility> facilityFor(String inviteCode) {
+    return find(inviteCode).map(Invite::facility);
+  }
+
+  /** A code's facility and issuer, however the person typed its case, spaces and dashes. */
+  @Transactional(readOnly = true)
+  public Optional<Invite> find(String inviteCode) {
     if (inviteCode == null) {
       return Optional.empty();
     }
     return codes
         .findByCodeHash(hash(inviteCode))
-        .flatMap(row -> facilities.findById(row.getFacilityId()));
+        .flatMap(
+            row ->
+                facilities
+                    .findById(row.getFacilityId())
+                    .map(facility -> new Invite(facility, row.getIssuedBy())));
   }
 
   /** When each facility with a code was issued it, by facility id. */
@@ -98,6 +123,14 @@ public class InviteCodes {
     return codes.findAllById(facilityIds).stream()
         .collect(
             Collectors.toMap(FacilityInviteCode::getFacilityId, FacilityInviteCode::getIssuedAt));
+  }
+
+  /** Who issued each facility's current code, by facility id. Facilities without one are absent. */
+  @Transactional(readOnly = true)
+  public Map<Long, Long> issuerByFacility(List<Long> facilityIds) {
+    return codes.findAllById(facilityIds).stream()
+        .collect(
+            Collectors.toMap(FacilityInviteCode::getFacilityId, FacilityInviteCode::getIssuedBy));
   }
 
   static String generate(String districtCode) {
