@@ -34,7 +34,9 @@ export function useDemo() {
     queryKey: ['demo'],
     queryFn: async ({ signal }) => {
       try {
-        return await getJson<Demo>('/public/demo', {}, signal)
+        const demo = await getJson<Demo>('/public/demo', {}, signal)
+        // The panel is optional; an answer not shaped like the demo must not take sign-in down.
+        return Array.isArray(demo.accounts) ? demo : null
       } catch (caught) {
         if (caught instanceof ApiError && caught.status === 404) {
           return null
