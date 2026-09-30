@@ -125,6 +125,15 @@ public class InviteCodes {
             Collectors.toMap(FacilityInviteCode::getFacilityId, FacilityInviteCode::getIssuedAt));
   }
 
+  /** Who issued a facility's current code; empty if it has none or no such facility exists. */
+  @Transactional(readOnly = true)
+  public Optional<Long> issuerOf(String facilityCode) {
+    return facilities
+        .findByCode(facilityCode)
+        .flatMap(facility -> codes.findById(facility.getId()))
+        .map(FacilityInviteCode::getIssuedBy);
+  }
+
   /** Who issued each facility's current code, by facility id. Facilities without one are absent. */
   @Transactional(readOnly = true)
   public Map<Long, Long> issuerByFacility(List<Long> facilityIds) {
