@@ -1,6 +1,7 @@
 import { type FormEvent, useId, useState } from 'react'
 import { SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
+import { Email } from '@/components/ui/Email'
 import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { ACTIVATE_PATH } from '@/features/auth/ActivatePage'
@@ -21,6 +22,7 @@ import {
   useDistrictNames,
   useNewLink,
 } from './api'
+import { RowActions } from './RowActions'
 import { ShownOnce } from './ShownOnce'
 
 const panelTitle = 'text-section leading-snug font-medium tracking-tight'
@@ -351,7 +353,9 @@ function AccountRow({
           <h4 className={cx('text-body font-medium', account.enabled ? null : 'text-ink-70')}>
             {account.displayName}
           </h4>
-          <p className="font-mono text-small break-all text-ink-70">{account.email}</p>
+          <p className="font-mono text-small break-words text-ink-70">
+            <Email address={account.email} />
+          </p>
         </div>
         {reach ? <p className="text-small">{reach}</p> : null}
         <p className={cx(labelSm, 'text-ink-70')}>{state(account)}</p>
@@ -364,8 +368,7 @@ function AccountRow({
       {account.id === me.id ? (
         <p className={cx(labelSm, 'text-ink-70')}>Your own account</p>
       ) : (
-        <div className="flex flex-wrap items-baseline gap-x-md gap-y-3xs md:justify-end">
-          {account.lockedInDemo ? <SwitchedOff /> : null}
+        <RowActions locked={account.lockedInDemo}>
           <QuietButton
             onClick={() => change.mutate({ id: account.id, enabled: !account.enabled })}
             disabled={change.isPending || account.lockedInDemo}
@@ -380,15 +383,10 @@ function AccountRow({
               {account.activated ? 'New password link' : 'New activation link'}
             </QuietButton>
           ) : null}
-        </div>
+        </RowActions>
       )}
     </article>
   )
-}
-
-/** Said beside the actions the demo administrator may not take, which stay visible but disabled. */
-export function SwitchedOff() {
-  return <p className={cx(labelSm, 'text-ink-70')}>Switched off in the demo</p>
 }
 
 /** What an account reaches, in words; the group it sits in already names its role. */
