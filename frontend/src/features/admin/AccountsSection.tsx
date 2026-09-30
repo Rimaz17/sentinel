@@ -1,10 +1,11 @@
 import { type FormEvent, useState } from 'react'
 import { SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
+import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { ACTIVATE_PATH } from '@/features/auth/ActivatePage'
 import { ROLE_NAMES, useAccount } from '@/features/auth/session'
-import { formatDateTime } from '@/features/dashboard/format'
+import { formatCount, formatDateTime } from '@/features/dashboard/format'
 import { EmptyState, LoadingRows, QueryView } from '@/features/dashboard/QueryView'
 import { ApiError } from '@/lib/api/client'
 import { caps, cx, labelSm, sectionTitle } from '@/styles/recipes'
@@ -31,50 +32,55 @@ function activationLink(token: string): string {
  * Inspector accounts are created here, by an administrator, and nowhere else.
  * A new inspector has no password: the page shows a one-time link to pass on,
  * and following it they choose their own.
+ *
+ * Two sheet panels: the title and the new inspector form on the left, every
+ * account on the right, grouped by role. From 68rem they stand side by side,
+ * the list the wider; below that the list follows the form.
  */
 export function AccountsSection() {
   const [issued, setIssued] = useState<IssuedAccount | null>(null)
   const districtNames = useDistrictNames()
 
   return (
-    <>
-      <div className="grid gap-xs">
-        <h1 className={sectionTitle}>Inspectors and accounts</h1>
-        <p className="max-w-measure text-body text-ink-70">
-          Public health inspectors cannot sign up. Create their account here, then pass them the
-          link it gives you, by a channel you trust. Sentinel sends no email.
-        </p>
-      </div>
-
-      {issued ? (
-        <ShownOnce
-          title="Activation link"
-          value={activationLink(issued.activationToken)}
-          onDismiss={() => setIssued(null)}
+    <div className="grid gap-md xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] xl:items-start">
+      <Panel as="div" className="gap-md md:p-lg">
+        <div className="grid gap-xs">
+          <h1 className={sectionTitle}>Inspectors and accounts</h1>
+          <p className="max-w-measure text-body text-ink-70">
+            Public health inspectors cannot sign up. Create their account here, then pass them the
+            link it gives you, by a channel you trust. Sentinel sends no email.
+          </p>
+        </div>
+        <section
+          aria-labelledby="new-inspector"
+          className="grid gap-sm border-t border-t-ink-14 pt-md"
         >
-          For <span className="font-medium text-ink">{issued.account.displayName}</span>,{' '}
-          {issued.account.email}. It works once, until {formatDateTime(issued.activationExpiresAt)}{' '}
-          Sri Lanka time. Only a hash is kept, so it cannot be shown again; issue a new one if it is
-          lost.
-        </ShownOnce>
-      ) : null}
-
-      <div className="grid gap-xl xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
-        <section aria-labelledby="new-inspector" className="grid content-start gap-sm">
           <h2 id="new-inspector" className={panelTitle}>
             New inspector
           </h2>
           <NewInspectorForm districts={districtNames.data ?? []} onCreated={setIssued} />
         </section>
+      </Panel>
 
-        <section aria-labelledby="accounts-heading" className="grid content-start gap-sm">
-          <h2 id="accounts-heading" className={panelTitle}>
-            Accounts
-          </h2>
+      <div className="grid min-w-0 content-start gap-md">
+        {issued ? (
+          <ShownOnce
+            key={issued.activationToken}
+            title="Activation link"
+            value={activationLink(issued.activationToken)}
+            onDismiss={() => setIssued(null)}
+          >
+            For <span className="font-medium text-ink">{issued.account.displayName}</span>,{' '}
+            <span className="font-mono">{issued.account.email}</span>. It works once, until{' '}
+            {formatDateTime(issued.activationExpiresAt)} Sri Lanka time. Only a hash is kept, so it
+            cannot be shown again; issue a new one if it is lost.
+          </ShownOnce>
+        ) : null}
+        <Panel labelledBy="accounts-heading">
           <AccountList districts={districtNames.data ?? []} onLinkIssued={setIssued} />
-        </section>
+        </Panel>
       </div>
-    </>
+    </div>
   )
 }
 
@@ -196,23 +202,39 @@ function AccountList({
 }) {
   const accounts = useAccounts()
   return (
-    <QueryView
-      query={accounts}
-      what="accounts"
-      loading={<LoadingRows label="Loading accounts" rows={4} />}
-      isEmpty={(list) => list.length === 0}
-      empty={<EmptyState title="No accounts yet.">Create an inspector to begin.</EmptyState>}
-    >
-      {(list) => (
-        <ul className="border-t border-t-ink">
-          {list.map((account) => (
-            <li key={account.id}>
-              <AccountRow account={account} districts={districts} onLinkIssued={onLinkIssued} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </QueryView>
+    <>
+      <PanelHeading
+        id="accounts-heading"
+        aside={
+          accounts.data ? (
+            <span className={cx(labelSm, 'text-ink-70')}>
+              {accounts.data.length === 1
+                ? '1 account'
+                : `${formatCount(accounts.data.length)} accounts`}
+            </span>
+          ) : null
+        }
+      >
+        Accounts
+      </PanelHeading>
+      <QueryView
+        query={accounts}
+        what="accounts"
+        loading={<LoadingRows label="Loading accounts" rows={4} />}
+        isEmpty={(list) => list.length === 0}
+        empty={<EmptyState title="No accounts yet.">Create an inspector to begin.</EmptyState>}
+      >
+        {(list) => (
+          <ul className="border-t border-t-ink">
+            {list.map((account) => (
+              <li key={account.id}>
+                <AccountRow account={account} districts={districts} onLinkIssued={onLinkIssued} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </QueryView>
+    </>
   )
 }
 
