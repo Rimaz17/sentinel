@@ -4,6 +4,7 @@ import type {
   LocatedReport,
   WeeklyCounts,
 } from '@/features/dashboard/api/types'
+import type { Demo } from '@/features/demo/api'
 import type { Session } from '@/lib/api/session'
 
 /*
@@ -117,4 +118,45 @@ export function inspectorSession(districts: string[] = ['*']): Session {
       facility: null,
     },
   }
+}
+
+/** GET /api/public/demo, as the API answers it in demo mode. */
+export const DEMO: Demo = {
+  accounts: [
+    {
+      role: 'ADMIN',
+      email: 'admin@demo.sentinel.test',
+      displayName: 'Demo administrator',
+      districts: [],
+      facilityName: null,
+    },
+    {
+      role: 'PHI',
+      email: 'inspector.national@demo.sentinel.test',
+      displayName: 'Demo inspector, every district',
+      districts: ['*'],
+      facilityName: null,
+    },
+    {
+      role: 'PHI',
+      email: 'inspector.colombo@demo.sentinel.test',
+      displayName: 'Demo inspector, Colombo',
+      districts: ['CMB'],
+      facilityName: null,
+    },
+    {
+      role: 'DATA_PROVIDER',
+      email: 'records.idh@demo.sentinel.test',
+      displayName: 'Demo records officer',
+      districts: [],
+      facilityName: 'Infectious Diseases Hospital, Angoda',
+    },
+  ],
+  password: 'the right password',
+  invite: {
+    code: 'CMB-DEM-7Q4X',
+    facilityName: 'Infectious Diseases Hospital, Angoda',
+    districtCode: 'CMB',
+  },
+  resetAt: '03:00',
 }
