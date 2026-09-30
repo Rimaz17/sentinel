@@ -11,7 +11,7 @@ function describe(account: DemoAccount): { title: string; what: ReactNode } {
     case 'ADMIN':
       return {
         title: 'Administrator',
-        what: 'Every page of administration: inspector accounts, facilities and invite codes. A few changes that would spoil the demo for the next visitor are switched off.',
+        what: 'Every page of administration. A few changes that would spoil the demo for the next visitor are switched off.',
       }
     case 'DATA_PROVIDER':
       return {
@@ -34,6 +34,20 @@ function describe(account: DemoAccount): { title: string; what: ReactNode } {
             ),
           }
   }
+}
+
+/** An email address that wraps, when it must, before its @ rather than mid-word. */
+function Email({ address }: { address: string }) {
+  const at = address.indexOf('@')
+  return at < 0 ? (
+    address
+  ) : (
+    <>
+      {address.slice(0, at)}
+      <wbr />
+      {address.slice(at)}
+    </>
+  )
 }
 
 /**
@@ -71,13 +85,18 @@ export function DemoAccountsPanel({
         {demo.accounts.map((account) => {
           const { title, what } = describe(account)
           return (
-            <li key={account.email} className="grid content-start gap-xs">
+            <li
+              key={account.email}
+              className="grid grid-rows-[auto_1fr_auto_auto] gap-xs border-t border-t-ink-14 pt-md first:border-t-0 first:pt-0 md:border-t-0 md:pt-0"
+            >
               <h3 className="text-body font-medium">{title}</h3>
               <p className="text-small text-ink-70">{what}</p>
               <dl className="grid gap-2xs">
                 <div className="grid gap-3xs">
                   <dt className={cx(labelSm, caps, 'text-ink-70')}>Email address</dt>
-                  <dd className="font-mono text-small break-all">{account.email}</dd>
+                  <dd className="font-mono text-small">
+                    <Email address={account.email} />
+                  </dd>
                 </div>
                 <div className="grid gap-3xs">
                   <dt className={cx(labelSm, caps, 'text-ink-70')}>Password</dt>
