@@ -10,6 +10,8 @@ import java.time.Instant;
  * issued.
  *
  * @param inviteIssuedAt when the current code was issued; null if the facility has none
+ * @param lockedInDemo whether the administrator asking is the demo administrator and must leave
+ *     this facility's code as it is; see DemoGuard
  */
 record AdminFacilityResponse(
     String code,
@@ -18,9 +20,11 @@ record AdminFacilityResponse(
     FacilityCategory category,
     String institutionType,
     Instant inviteIssuedAt,
-    long dataProviderAccounts) {
+    long dataProviderAccounts,
+    boolean lockedInDemo) {
 
-  static AdminFacilityResponse from(Facility facility, Instant inviteIssuedAt, long accounts) {
+  static AdminFacilityResponse from(
+      Facility facility, Instant inviteIssuedAt, long accounts, boolean lockedInDemo) {
     return new AdminFacilityResponse(
         facility.getCode(),
         facility.getName(),
@@ -28,6 +32,7 @@ record AdminFacilityResponse(
         facility.getCategory(),
         facility.getInstitutionType(),
         inviteIssuedAt,
-        accounts);
+        accounts,
+        lockedInDemo);
   }
 }

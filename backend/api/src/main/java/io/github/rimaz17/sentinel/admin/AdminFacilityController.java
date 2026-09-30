@@ -2,6 +2,7 @@ package io.github.rimaz17.sentinel.admin;
 
 import io.github.rimaz17.sentinel.accounts.AccountService;
 import io.github.rimaz17.sentinel.auth.Caller;
+import io.github.rimaz17.sentinel.demo.DemoGuard;
 import io.github.rimaz17.sentinel.facilities.Facility;
 import io.github.rimaz17.sentinel.facilities.FacilityService;
 import io.github.rimaz17.sentinel.facilities.InviteCodes;
@@ -29,21 +30,29 @@ class AdminFacilityController {
   private final FacilityService facilities;
   private final InviteCodes inviteCodes;
   private final AccountService accounts;
+  private final DemoGuard demo;
 
   AdminFacilityController(
-      FacilityService facilities, InviteCodes inviteCodes, AccountService accounts) {
+      FacilityService facilities,
+      InviteCodes inviteCodes,
+      AccountService accounts,
+      DemoGuard demo) {
     this.facilities = facilities;
     this.inviteCodes = inviteCodes;
     this.accounts = accounts;
+    this.demo = demo;
   }
 
   /** The registry, or one district of it, with each facility's invite status. */
   @GetMapping
   List<AdminFacilityResponse> list(
+      Caller.Staff admin,
       @RequestParam(required = false) @Pattern(regexp = "[A-Z]{3}") String district) {
+    boolean restricted = demo.restricts(admin.accountId());
     List<Facility> found = facilities.inDistricts(district == null ? null : List.of(district));
-    Map<Long, Instant> issued =
-        inviteCodes.issuedAtByFacility(found.stream().map(Facility::getId).toList());
+    List<Long> ids = found.stream().map(Facility::getId).toList();
+    Map<Long, Instant> issued = inviteCodes.issuedAtByFacility(ids);
+    Map<Long, Long> issuers = inviteCodes.issuerByFacility(ids);
     Map<Long, Long> registered = accounts.dataProviderCountsByFacility();
     return found.stream()
         .map(
@@ -51,7 +60,12 @@ class AdminFacilityController {
                 AdminFacilityResponse.from(
                     facility,
                     issued.get(facility.getId()),
-                    registered.getOrDefault(facility.getId(), 0L)))
+                    registered.getOrDefault(facility.getId(), 0L),
+                    DemoGuard.codeLocked(
+                        restricted,
+                        admin.accountId(),
+                        facility.getCode(),
+                        issuers.get(facility.getId()))))
         .toList();
   }
 
@@ -61,6 +75,7 @@ class AdminFacilityController {
    */
   @PostMapping("/{code}/invite-code")
   ResponseEntity<InviteCodes.IssuedCode> issue(Caller.Staff admin, @PathVariable String code) {
+    demo.requireCodeChangeable(admin.accountId(), code);
     return ResponseEntity.status(HttpStatus.CREATED)
         .cacheControl(CacheControl.noStore())
         .body(inviteCodes.issue(code, admin.accountId()));
@@ -68,7 +83,8 @@ class AdminFacilityController {
 
   @DeleteMapping("/{code}/invite-code")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  void revoke(@PathVariable String code) {
+  void revoke(Caller.Staff admin, @PathVariable String code) {
+    demo.requireCodeChangeable(admin.accountId(), code);
     inviteCodes.revoke(code);
   }
 }
