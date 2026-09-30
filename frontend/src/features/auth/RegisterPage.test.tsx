@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { resetSession, sessionState } from '@/lib/api/session'
+import { DEMO } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import { displayCode } from './inviteCode'
 import { RegisterPage } from './RegisterPage'
@@ -29,14 +30,21 @@ const SESSION = {
 }
 
 let fetchMock: Mock<(url: string, init?: RequestInit) => Promise<Response>>
+let demoMode = false
 
 beforeEach(() => {
   resetSession()
+  demoMode = false
   fetchMock = vi.fn((url: string, init?: RequestInit) => {
     const body = JSON.parse((init?.body as string | undefined) ?? '{}') as Record<string, string>
+    if (url === '/api/public/demo') {
+      return Promise.resolve(
+        demoMode ? Response.json(DEMO) : Response.json({ detail: 'Not found.' }, { status: 404 }),
+      )
+    }
     if (url === '/api/auth/invite-codes/check') {
       return Promise.resolve(
-        body.inviteCode === 'KDY-7X2-M4QP'
+        body.inviteCode === 'KDY-7X2-M4QP' || body.inviteCode === DEMO.invite.code
           ? Response.json(PREVIEW)
           : Response.json(
               { detail: 'No facility has this invite code. Check it with whoever gave it.' },
@@ -159,5 +167,36 @@ describe('RegisterPage', () => {
     renderPage()
 
     expect(screen.getByText(/created by a system administrator/i)).toBeInTheDocument()
+  })
+})
+
+describe('RegisterPage in demo mode', () => {
+  it('shows no demo code unless the API is in demo mode', async () => {
+    renderPage()
+
+    await screen.findByLabelText('Facility invite code')
+    await vi.waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith('/api/public/demo', expect.anything()),
+    )
+    expect(screen.queryByRole('region', { name: 'Demo invite code' })).not.toBeInTheDocument()
+  })
+
+  it('fills in the published code, which then registers as any facility code does', async () => {
+    demoMode = true
+    renderPage()
+
+    const panel = await screen.findByRole('region', { name: 'Demo invite code' })
+    expect(panel).toHaveTextContent('CMB-DEM-7Q4X')
+    expect(panel).toHaveTextContent('made-up name and email address')
+    await userEvent.click(within(panel).getByRole('button', { name: 'Use this code' }))
+
+    expect(screen.getByLabelText('Facility invite code')).toHaveValue('CMB-DEM-7Q4X')
+    expect(screen.getByRole('button', { name: 'Check the code' })).toHaveFocus()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Check the code' }))
+    expect(await screen.findByText('Peradeniya')).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('region', { name: 'Demo invite code' })).queryByRole('button'),
+    ).not.toBeInTheDocument()
   })
 })
