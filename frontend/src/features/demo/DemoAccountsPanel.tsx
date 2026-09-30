@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react'
+import { Email } from '@/components/ui/Email'
 import { Panel } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
@@ -34,20 +35,6 @@ function describe(account: DemoAccount): { title: string; what: ReactNode } {
             ),
           }
   }
-}
-
-/** An email address that wraps, when it must, before its @ rather than mid-word. */
-function Email({ address }: { address: string }) {
-  const at = address.indexOf('@')
-  return at < 0 ? (
-    address
-  ) : (
-    <>
-      {address.slice(0, at)}
-      <wbr />
-      {address.slice(at)}
-    </>
-  )
 }
 
 /**
