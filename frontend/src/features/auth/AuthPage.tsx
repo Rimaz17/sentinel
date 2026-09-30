@@ -15,6 +15,8 @@ type AuthPageProps = {
   children: ReactNode
   /** Below the rail: routes for people this page is not for. */
   aside?: ReactNode
+  /** Under both halves, across the full width: the demo's panel, when the API is in demo mode. */
+  after?: ReactNode
 }
 
 /**
@@ -24,13 +26,13 @@ type AuthPageProps = {
  * the right. From 68rem the two sheets stand side by side, their tops and feet
  * level; below that the form's sheet follows the other.
  */
-export function AuthPage({ title, intro, rail, children, aside }: AuthPageProps) {
+export function AuthPage({ title, intro, rail, children, aside, after }: AuthPageProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <SkipLink />
       <SiteHeader />
-      <main id="main" className="flex-1 py-lg">
-        <div className={cx(shell, 'grid gap-md xl:gap-lg', SPLIT_COLUMNS)}>
+      <main id="main" className={cx(shell, 'grid flex-1 content-start gap-md py-lg xl:gap-lg')}>
+        <div className={cx('grid gap-md xl:gap-lg', SPLIT_COLUMNS)}>
           <Panel as="div" className="gap-lg md:p-lg">
             <div className="grid gap-sm">
               <h1 className={sectionTitle}>{title}</h1>
@@ -45,6 +47,7 @@ export function AuthPage({ title, intro, rail, children, aside }: AuthPageProps)
             {children}
           </Panel>
         </div>
+        {after}
       </main>
       <SiteFooter />
     </div>
