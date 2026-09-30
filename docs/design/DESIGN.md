@@ -526,6 +526,30 @@ then the same pair of panels, from `68rem` 2 parts to 3:
   under it all 25 districts show at once in three columns (two on a phone), with
   no inner scroll, and a mono count of those chosen.
 
+**Demo mode adds a panel under the staff frame.** When the API runs in demo mode
+(ADR 0017), sign-in and registration each carry one more sheet panel across the
+full width under their two halves. Nothing about it shows otherwise.
+
+- **"Demo accounts"** on sign-in: a heading, a line on how it works and when it
+  resets, and the simulated-data notice on its right, the page's one spend of
+  ochre. Under a full-ink rule, the four accounts side by side from `68rem` (two
+  by two from `48rem`, stacked and parted by hairlines on a phone): each a title
+  ("Public health inspector · Colombo"), what signing in shows, then the email
+  and password as a small description list in mono, in plain sight. Emails wrap
+  before their `@`, never mid-word. Each ends in a quiet "Use this account",
+  which fills the form, moves focus to "Sign in" and says so in a status line
+  under the fields; it never signs in by itself. Rows share one grid, so the
+  labels and buttons sit level across the four.
+- **"Demo invite code"** on registration: the same head, then the code in mono
+  with its facility and a quiet "Use this code", which fills the first step and
+  moves focus to "Check the code". Beside it, in medium weight, the request to
+  use a made-up name and email address. Once the code is accepted the button
+  goes and the request stays.
+- **In administration**, the demo administrator's header says what is switched
+  off and when the reset comes, and a row it may not change keeps its quiet
+  buttons, disabled, with "Switched off in the demo" in mono under them. A
+  disabled quiet button loses its underline, so it no longer reads as live.
+
 **Report submission is one form panel.** `/submit` has no rail: submission is a
 repeated single-screen task inside a shift, not a sequence, so a step rail there
 would be a costume. From `68rem` a wide sheet panel (3 parts to 2) holds the form
