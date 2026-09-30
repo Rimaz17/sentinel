@@ -132,6 +132,7 @@ function NewInspectorForm({
       <Field
         label="Name"
         name="displayName"
+        width="lg"
         autoComplete="off"
         required
         value={displayName}
@@ -142,6 +143,7 @@ function NewInspectorForm({
         label="Email address"
         type="email"
         name="email"
+        width="lg"
         autoComplete="off"
         required
         value={email}
@@ -149,32 +151,46 @@ function NewInspectorForm({
         error={error?.problemWith('email')}
       />
       <fieldset className="m-0 grid gap-xs border-0 p-0">
-        <legend className={cx(labelSm, caps, 'mb-3xs text-ink-70')}>Districts covered</legend>
-        <label className="inline-flex cursor-pointer items-center gap-xs text-body">
+        <legend className={cx(labelSm, caps, 'mb-2xs text-ink-70')}>Districts covered</legend>
+        <label
+          className={cx(
+            'flex cursor-pointer items-center gap-xs rounded-control border border-ink-24 bg-paper-raised px-xs py-sm text-small',
+            'transition-colors duration-(--dur-fast) ease-out hover:border-ink-70',
+            'has-checked:border-ink has-checked:bg-ink-08 has-checked:font-medium',
+          )}
+        >
           <input
             type="checkbox"
             checked={national}
             onChange={(event) => setNational(event.target.checked)}
-            className="m-0 size-[1rem]"
+            className="m-0 size-[1rem] shrink-0 cursor-pointer"
           />
           Every district: a national inspector
         </label>
         {national ? null : (
-          <div className="grid max-h-[16rem] grid-cols-2 gap-x-sm gap-y-3xs overflow-y-auto border-y border-y-ink-14 py-xs">
-            {districts.map((district) => (
-              <label
-                key={district.code}
-                className="inline-flex cursor-pointer items-center gap-xs text-small"
-              >
-                <input
-                  type="checkbox"
-                  checked={chosen.has(district.code)}
-                  onChange={() => toggle(district.code)}
-                  className="m-0 size-[0.9rem]"
-                />
-                {district.name}
-              </label>
-            ))}
+          <div className="grid gap-2xs border-t border-t-ink-14 pt-xs">
+            <p className="flex flex-wrap items-baseline justify-between gap-x-sm text-small text-ink-70">
+              <span>Or choose one or more districts</span>
+              <span className={labelSm} aria-live="polite">
+                {chosen.size === 1 ? '1 chosen' : `${chosen.size} chosen`}
+              </span>
+            </p>
+            <div className="grid grid-cols-3 gap-x-sm gap-y-2xs phone:grid-cols-2">
+              {districts.map((district) => (
+                <label
+                  key={district.code}
+                  className="inline-flex cursor-pointer items-center gap-xs text-small has-checked:font-medium"
+                >
+                  <input
+                    type="checkbox"
+                    checked={chosen.has(district.code)}
+                    onChange={() => toggle(district.code)}
+                    className="m-0 size-[0.9rem] shrink-0 cursor-pointer"
+                  />
+                  {district.name}
+                </label>
+              ))}
+            </div>
           </div>
         )}
         {error?.problemWith('districts') ? (
