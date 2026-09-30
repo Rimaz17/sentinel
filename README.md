@@ -115,6 +115,16 @@ See [ADR 0014](docs/adr/0014-kafka-between-ingestion-and-storage.md),
 [ADR 0016](docs/adr/0016-alerts-pushed-over-websocket.md), and
 [Measured pipeline](#measured-pipeline) for how fast it runs.
 
+**Demo mode** opens the staff side to visitors without an account. Switched on,
+the sign-in page lists four demo accounts with their password (an administrator,
+an inspector for every district, an inspector for Colombo, and a data provider
+at a Colombo hospital), each with a button that fills it into the form, and the
+registration page publishes a facility invite code. The demo administrator sees
+all of administration but may change only what visitors made, so nothing it can
+do leaves the demo broken for the next visitor, and every night at 03:00 Sri
+Lanka time what visitors made is removed. See
+[ADR 0017](docs/adr/0017-public-demo-mode.md).
+
 ## Measured detection
 
 Because the simulator decides when each outbreak starts, the detector can be
@@ -252,6 +262,8 @@ them elsewhere.
 To try it end to end: sign in as the administrator from `.env`, create an
 inspector at `/app/admin` and open the link it gives you, then issue a facility a
 code under **Facilities and invite codes** and register with it at `/register`.
+With the API in demo mode, the sign-in and registration pages offer the demo
+accounts and the demo invite code instead (see step 6 of the backend).
 Alerts reach the internal dashboard over a WebSocket the moment they are raised
 or change, and are polled only while it is not open; the header says which.
 Every other internal panel polls every 30 seconds while the tab is visible, and
@@ -355,6 +367,32 @@ check refuses to run until reports reach back 63 days, which the backfill
 provides. Alerts are written to the `alerts` table, numbered from `A-1001`, and
 appear in the dashboard's alert list within one poll.
 
+**6. Optionally, demo mode.** For a deployment visitors will try without an
+account ([ADR 0017](docs/adr/0017-public-demo-mode.md)), set these in `.env`,
+with a password of 12 characters or more that you use nowhere else:
+
+```
+SENTINEL_DEMO_MODE=true
+SENTINEL_DEMO_PASSWORD=change-me-demo-password
+SENTINEL_DEMO_INVITE_CODE=CMB-DEM-7Q4X
+```
+
+Both values are shown to every visitor. At each start the API creates or puts
+back the four demo accounts, all signing in with that password:
+
+| Account | Email | Reaches |
+|---|---|---|
+| Administrator | `admin@demo.sentinel.test` | All of administration, held back from what would break the demo |
+| Inspector, every district | `inspector.national@demo.sentinel.test` | The internal dashboard for all 25 districts |
+| Inspector, Colombo | `inspector.colombo@demo.sentinel.test` | Colombo only; Kandy answers 403 |
+| Data provider | `records.idh@demo.sentinel.test` | Report submission for the Infectious Diseases Hospital, Angoda |
+
+The invite code is the same hospital's. Every night at 03:00 Sri Lanka time the
+API deletes the accounts visitors made, removes the invite codes the demo
+administrator issued, returns every alert to new, and puts the demo accounts and
+code back. Accounts you made are never touched, but alert reviews are undone, so
+keep demo mode for a deployment meant for visitors.
+
 ### Injecting an outbreak
 
 `--outbreak` adds an outbreak on top of the simulated baseline, timed from now.
@@ -399,6 +437,7 @@ that name the field at fault and never repeat what was submitted in it.
 | `GET /api/public/districts` | Every district with its status, `USUAL` or `ELEVATED` with the symptom groups elevated, its reports over the last seven days, its usual week (the average of the eight before) and the one as a percentage of the other. |
 | `GET /api/public/alerts` | Published alerts from the last 90 days, active first, in plain wording, with the day each was first and last flagged and whether an inspector confirmed it. |
 | `GET /api/public/trends` | Reports per symptom group in each of the last nine weeks; `?district=KDY` for one district. |
+| `GET /api/public/demo` | In demo mode only, otherwise 404: the demo accounts, their password, the demo invite code and the reset time. |
 
 **Sign-in**, all `POST`:
 
@@ -458,6 +497,10 @@ are read from Redis; while Redis cannot be reached those two endpoints answer
 | `GET /api/admin/facilities` | The registry with each facility's invite status; `?district=KDY`. |
 | `POST` / `DELETE /api/admin/facilities/{code}/invite-code` | Issues a facility a new code, shown once, or revokes it. |
 
+In demo mode the demo administrator gets `403` from the account and invite code
+changes above for anything a visitor did not make, and the two lists mark each
+such row `lockedInDemo`.
+
 A report as a facility might send it, identity included:
 
 ```json
@@ -502,7 +545,8 @@ sentinel/
 │   ├── api/               Spring Boot: accounts and sign-in, facility registry and invite
 │   │                      codes, ingestion onto Kafka, the stream processor storing
 │   │                      reports, the Redis windows, districts, alerts and their
-│   │                      WebSocket push, administration, and the public API
+│   │                      WebSocket push, administration, the public API, and
+│   │                      demo mode
 │   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
 │   ├── detector/          Python: hourly z-score check, alerts, evaluation
 │   └── simulator/         Python: simulated reports and outbreaks, backfill and live modes
@@ -515,6 +559,7 @@ sentinel/
 │           ├── auth/      Sign-in, registration, activation, the session and route guards
 │           ├── submit/    Report submission for data providers
 │           ├── admin/     Inspector accounts and facility invite codes
+│           ├── demo/      The demo accounts and invite code panels, in demo mode
 │           └── dashboard/ The internal dashboard at /app: alert list and review,
 │                          district list, Leaflet map, weekly chart, and the alert socket
 ├── infra/
@@ -630,6 +675,13 @@ These are documented on purpose and are not defects.
   28% of the time, and the median time to detect across all injected outbreaks
   is 140 hours, because a 7-day window only fills as an outbreak grows. See
   [Measured detection](#measured-detection).
+- **Demo mode undoes alert reviews and leaves reports.** Its nightly reset
+  returns every alert to new, the owner's reviews included, because a status
+  change is not recorded against an account; and it cannot remove a visitor's
+  reports, because a report carries no account by design. Both are simulated.
+  See [ADR 0017](docs/adr/0017-public-demo-mode.md).
+- **The demo administrator sees every account's name and email** until the
+  nightly reset, so the demo's pages ask visitors for made-up details.
 - **Detection assumes a stable baseline.** A prior year containing a real epidemic
   inflates "normal" and reduces future sensitivity. Periodic recalibration would be
   needed.
