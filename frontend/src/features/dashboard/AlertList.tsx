@@ -4,6 +4,7 @@ import { caps, cx, labelSm, tnum } from '@/styles/recipes'
 import { AlertActions } from './AlertActions'
 import type { Alert } from './api/types'
 import { formatAgo, formatDateTime, formatDecimal, formatSigma } from './format'
+import { clusterWords, expectedWords, nearWords } from './map/rings'
 import { districtPath } from './paths'
 import { publicationWords } from './publication'
 import { EmptyState, LoadingRows, QueryView } from './QueryView'
@@ -19,7 +20,8 @@ type AlertListProps = {
 
 /**
  * The alert queue, most recently detected first. Wording is the internal,
- * technical register: "A-1001, 41 reports, 3.2σ above baseline".
+ * technical register: "A-1001, 41 reports, 3.2σ above baseline, cluster
+ * confirmed across 7 facilities".
  */
 export function AlertList({ query, districtName, now }: AlertListProps) {
   return (
@@ -94,6 +96,9 @@ function AlertItem({
       <p className="text-small">
         <span className="font-medium">{alert.observedCount} reports</span>,{' '}
         {formatSigma(alert.zScore)} above baseline
+        {alert.clusters[0] ? (
+          <>, cluster confirmed across {alert.clusters[0].facilityCount} facilities</>
+        ) : null}
       </p>
 
       <dl className={cx(labelSm, 'grid grid-cols-[auto_1fr] gap-x-sm text-ink-70')}>
@@ -105,6 +110,10 @@ function AlertItem({
         <dd>
           {formatSigma(alert.peakZScore)}, threshold {formatSigma(alert.threshold)}
         </dd>
+        <dt>Where</dt>
+        <dd>
+          <Where alert={alert} />
+        </dd>
         <dt>Detected</dt>
         <dd>
           {formatDateTime(alert.firstDetectedAt)} to {formatDateTime(alert.lastDetectedAt)}
@@ -115,6 +124,33 @@ function AlertItem({
 
       <AlertActions alert={alert} />
     </article>
+  )
+}
+
+/**
+ * Where the alert's reports are, from the geographic check: each cluster on a
+ * line of its own, or that they are spread out, or that the check has not
+ * looked yet, which is not the same as having found nothing.
+ */
+function Where({ alert }: { alert: Alert }) {
+  if (alert.clustersCheckedAt === null) {
+    return <>Not checked for clusters</>
+  }
+  if (alert.clusters.length === 0) {
+    return <>No cluster: not bunched in any one place</>
+  }
+  return (
+    <ul>
+      {alert.clusters.map((cluster) => {
+        const near = nearWords(cluster)
+        return (
+          <li key={`${cluster.latitude},${cluster.longitude}`}>
+            {clusterWords(cluster)}
+            {near === null ? '' : `, ${near}`}; {expectedWords(cluster)}
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 

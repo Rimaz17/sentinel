@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { alert, NOW } from '@/test/fixtures'
+import { alert, cluster, NOW } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import { AlertList } from './AlertList'
 import type { Alert } from './api/types'
@@ -39,6 +39,45 @@ describe('AlertList', () => {
     expect(item).toHaveTextContent('3.4σ, threshold 3.0σ')
     expect(item).toHaveTextContent('28 Sep, 09:30 to 28 Sep, 11:30')
     expect(within(item).getByText('2 h ago')).toBeInTheDocument()
+  })
+
+  it('says where a clustered alert is bunched, and across how many facilities', async () => {
+    renderList(
+      Promise.resolve([
+        alert({
+          clusters: [cluster(), cluster({ reportCount: 6, facilityCount: 3, latitude: 7.35 })],
+        }),
+      ]),
+    )
+
+    const item = await screen.findByRole('article', { name: 'A-1001' })
+    expect(item).toHaveTextContent(
+      '41 reports, 3.2σ above baseline, cluster confirmed across 7 facilities',
+    )
+    expect(
+      within(item)
+        .getAllByRole('listitem')
+        .map((line) => line.textContent),
+    ).toEqual([
+      '17 reports within 2 km from 7 facilities, near Peradeniya; 5.6 expected at its usual share',
+      '6 reports within 2 km from 3 facilities, near Peradeniya; 5.6 expected at its usual share',
+    ])
+  })
+
+  it('tells an alert spread out from one never checked for clusters', async () => {
+    renderList(
+      Promise.resolve([
+        alert({ code: 'A-1002' }),
+        alert({ code: 'A-1001', clustersCheckedAt: null }),
+      ]),
+    )
+
+    const spread = await screen.findByRole('article', { name: 'A-1002' })
+    expect(spread).toHaveTextContent('WhereNo cluster: not bunched in any one place')
+    expect(spread).not.toHaveTextContent('cluster confirmed')
+    expect(screen.getByRole('article', { name: 'A-1001' })).toHaveTextContent(
+      'WhereNot checked for clusters',
+    )
   })
 
   it('states whether an alert is open in words, not by colour alone', async () => {
