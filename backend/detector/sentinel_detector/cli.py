@@ -4,6 +4,7 @@ python -m sentinel_detector run
 python -m sentinel_detector run --at 2026-09-27T12:00+05:30
 python -m sentinel_detector watch
 python -m sentinel_detector evaluate
+python -m sentinel_detector evaluate-geography
 """
 
 from __future__ import annotations
@@ -52,6 +53,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=int,
         default=52,
         help="weeks without outbreaks for the false-alarm rate (default: 52)",
+    )
+    geography = commands.add_parser(
+        "evaluate-geography",
+        help="measure the geographic check against point and wave outbreaks; needs no database"
+        " (a few minutes)",
+    )
+    geography.add_argument("--seed", type=int, default=2026, help="random seed (default: 2026)")
+    geography.add_argument(
+        "--quiet-weeks",
+        type=int,
+        default=52,
+        help="weeks without outbreaks whose false alarms are looked at (default: 52)",
     )
     for command in (run, watch):
         command.add_argument(
@@ -133,10 +146,23 @@ def evaluate(seed: int, quiet_weeks: int) -> str:
     return evaluation.report(trials, false_alarms, seed, quiet_weeks)
 
 
+def evaluate_geography(seed: int, quiet_weeks: int) -> str:
+    from sentinel_detector import geography_evaluation
+
+    rng = random.Random(seed)
+    facilities = geography_evaluation.registry_facilities()
+    trials = geography_evaluation.outbreak_trials(rng, facilities)
+    quiet = geography_evaluation.quiet_rings(rng, facilities, quiet_weeks)
+    return geography_evaluation.report(trials, quiet, seed)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     if args.command == "evaluate":
         print(evaluate(args.seed, args.quiet_weeks), end="")
+        return 0
+    if args.command == "evaluate-geography":
+        print(evaluate_geography(args.seed, args.quiet_weeks), end="")
         return 0
     try:
         settings = connection_settings()

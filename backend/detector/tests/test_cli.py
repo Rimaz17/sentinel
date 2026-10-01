@@ -121,3 +121,21 @@ def test_describes_where_each_alert_is_bunched_or_that_it_is_not():
         "  A-1002   ongoing  CMB INFLUENZA_LIKE      110 reports, 4.1 sd above baseline",
         "           no cluster: not bunched in any one place",
     ]
+
+
+def test_evaluate_geography_prints_its_table(monkeypatch, capsys):
+    from sentinel_detector import geography_evaluation
+
+    original = geography_evaluation.outbreak_trials
+    monkeypatch.setattr(
+        geography_evaluation,
+        "outbreak_trials",
+        lambda rng, facilities: original(rng, facilities, series=[("KDY", "DENGUE_LIKE")]),
+    )
+
+    assert main(["evaluate-geography", "--seed", "3", "--quiet-weeks", "1"]) == 0
+
+    out = capsys.readouterr().out
+    assert out.startswith("Seed 3: 12 injected outbreaks of 14 days")
+    assert "| Outbreak | Alerted | Ringed at first alert |" in out
+    assert "Kandy dengue-like" in out
