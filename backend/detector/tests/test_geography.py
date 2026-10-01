@@ -6,8 +6,12 @@ import pytest
 from sentinel_detector.geography import (
     MIN_REPORTS,
     Point,
+    Ring,
+    assess,
     candidate_centres,
+    concentration,
     distance_km,
+    expected_in_ring,
 )
 
 # Kandy town, and one degree of latitude in kilometres.
@@ -89,3 +93,53 @@ def test_finds_two_places_apart_largest_first():
 
 def test_finds_nothing_without_reports():
     assert candidate_centres([]) == []
+
+
+def ring(reports=17, facilities=7, baseline_reports=16, week_total=41, baseline_total=200):
+    """Kandy's worked example by default: 17 of the week's 41 reports in a ring that usually
+    holds about 8% of the series."""
+    return Ring(*KANDY, reports, facilities, baseline_reports, week_total, baseline_total)
+
+
+def test_expects_the_rings_usual_share_of_this_weeks_reports():
+    # (16 + 0.5) / (200 + 1) of 41.
+    assert expected_in_ring(ring()) == pytest.approx(3.366, abs=0.001)
+
+
+def test_expects_a_little_even_where_nothing_was_reported_before():
+    assert expected_in_ring(ring(baseline_reports=0)) > 0
+
+
+def test_scores_concentration_as_the_z_score_scores_a_week():
+    assert concentration(ring()) == pytest.approx((17 - 3.366) / math.sqrt(3.366), abs=0.01)
+    # An expectation below one report is spread as one report.
+    assert concentration(ring(baseline_reports=0, week_total=10)) == pytest.approx(
+        17 - 10 * 0.5 / 201, abs=0.001
+    )
+
+
+def test_a_ring_far_above_its_usual_share_from_several_facilities_is_a_cluster():
+    cluster = assess(ring())
+
+    assert cluster is not None
+    assert (cluster.latitude, cluster.longitude) == KANDY
+    assert (cluster.reports, cluster.facilities) == (17, 7)
+    assert cluster.expected == 3.37
+    assert cluster.concentration > 3
+
+
+def test_a_ring_holding_its_usual_share_is_no_cluster_however_busy():
+    # A seasonal wave: the week doubled everywhere, and so did the ring.
+    assert assess(ring(reports=33, baseline_reports=80, week_total=82)) is None
+
+
+def test_a_ring_fed_by_fewer_than_three_facilities_is_no_cluster():
+    assert assess(ring(facilities=2)) is None
+    assert assess(ring(facilities=3)) is not None
+
+
+def test_the_concentration_must_pass_the_threshold():
+    score = concentration(ring())
+
+    assert assess(ring(), threshold=score) is None
+    assert assess(ring(), threshold=score - 0.01) is not None

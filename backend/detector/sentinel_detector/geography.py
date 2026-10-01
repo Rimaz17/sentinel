@@ -8,11 +8,14 @@ same seven days' located reports on the map.
 
 DBSCAN proposes the places: groups of reports each within a kilometre of
 another, at least four strong, measured on the Earth's surface (haversine). Each
-proposal is then tested before it is shown to an inspector; see `assess`.
+proposal is then judged in a 2 km ring around its centre before it is shown to
+an inspector; see `assess`. Reports bunch around a busy hospital every week, so
+being dense is not enough: the ring must hold far more than its usual share.
 """
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -33,6 +36,13 @@ MIN_REPORTS = 4
 # place's centre.
 CENTRE_DECIMALS = 3
 
+# The ring a place is judged in, and drawn as on the inspectors' map.
+RING_KM = 2.0
+# Reports in the ring must come from at least this many facilities.
+MIN_FACILITIES = 3
+# Standard deviations above its usual share a ring must run, as the z-score's 3.
+CONCENTRATION_THRESHOLD = 3.0
+
 
 @dataclass(frozen=True)
 class Point:
@@ -41,6 +51,82 @@ class Point:
     latitude: float
     longitude: float
     facility_id: int
+
+
+@dataclass(frozen=True)
+class Ring:
+    """What lies within RING_KM of a place's centre, in the series being checked.
+
+    `reports` and `facilities` are from the current seven days; `baseline_reports`
+    from the eight weeks before. `week_total` and `baseline_total` are the
+    series' located reports in each period, anywhere in the district.
+    """
+
+    latitude: float
+    longitude: float
+    reports: int
+    facilities: int
+    baseline_reports: int
+    week_total: int
+    baseline_total: int
+
+
+@dataclass(frozen=True)
+class Cluster:
+    """A place that passed: where it is, and what its ring held."""
+
+    latitude: float
+    longitude: float
+    reports: int
+    facilities: int
+    expected: float
+    concentration: float
+
+
+def expected_in_ring(ring: Ring) -> float:
+    """This week's reports the ring would hold if it kept its usual share of the series.
+
+    The share is taken from the eight baseline weeks, with half a report added
+    to the ring and one to the whole, so an area that had no reports before
+    still expects a little rather than nothing.
+    """
+    share = (ring.baseline_reports + 0.5) / (ring.baseline_total + 1)
+    return ring.week_total * share
+
+
+def concentration(ring: Ring) -> float:
+    """How far the ring's reports run above its usual share, in standard deviations.
+
+    The same form as the z-score: a Poisson count's spread is the square root of
+    its mean, never taken as less than one report.
+    """
+    expected = expected_in_ring(ring)
+    return (ring.reports - expected) / math.sqrt(max(expected, 1.0))
+
+
+def assess(ring: Ring, threshold: float = CONCENTRATION_THRESHOLD) -> Cluster | None:
+    """A cluster if the ring is a local outbreak's signature, otherwise None.
+
+    It must hold reports from at least MIN_FACILITIES facilities: one facility's
+    patients bunch around it every week, and a single source could be one
+    clinic's data problem. And its reports must run more than `threshold`
+    standard deviations above the ring's usual share of the series. A seasonal
+    wave raises every part of a district together, so each part keeps its
+    share; a local outbreak raises one part far beyond it.
+    """
+    if ring.facilities < MIN_FACILITIES:
+        return None
+    score = concentration(ring)
+    if score <= threshold:
+        return None
+    return Cluster(
+        ring.latitude,
+        ring.longitude,
+        ring.reports,
+        ring.facilities,
+        round(expected_in_ring(ring), 2),
+        round(score, 2),
+    )
 
 
 def candidate_centres(points: Sequence[Point]) -> list[tuple[float, float]]:
