@@ -7,7 +7,10 @@ runs this schedule unless told not to (`--quiet`):
   - a new outbreak starts every three and a half days, at full strength from its
     first hour (the "step" profile), and lasts 10 days, so two or three are
     always running;
-  - each is a point outbreak, bunched around one spot, as a local outbreak is;
+  - each is a point outbreak, bunched around one spot, as a local outbreak is,
+    except the influenza-like ones, which are waves spread across their
+    district, as a seasonal rise is; so the inspectors' map shows both a cluster
+    ring and an alert with none (docs/adr/0020);
   - each adds 20 times the square root of its district and group's usual week,
     so the detector's z-score passes 3 within about a day and the public
     threshold of 5 within about two, and the alert is published without an
@@ -92,7 +95,7 @@ def scheduled(index: int) -> Outbreak:
         extra_per_week=strength(district, group),
         days=LASTS / timedelta(days=1),
         profile="step",
-        spread="point",
+        spread="wave" if group == INFLUENZA_LIKE else "point",
         place=f"demo-{index}",
     )
 
