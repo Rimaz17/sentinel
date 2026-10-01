@@ -1,10 +1,12 @@
 import { type FormEvent, useId, useState } from 'react'
 import { SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
+import { Email } from '@/components/ui/Email'
 import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { ACTIVATE_PATH } from '@/features/auth/ActivatePage'
 import { useAccount } from '@/features/auth/session'
+import { isDemoAdministrator, useDemo } from '@/features/demo/api'
 import type { Role } from '@/lib/api/session'
 import { formatCount, formatDateTime } from '@/features/dashboard/format'
 import { EmptyState, LoadingRows, QueryView } from '@/features/dashboard/QueryView'
@@ -20,6 +22,7 @@ import {
   useDistrictNames,
   useNewLink,
 } from './api'
+import { RowActions } from './RowActions'
 import { ShownOnce } from './ShownOnce'
 
 const panelTitle = 'text-section leading-snug font-medium tracking-tight'
@@ -41,6 +44,9 @@ function activationLink(token: string): string {
 export function AccountsSection() {
   const [issued, setIssued] = useState<IssuedAccount | null>(null)
   const districtNames = useDistrictNames()
+  const me = useAccount()
+  const demo = useDemo()
+  const demoAdministrator = isDemoAdministrator(demo.data, me.email)
 
   return (
     <div className="grid gap-md xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] xl:items-start">
@@ -59,6 +65,12 @@ export function AccountsSection() {
           <h2 id="new-inspector" className={panelTitle}>
             New inspector
           </h2>
+          {demoAdministrator ? (
+            <p className="max-w-measure text-small font-medium">
+              Use a made-up name and email address. Other visitors signed in as the demo
+              administrator can see this list until the nightly reset removes what visitors made.
+            </p>
+          ) : null}
           <NewInspectorForm districts={districtNames.data ?? []} onCreated={setIssued} />
         </section>
       </Panel>
@@ -341,7 +353,9 @@ function AccountRow({
           <h4 className={cx('text-body font-medium', account.enabled ? null : 'text-ink-70')}>
             {account.displayName}
           </h4>
-          <p className="font-mono text-small break-all text-ink-70">{account.email}</p>
+          <p className="font-mono text-small break-words text-ink-70">
+            <Email address={account.email} />
+          </p>
         </div>
         {reach ? <p className="text-small">{reach}</p> : null}
         <p className={cx(labelSm, 'text-ink-70')}>{state(account)}</p>
@@ -354,22 +368,22 @@ function AccountRow({
       {account.id === me.id ? (
         <p className={cx(labelSm, 'text-ink-70')}>Your own account</p>
       ) : (
-        <div className="flex flex-wrap gap-x-md gap-y-3xs md:justify-end">
+        <RowActions locked={account.lockedInDemo}>
           <QuietButton
             onClick={() => change.mutate({ id: account.id, enabled: !account.enabled })}
-            disabled={change.isPending}
+            disabled={change.isPending || account.lockedInDemo}
           >
             {account.enabled ? 'Disable' : 'Enable'}
           </QuietButton>
           {account.enabled ? (
             <QuietButton
               onClick={() => newLink.mutate(account.id, { onSuccess: onLinkIssued })}
-              disabled={newLink.isPending}
+              disabled={newLink.isPending || account.lockedInDemo}
             >
               {account.activated ? 'New password link' : 'New activation link'}
             </QuietButton>
           ) : null}
-        </div>
+        </RowActions>
       )}
     </article>
   )

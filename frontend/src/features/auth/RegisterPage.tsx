@@ -1,8 +1,10 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
 import { QuietButton } from '@/components/ui/QuietButton'
+import { useDemo } from '@/features/demo/api'
+import { DemoInvitePanel } from '@/features/demo/DemoInvitePanel'
 import { ApiError, apiRequest } from '@/lib/api/client'
 import type { Session } from '@/lib/api/session'
 import { caps, cx, labelSm } from '@/styles/recipes'
@@ -28,6 +30,9 @@ type InvitePreview = {
  */
 export function RegisterPage() {
   const [preview, setPreview] = useState<{ code: string; facility: InvitePreview } | null>(null)
+  const [code, setCode] = useState('')
+  const demo = useDemo()
+  const codeStep = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     document.title = 'Facility registration · Sentinel'
@@ -54,6 +59,23 @@ export function RegisterPage() {
           ]}
         />
       }
+      after={
+        demo.data ? (
+          <DemoInvitePanel
+            demo={demo.data}
+            {...(preview
+              ? {}
+              : {
+                  onUse: (demoCode: string) => {
+                    setCode(demoCode)
+                    codeStep.current
+                      ?.querySelector<HTMLButtonElement>('button[type="submit"]')
+                      ?.focus()
+                  },
+                })}
+          />
+        ) : null
+      }
       aside={
         <>
           <p>
@@ -77,14 +99,27 @@ export function RegisterPage() {
           onChangeCode={() => setPreview(null)}
         />
       ) : (
-        <CodeStep onFound={(code, facility) => setPreview({ code, facility })} />
+        <div ref={codeStep}>
+          <CodeStep
+            code={code}
+            onChange={setCode}
+            onFound={(found, facility) => setPreview({ code: found, facility })}
+          />
+        </div>
       )}
     </AuthPage>
   )
 }
 
-function CodeStep({ onFound }: { onFound: (code: string, facility: InvitePreview) => void }) {
-  const [code, setCode] = useState('')
+function CodeStep({
+  code,
+  onChange,
+  onFound,
+}: {
+  code: string
+  onChange: (code: string) => void
+  onFound: (code: string, facility: InvitePreview) => void
+}) {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -120,7 +155,7 @@ function CodeStep({ onFound }: { onFound: (code: string, facility: InvitePreview
         spellCheck={false}
         required
         value={code}
-        onChange={(event) => setCode(event.target.value)}
+        onChange={(event) => onChange(event.target.value)}
       />
       {error ? <FormError>{error}</FormError> : null}
       <div>

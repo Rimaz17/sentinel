@@ -2,6 +2,7 @@ package io.github.rimaz17.sentinel.auth;
 
 import io.github.rimaz17.sentinel.accounts.Account;
 import io.github.rimaz17.sentinel.accounts.AccountService;
+import io.github.rimaz17.sentinel.demo.DemoGuard;
 import io.github.rimaz17.sentinel.districts.District;
 import io.github.rimaz17.sentinel.districts.DistrictService;
 import io.github.rimaz17.sentinel.facilities.Facility;
@@ -35,16 +36,19 @@ class RegistrationController {
   private final AccountService accounts;
   private final DistrictService districts;
   private final Sessions sessions;
+  private final DemoGuard demo;
 
   RegistrationController(
       InviteCodes inviteCodes,
       AccountService accounts,
       DistrictService districts,
-      Sessions sessions) {
+      Sessions sessions,
+      DemoGuard demo) {
     this.inviteCodes = inviteCodes;
     this.accounts = accounts;
     this.districts = districts;
     this.sessions = sessions;
+    this.demo = demo;
   }
 
   record InviteCheck(@NotBlank @Size(max = 32) String inviteCode) {
@@ -95,16 +99,23 @@ class RegistrationController {
         districtName);
   }
 
-  /** Creates the account and signs its owner straight in. */
+  /**
+   * Creates the account and signs its owner straight in. Registering with a code the demo
+   * administrator issued, the published demo code among them, marks the account as a visitor's.
+   */
   @PostMapping("/register")
   ResponseEntity<SessionResponse> register(@Valid @RequestBody Registration request) {
-    Facility facility =
+    InviteCodes.Invite invite =
         inviteCodes
-            .facilityFor(request.inviteCode())
+            .find(request.inviteCode())
             .orElseThrow(() -> new InvalidFieldException("inviteCode", UNKNOWN_CODE));
     Account account =
         accounts.registerDataProvider(
-            request.email(), request.displayName(), request.password(), facility);
+            request.email(),
+            request.displayName(),
+            request.password(),
+            invite.facility(),
+            demo.madeInDemo(invite.issuedBy()));
     return sessions.start(account, HttpStatus.CREATED);
   }
 }

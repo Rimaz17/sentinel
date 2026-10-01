@@ -12,6 +12,7 @@ import {
   useIssueCode,
   useRevokeCode,
 } from './api'
+import { RowActions } from './RowActions'
 import { ShownOnce } from './ShownOnce'
 
 /**
@@ -189,19 +190,22 @@ function FacilityRow({
           </p>
         ) : null}
       </div>
-      <div className="flex flex-wrap gap-x-md gap-y-3xs md:justify-end">
+      <RowActions locked={facility.lockedInDemo}>
         <QuietButton
           onClick={() => issue.mutate(facility.code, { onSuccess: onIssued })}
-          disabled={busy}
+          disabled={busy || facility.lockedInDemo}
         >
           {facility.inviteIssuedAt ? 'Issue a new code' : 'Issue a code'}
         </QuietButton>
         {facility.inviteIssuedAt ? (
-          <QuietButton onClick={() => revoke.mutate(facility.code)} disabled={busy}>
+          <QuietButton
+            onClick={() => revoke.mutate(facility.code)}
+            disabled={busy || facility.lockedInDemo}
+          >
             Revoke
           </QuietButton>
         ) : null}
-      </div>
+      </RowActions>
     </article>
   )
 }

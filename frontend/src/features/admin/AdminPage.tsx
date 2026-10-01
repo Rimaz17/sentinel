@@ -3,6 +3,7 @@ import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
 import { SkipLink } from '@/components/layout/SkipLink'
 import { StaffHeader } from '@/features/auth/AccountBar'
 import { useAccount } from '@/features/auth/session'
+import { isDemoAdministrator, resetTime, useDemo } from '@/features/demo/api'
 import { cx, monoLink, shell } from '@/styles/recipes'
 import { AccountsSection } from './AccountsSection'
 import { FacilitiesSection } from './FacilitiesSection'
@@ -21,6 +22,7 @@ const SECTIONS = [
  */
 export function AdminPage() {
   const account = useAccount()
+  const demo = useDemo()
 
   useEffect(() => {
     document.title = 'Administration · Sentinel'
@@ -29,7 +31,15 @@ export function AdminPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <SkipLink />
-      <StaffHeader section="Administration" account={account} />
+      <StaffHeader section="Administration" account={account}>
+        {isDemoAdministrator(demo.data, account.email) ? (
+          <p className="max-w-measure text-small text-ink-70">
+            You are the demo administrator. Changes that would spoil the demo for the next visitor
+            are switched off, and what visitors make is removed every night at{' '}
+            {demo.data ? resetTime(demo.data) : null} Sri Lanka time.
+          </p>
+        ) : null}
+      </StaffHeader>
       <main id="main" className={cx(shell, 'grid flex-1 content-start gap-md py-md')}>
         <nav aria-label="Administration">
           <ul className="flex flex-wrap gap-2xs">

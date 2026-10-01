@@ -58,6 +58,9 @@ public class Account {
   @Column(name = "created_at", nullable = false)
   private Instant createdAt;
 
+  @Column(name = "made_in_demo", nullable = false)
+  private boolean madeInDemo;
+
   protected Account() {}
 
   private Account(
@@ -142,6 +145,18 @@ public class Account {
 
   public Instant getCreatedAt() {
     return createdAt;
+  }
+
+  /**
+   * Whether a visitor to the public demonstration made this account, so the demo's nightly reset
+   * removes it. See the made_in_demo migration.
+   */
+  public boolean isMadeInDemo() {
+    return madeInDemo;
+  }
+
+  public void markMadeInDemo() {
+    this.madeInDemo = true;
   }
 
   public void setPasswordHash(String passwordHash) {

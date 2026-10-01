@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { resetSession, type Session } from '@/lib/api/session'
+import { DEMO } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import { AccountMenu } from './AccountBar'
 import { RequireRole } from './RequireRole'
@@ -56,7 +57,15 @@ function signedOut(url: string, init?: RequestInit): Promise<Response> {
         : Response.json({ detail: 'The email address or password is not right.' }, { status: 401 }),
     )
   }
+  if (url === '/api/public/demo') {
+    return Promise.resolve(Response.json({ detail: 'Not found.' }, { status: 404 }))
+  }
   return Promise.resolve(Response.json({}))
+}
+
+/** The API in demo mode: the same, but the demo accounts are published. */
+function inDemoMode(url: string, init?: RequestInit): Promise<Response> {
+  return url === '/api/public/demo' ? Promise.resolve(Response.json(DEMO)) : signedOut(url, init)
 }
 
 beforeEach(() => {
@@ -253,6 +262,83 @@ describe('afterSignIn', () => {
   it('sends an account home with no page left, or one its role may not open', () => {
     expect(afterSignIn(kandy, null)).toBe('/app')
     expect(afterSignIn(kandy, { from: '/app/admin', leftBy: null })).toBe('/app')
+  })
+})
+
+describe('SignInPage in demo mode', () => {
+  it('shows no demo accounts unless the API is in demo mode', async () => {
+    renderAt('/signin')
+
+    await screen.findByLabelText('Email address')
+    await vi.waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith('/api/public/demo', expect.anything()),
+    )
+    expect(screen.queryByRole('region', { name: 'Demo accounts' })).not.toBeInTheDocument()
+  })
+
+  it('lists the four demo accounts with their email and password in plain sight', async () => {
+    fetchMock.mockImplementation(inDemoMode)
+    renderAt('/signin')
+
+    const panel = await screen.findByRole('region', { name: 'Demo accounts' })
+    const names = within(panel)
+      .getAllByRole('heading', { level: 3 })
+      .map((heading) => heading.textContent)
+    expect(names).toEqual([
+      'Administrator',
+      'Public health inspector',
+      'Public health inspector',
+      'Data provider',
+    ])
+    expect(within(panel).getByText('Colombo only')).toBeInTheDocument()
+    expect(within(panel).getByText('inspector.colombo@demo.sentinel.test')).toBeInTheDocument()
+    expect(within(panel).getAllByText('the right password')).toHaveLength(4)
+    expect(within(panel).getByText(/every night at 3:00 Sri Lanka time/)).toBeInTheDocument()
+  })
+
+  it('fills in an account, leaving the visitor to sign in through the form', async () => {
+    fetchMock.mockImplementation(inDemoMode)
+    renderAt('/signin')
+
+    await userEvent.click(
+      await screen.findByRole('button', {
+        name: 'Use this account: Public health inspector · Colombo only',
+      }),
+    )
+
+    expect(screen.getByLabelText('Email address')).toHaveValue(
+      'inspector.colombo@demo.sentinel.test',
+    )
+    expect(screen.getByLabelText('Password')).toHaveValue('the right password')
+    expect(screen.getByRole('button', { name: 'Sign in' })).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Filled in the demo account: Public health inspector · Colombo only.',
+    )
+    expect(fetchMock).not.toHaveBeenCalledWith('/api/auth/signin', expect.anything())
+
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+    expect(await screen.findByText('Inspector dashboard')).toBeInTheDocument()
+  })
+})
+
+describe('SignInPage: the way to the demo accounts', () => {
+  it('offers a way down to the demo accounts, and takes focus there', async () => {
+    fetchMock.mockImplementation(inDemoMode)
+    renderAt('/signin')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Try a demo account' }))
+
+    expect(screen.getByRole('heading', { level: 2, name: 'Demo accounts' })).toHaveFocus()
+  })
+
+  it('offers nothing of the kind outside demo mode', async () => {
+    renderAt('/signin')
+
+    await screen.findByLabelText('Email address')
+    await vi.waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith('/api/public/demo', expect.anything()),
+    )
+    expect(screen.queryByRole('button', { name: 'Try a demo account' })).not.toBeInTheDocument()
   })
 })
 

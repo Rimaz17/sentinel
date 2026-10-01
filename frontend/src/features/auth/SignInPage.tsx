@@ -1,9 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Action, SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
 import { QuietButton } from '@/components/ui/QuietButton'
+import { useDemo } from '@/features/demo/api'
+import { DEMO_ACCOUNTS_HEADING, DemoAccountsPanel } from '@/features/demo/DemoAccountsPanel'
 import { ApiError, apiRequest } from '@/lib/api/client'
 import type { Session } from '@/lib/api/session'
 import { AuthPage, CheckingSession } from './AuthPage'
@@ -53,10 +55,37 @@ export function SignInPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [filledAs, setFilledAs] = useState<string | null>(null)
+  const form = useRef<HTMLFormElement>(null)
+  const demo = useDemo()
 
   useEffect(() => {
     document.title = 'Staff sign-in · Sentinel'
   }, [])
+
+  /**
+   * Brings the demo accounts into view and moves focus to their heading, so a
+   * keyboard or screen reader user lands where a sighted visitor is taken.
+   */
+  function showDemoAccounts() {
+    const heading = document.getElementById(DEMO_ACCOUNTS_HEADING)
+    const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    heading?.scrollIntoView?.({ behavior: still ? 'auto' : 'smooth', block: 'start' })
+    heading?.focus({ preventScroll: true })
+  }
+
+  /**
+   * Fills in a demo account and moves focus to "Sign in", so the visitor signs
+   * in through the form itself; on a phone that also brings the form back into
+   * view from the panel below it.
+   */
+  function fillDemoAccount(account: { email: string }, password: string, title: string) {
+    setEmail(account.email)
+    setPassword(password)
+    setError(null)
+    setFilledAs(title)
+    form.current?.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus()
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -92,6 +121,14 @@ export function SignInPage() {
           ]}
         />
       }
+      after={
+        demo.data && state.status !== 'signed-in' ? (
+          <DemoAccountsPanel
+            demo={demo.data}
+            onUse={(account, title) => fillDemoAccount(account, demo.data?.password ?? '', title)}
+          />
+        ) : null
+      }
       aside={
         <>
           <p>
@@ -112,7 +149,12 @@ export function SignInPage() {
       {state.status === 'signed-in' ? (
         <SignedIn session={state.session} />
       ) : (
-        <form onSubmit={(event) => void submit(event)} className="grid gap-md" noValidate>
+        <form
+          ref={form}
+          onSubmit={(event) => void submit(event)}
+          className="grid gap-md"
+          noValidate
+        >
           <Field
             label="Email address"
             type="email"
@@ -121,7 +163,10 @@ export function SignInPage() {
             autoComplete="username"
             required
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => {
+              setEmail(event.target.value)
+              setFilledAs(null)
+            }}
           />
           <Field
             label="Password"
@@ -131,12 +176,27 @@ export function SignInPage() {
             autoComplete="current-password"
             required
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => {
+              setPassword(event.target.value)
+              setFilledAs(null)
+            }}
           />
           {error ? <FormError>{error}</FormError> : null}
+          <p role="status" className="text-small text-ink-70 empty:hidden">
+            {filledAs ? `Filled in the demo account: ${filledAs}. Select Sign in to continue.` : ''}
+          </p>
           <div>
             <SubmitButton busy={busy}>{busy ? 'Signing in' : 'Sign in'}</SubmitButton>
           </div>
+          {demo.data ? (
+            <div className="grid max-w-field-lg justify-items-start gap-xs border-t border-t-ink-14 pt-md">
+              <p className="text-small text-ink-70">
+                No account? Sentinel is a demonstration, so you can sign in with one of its demo
+                accounts.
+              </p>
+              <QuietButton onClick={showDemoAccounts}>Try a demo account</QuietButton>
+            </div>
+          ) : null}
         </form>
       )}
     </AuthPage>

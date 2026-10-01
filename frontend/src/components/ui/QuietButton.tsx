@@ -24,7 +24,7 @@ export function QuietButton({
         'font-mono text-label font-medium tracking-label text-ink-70 uppercase',
         'transition-[color,border-color] duration-(--dur-fast) ease-out',
         'hover:border-b-ink hover:text-ink focus-visible:border-b-ink focus-visible:text-ink',
-        'disabled:cursor-default disabled:border-b-ink-14 disabled:text-ink-70',
+        'disabled:cursor-default disabled:border-b-transparent disabled:text-ink-70',
       )}
     >
       {children}
