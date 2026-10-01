@@ -7,8 +7,11 @@
 name: sentinel
 
 services:
+  # PostgreSQL 17 with PostGIS, for report locations and distance queries
+  # (docs/adr/0019). The same server as the plain image, so a volume written by
+  # postgres:17-alpine opens unchanged; the extension is created by migration.
   postgres:
-    image: postgres:17-alpine
+    image: postgis/postgis:17-3.5-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
       POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
