@@ -2,7 +2,7 @@ import random
 from datetime import UTC, datetime, timedelta
 
 from sentinel_simulator.baselines import WEEKLY_BASELINES
-from sentinel_simulator.cli import backfill, live, main, parse_args
+from sentinel_simulator.cli import backfill, live, main, parse_args, planned_demo
 from sentinel_simulator.generator import Facility, Generator
 
 NOW = datetime(2026, 9, 27, 6, 0, tzinfo=UTC)
@@ -103,3 +103,26 @@ def test_backfill_includes_an_injected_outbreak(capsys):
         if r.facility_code == "PKDY0000001" and r.symptom_group == "DENGUE_LIKE"
     ]
     assert len(kandy_dengue) > 100
+
+
+def test_the_demo_outbreaks_run_unless_quiet():
+    assert parse_args(["backfill"]).quiet is False
+    assert parse_args(["--quiet", "backfill"]).quiet is True
+
+    assert planned_demo(parse_args(["backfill"]), NOW)
+    assert planned_demo(parse_args(["--quiet", "backfill"]), NOW) == []
+    assert planned_demo(parse_args(["--quiet", "live"]), NOW) == []
+
+
+def test_a_backfill_plans_the_demo_outbreaks_of_its_own_days():
+    planned = planned_demo(parse_args(["backfill", "--days", "63"]), NOW)
+
+    assert all(o.end > NOW - timedelta(days=63) and o.start < NOW for o in planned)
+    assert any(o.start <= NOW < o.end for o in planned)
+
+
+def test_a_live_run_plans_the_demo_outbreaks_years_ahead():
+    planned = planned_demo(parse_args(["live"]), NOW)
+
+    assert any(o.start <= NOW < o.end for o in planned)
+    assert max(o.start for o in planned) > NOW + timedelta(days=3000)

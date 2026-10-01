@@ -337,11 +337,21 @@ python -m sentinel_simulator backfill --days 63
 python -m sentinel_simulator live
 ```
 
-A 63-day backfill posts about 10,000 reports. Live mode posts at the simulated
-real-time rate, around 1,100 reports a week across the country: about twenty an
-hour at a weekday's morning peak and about one an hour overnight, so it is quiet
-by design. `--seed N` makes a run repeatable; `--api-url`, or `SENTINEL_API_URL`,
+A 63-day backfill posts about 12,000 reports. Live mode posts at the simulated
+real-time rate, around 1,100 reports a week across the country on the baseline:
+about twenty an hour at a weekday's morning peak and about one an hour
+overnight. `--seed N` makes a run repeatable; `--api-url`, or `SENTINEL_API_URL`,
 points it at another API.
+
+**The demo's outbreaks run by default**, so the dashboards always have alerts to
+show ([ADR 0018](docs/adr/0018-demo-outbreaks-by-default.md)). On top of the
+baseline, a new outbreak starts every three and a half days and lasts ten, each
+far enough above its district's usual week that the detector publishes it
+without an inspector, so after a backfill and one check two or three alerts are
+active on the public dashboard. They are far larger and more frequent than real
+outbreaks, on purpose. `--quiet` leaves them out, for the baseline alone; a
+backfill from before this change has none in its past, so start a fresh one, or
+let `live` run for about two days.
 
 **4. Look at what arrived.**
 
@@ -397,12 +407,14 @@ so switch demo mode off on a database whose reviews you want to keep.
 
 ### Injecting an outbreak
 
-`--outbreak` adds an outbreak on top of the simulated baseline, timed from now.
-To see the detector raise an alert, fill in history with an outbreak that began
-four days ago, then check. From `backend/simulator`, then `backend/detector`:
+`--outbreak` adds an outbreak of your own on top of the simulated baseline,
+timed from now. To see the detector raise an alert for it alone, fill in
+history with an outbreak that began four days ago and `--quiet`, so the demo's
+outbreaks stay out, then check. From `backend/simulator`, then
+`backend/detector`:
 
 ```bash
-python -m sentinel_simulator --seed 2026 --outbreak district=KDY,group=DENGUE_LIKE,extra=60,start=-4d,profile=step backfill --days 63
+python -m sentinel_simulator --seed 2026 --quiet --outbreak district=KDY,group=DENGUE_LIKE,extra=60,start=-4d,profile=step backfill --days 63
 ```
 
 ```bash
@@ -672,6 +684,10 @@ These are documented on purpose and are not defects.
   [Measured pipeline](#measured-pipeline).
 - **The local Kafka is a single broker**, so each message is kept once. The
   topic survives a restart of the broker, not the loss of its disk.
+- **The demo's outbreaks are not realistic.** They are large, frequent and
+  regular so that the dashboards always have alerts to show; the detection
+  figures above are measured without them. See
+  [ADR 0018](docs/adr/0018-demo-outbreaks-by-default.md).
 - **Small or gradual outbreaks are caught late or not at all.** At the shipped
   3 sd, an outbreak adding half again to a district's usual week is detected
   28% of the time, and the median time to detect across all injected outbreaks

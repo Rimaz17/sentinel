@@ -3,10 +3,13 @@
     python -m sentinel_simulator backfill --days 63
     python -m sentinel_simulator live
     python -m sentinel_simulator --outbreak SETTINGS backfill
+    python -m sentinel_simulator --quiet backfill
 
 Detection compares the last 7 days with the 8 weeks before them, so a 63-day
-backfill gives it a full window on first run. `--outbreak` injects an outbreak
-on top of the baseline, timed relative to now, with SETTINGS such as
+backfill gives it a full window on first run. Unless `--quiet` is given, the
+demo's rolling outbreaks run on top of the baseline, so the dashboards always
+have alerts to show; see sentinel_simulator.scenario. `--outbreak` injects an
+outbreak of your own, timed relative to now, with SETTINGS such as
 district=KDY,group=DENGUE_LIKE,extra=40,start=-3d; see sentinel_simulator.outbreaks.
 """
 
@@ -22,11 +25,14 @@ from datetime import UTC, datetime, timedelta
 
 from sentinel_simulator.client import ApiError, SentinelClient
 from sentinel_simulator.generator import Generator
-from sentinel_simulator.outbreaks import parse_outbreak
+from sentinel_simulator.outbreaks import Outbreak, parse_outbreak
+from sentinel_simulator.scenario import demo_outbreaks, running
 from sentinel_simulator.settings import feed_key
 
 DEFAULT_API_URL = "http://localhost:8080"
 PROGRESS_EVERY = 1000
+# How far ahead a live run plans the demo's outbreaks: longer than any run lasts.
+LIVE_HORIZON = timedelta(days=3650)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -61,6 +67,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             " repeatable"
         ),
     )
+    parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="leave out the demo's rolling outbreaks: the baseline alone, plus any --outbreak",
+    )
     commands = parser.add_subparsers(dest="command", required=True)
 
     backfill = commands.add_parser("backfill", help="post reports for the past N days, then stop")
@@ -71,6 +82,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--interval", type=float, default=60.0, help="seconds between batches (default: 60)"
     )
     return parser.parse_args(argv)
+
+
+def planned_demo(args: argparse.Namespace, now: datetime) -> list[Outbreak]:
+    """The demo's outbreaks this run will post, or none with --quiet."""
+    if args.quiet:
+        return []
+    if args.command == "backfill":
+        return demo_outbreaks(now - timedelta(days=args.days), now)
+    return demo_outbreaks(now, now + LIVE_HORIZON)
 
 
 def backfill(client, generator: Generator, days: int, now: datetime) -> int:
@@ -134,12 +154,22 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
+    demo = planned_demo(args, now)
     try:
         with SentinelClient(args.api_url, key) as client:
             facilities = client.facilities()
-            generator = Generator(facilities, rng, spread_km=args.spread_km, outbreaks=outbreaks)
+            generator = Generator(
+                facilities, rng, spread_km=args.spread_km, outbreaks=outbreaks + demo
+            )
             located = sum(1 for f in facilities if f.latitude is not None)
             print(f"{len(facilities):,} facilities in the registry, {located:,} with a location")
+            if demo:
+                print(
+                    "The demo's outbreaks run on top of the baseline, a new one every three and"
+                    " a half days (--quiet leaves them out). Running now:"
+                )
+                for outbreak in running(now):
+                    print(f"  {outbreak.describe()}")
             for outbreak in outbreaks:
                 print(f"Injecting an outbreak: {outbreak.describe()}")
                 if args.command == "backfill" and outbreak.start >= now:

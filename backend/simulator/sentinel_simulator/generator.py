@@ -161,7 +161,8 @@ class Generator:
         for i, outbreak in enumerate(self._outbreaks):
             if outbreak.spread == "point":
                 located, weights = self._candidates[outbreak.district_code]
-                centre = self._rng.choices(located, weights)[0]
+                draw = random.Random(outbreak.place) if outbreak.place else self._rng
+                centre = draw.choices(located, weights)[0]
                 nearest = sorted(located, key=lambda f: _distance_km(centre, f))[:POINT_FACILITIES]
                 self._hotspots[i] = (centre, nearest, _weights(nearest))
 

@@ -37,6 +37,9 @@ class Outbreak:
     days: float = 14.0
     profile: str = "ramp"
     spread: str = "point"
+    # Fixes where a point outbreak centres, so every run that posts its reports
+    # puts them in the same place. Without it the run's own random draw decides.
+    place: str | None = None
 
     def __post_init__(self):
         if self.district_code not in WEEKLY_BASELINES:
