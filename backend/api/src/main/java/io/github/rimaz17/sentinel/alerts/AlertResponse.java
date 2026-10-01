@@ -3,6 +3,7 @@ package io.github.rimaz17.sentinel.alerts;
 import io.github.rimaz17.sentinel.reports.SymptomGroup;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 /**
  * An alert as the internal API shows it, in the technical wording inspectors use. This is never
@@ -10,6 +11,8 @@ import java.time.Instant;
  *
  * @param verdict an inspector's judgement; null until one is given
  * @param published whether the public dashboard shows this alert
+ * @param clustersCheckedAt when the geographic check last looked; null if it never has
+ * @param clusters where the reports are bunched, the most reports first; empty if nowhere
  */
 record AlertResponse(
     String code,
@@ -28,9 +31,12 @@ record AlertResponse(
     BigDecimal threshold,
     Verdict verdict,
     Instant verdictAt,
-    boolean published) {
+    boolean published,
+    Instant clustersCheckedAt,
+    List<ClusterResponse> clusters) {
 
-  static AlertResponse from(Alert alert, Instant now, BigDecimal publicThreshold) {
+  static AlertResponse from(
+      Alert alert, List<AlertCluster> clusters, Instant now, BigDecimal publicThreshold) {
     return new AlertResponse(
         alert.getCode(),
         alert.getDistrict().getCode(),
@@ -48,6 +54,8 @@ record AlertResponse(
         alert.getThreshold(),
         alert.getVerdict(),
         alert.getVerdictAt(),
-        alert.isPublic(publicThreshold));
+        alert.isPublic(publicThreshold),
+        alert.getClustersCheckedAt(),
+        clusters.stream().map(ClusterResponse::from).toList());
   }
 }
