@@ -56,6 +56,11 @@
   /* The ground of a panel on the working pages: a step lighter than the page,
      so a panel reads as a sheet laid on it. Ink on it is 15.34:1, ink-70 5.82:1. */
   --color-card: #f7f9f9;
+  /* The inside of a form field, and of a secondary button: white, a step
+     lighter than the card, so a field reads as a place to type. Its edge is
+     ink-55, 3.72:1 on white, so the field's boundary passes the 3:1 that a
+     control's edge needs. */
+  --color-field: #ffffff;
   --color-ink: #15222b;
 
   /* Ink at fixed alphas, measured on paper:
@@ -167,13 +172,14 @@
   --container-field: 20rem;
   --container-field-lg: 28rem;
 
-  /* Panels on the dashboards and the report form: a softly rounded sheet with a
-     low, wide shadow, offset downward, so it sits on the page rather than
-     glowing. The staff sign-in pages box their two halves in a square ink rule
-     instead, and take neither. */
+  /* Panels on every working page: a softly rounded sheet with a low, wide
+     shadow, offset downward, so it sits on the page rather than glowing. A
+     field and a button take the control radius, and a field a 1px contact
+     shadow, so it sits a hair above the card. */
   --radius-panel: 0.875rem;
   --radius-control: 0.5rem;
   --shadow-panel: 0 1px 2px rgb(21 34 43 / 0.06), 0 12px 28px -18px rgb(21 34 43 / 0.38);
+  --shadow-field: 0 1px 2px rgb(21 34 43 / 0.06);
 
   /* ---- Spacing ----------------------------------------------------------
      A 4px-rooted scale. The larger steps are fluid so that vertical rhythm
