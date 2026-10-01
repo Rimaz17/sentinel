@@ -1,6 +1,6 @@
 # 0017, A public demo mode: published accounts, a held-back administrator and a nightly reset
 
-Status: accepted · 2026-10-01
+Status: accepted · 2026-10-01 · amended 2026-10-02: on by default
 
 ## Context
 
@@ -17,14 +17,17 @@ The question is not whether to publish, but what a published account may do.
 
 ## Decision
 
-- **Demo mode is a setting, off unless switched on** (`SENTINEL_DEMO_MODE`). Off,
-  nothing below exists: no demo accounts, no demo endpoint, no restriction. The
-  access rules of ADR 0011 are unchanged either way; demo mode only
-  pre-provisions accounts, as an administrator would.
+- **Demo mode is a setting, on unless switched off** (`SENTINEL_DEMO_MODE=false`).
+  Off, nothing below exists: no demo accounts, no demo endpoint, no restriction.
+  The access rules of ADR 0011 are unchanged either way; demo mode only
+  pre-provisions accounts, as an administrator would. It was first off by
+  default, so that nothing published or reset could happen without a choice;
+  the owner chose on by default (2026-10-02), so the demo works with no setup.
 - **Four demo accounts, all in Colombo where they are tied to a place:** an
   administrator, an inspector for every district, an inspector for Colombo only,
   and a data provider at the Infectious Diseases Hospital, Angoda. They share one
-  password, `SENTINEL_DEMO_PASSWORD`, and live under `demo.sentinel.test`, a name
+  password, `SENTINEL_DEMO_PASSWORD` (`sentinel-demo` when unset), and live under
+  `demo.sentinel.test`, a name
   that can never receive mail. They are created when the API starts and put back
   exactly as they were every night.
 - **They are shown on the sign-in page with their passwords**, from
@@ -33,7 +36,7 @@ The question is not whether to publish, but what a published account may do.
   real sign-in. The Colombo inspector's card suggests opening Kandy, so the
   district scope can be seen refusing.
 - **The demo facility's invite code is published on the registration page**
-  (`SENTINEL_DEMO_INVITE_CODE`). A facility's code is shared by all its staff
+  (`SENTINEL_DEMO_INVITE_CODE`, `CMB-DEM-7Q4X` when unset). A facility's code is shared by all its staff
   (the facility_invite_codes migration), so one code serves every visitor and
   registering with it is the same two steps a real facility's staff take.
 - **The demo administrator may change only what visitors made.** It sees every
@@ -82,3 +85,12 @@ The question is not whether to publish, but what a published account may do.
 - The demo password and code are public. The API refuses to start in demo mode
   with a password shorter than the policy's 12 characters or a code not shaped
   like one, and neither should be reused anywhere.
+- **Their defaults are in the repository**, in `application.yml`, against the
+  rule that no password is committed. The rule exists for secrets; these two are
+  published on the sign-in and registration pages by design, so committing them
+  reveals nothing. Every real secret (the JWT key, the feed key, the owner's
+  administrator) still comes only from the environment.
+- **On by default, the reset runs wherever the API runs at 03:00**, a developer's
+  own database included: alert reviews there are undone each night. Set
+  `SENTINEL_DEMO_MODE=false` where that matters, and for any deployment that is
+  not a demonstration.
