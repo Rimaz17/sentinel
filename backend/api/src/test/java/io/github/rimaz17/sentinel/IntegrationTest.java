@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Import;
       // Tests sign in far more often than a person does; RateLimitTest sets its own limits.
       "sentinel.rate-limit.auth-per-minute=100000",
       "sentinel.rate-limit.ingestion-per-minute=100000",
+      // Demo mode is on by default; only the tests of it switch it on.
+      "sentinel.demo.enabled=false",
       // Read even though the Redis container's own connection replaces it, so it must parse.
       "spring.data.redis.url=redis://replaced-by-the-test-container:6379"
     })

@@ -6,8 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
- * The public demonstration, from the environment. Off unless switched on. See
- * docs/adr/0017-public-demo-mode.md.
+ * The public demonstration, from the environment. On unless {@code SENTINEL_DEMO_MODE} is false.
+ * See docs/adr/0017-public-demo-mode.md.
  *
  * @param enabled whether the demo accounts exist and are shown on the sign-in page
  * @param password the one password every demo account signs in with; published on the sign-in page
@@ -17,7 +17,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  */
 @ConfigurationProperties("sentinel.demo")
 public record DemoProperties(
-    @DefaultValue("false") boolean enabled,
+    @DefaultValue("true") boolean enabled,
     String password,
     String inviteCode,
     @DefaultValue("03:00") LocalTime resetAt) {

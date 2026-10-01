@@ -75,10 +75,12 @@ sentinel:
     email: ${SENTINEL_ADMIN_EMAIL:}
     password: ${SENTINEL_ADMIN_PASSWORD:}
   # The public demonstration: published demo accounts, a published invite code,
-  # and a nightly reset. Off unless switched on. See docs/adr/0017-public-demo-mode.md.
+  # and a nightly reset. On unless SENTINEL_DEMO_MODE is false. The password and
+  # code below are not secrets: the sign-in and registration pages show them to
+  # every visitor. See docs/adr/0017-public-demo-mode.md.
   demo:
-    enabled: ${SENTINEL_DEMO_MODE:false}
-    password: ${SENTINEL_DEMO_PASSWORD:}
-    invite-code: ${SENTINEL_DEMO_INVITE_CODE:}
+    enabled: ${SENTINEL_DEMO_MODE:true}
+    password: ${SENTINEL_DEMO_PASSWORD:sentinel-demo}
+    invite-code: ${SENTINEL_DEMO_INVITE_CODE:CMB-DEM-7Q4X}
     # Sri Lanka time.
     reset-at: "03:00"
