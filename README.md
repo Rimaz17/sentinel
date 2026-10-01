@@ -115,8 +115,8 @@ See [ADR 0014](docs/adr/0014-kafka-between-ingestion-and-storage.md),
 [ADR 0016](docs/adr/0016-alerts-pushed-over-websocket.md), and
 [Measured pipeline](#measured-pipeline) for how fast it runs.
 
-**Demo mode** opens the staff side to visitors without an account. Switched on,
-the sign-in page lists four demo accounts with their password (an administrator,
+**Demo mode** opens the staff side to visitors without an account. It is on
+unless `SENTINEL_DEMO_MODE=false`: the sign-in page lists four demo accounts with their password (an administrator,
 an inspector for every district, an inspector for Colombo, and a data provider
 at a Colombo hospital), each with a button that fills it into the form, and the
 registration page publishes a facility invite code. The demo administrator sees
@@ -367,18 +367,20 @@ check refuses to run until reports reach back 63 days, which the backfill
 provides. Alerts are written to the `alerts` table, numbered from `A-1001`, and
 appear in the dashboard's alert list within one poll.
 
-**6. Optionally, demo mode.** For a deployment visitors will try without an
-account ([ADR 0017](docs/adr/0017-public-demo-mode.md)), set these in `.env`,
-with a password of 12 characters or more that you use nowhere else:
+**6. Demo mode, on by default.** So visitors can try the staff side without an
+account ([ADR 0017](docs/adr/0017-public-demo-mode.md)), the API runs in demo
+mode unless `.env` says otherwise. These are the defaults; change the password
+and code if you like (the password needs 12 characters or more), or set
+`SENTINEL_DEMO_MODE=false` to switch demo mode off:
 
 ```
 SENTINEL_DEMO_MODE=true
-SENTINEL_DEMO_PASSWORD=change-me-demo-password
+SENTINEL_DEMO_PASSWORD=sentinel-demo
 SENTINEL_DEMO_INVITE_CODE=CMB-DEM-7Q4X
 ```
 
-Both values are shown to every visitor. At each start the API creates or puts
-back the four demo accounts, all signing in with that password:
+Both values are shown to every visitor, so reuse neither. At each start the API
+creates or puts back the four demo accounts, all signing in with that password:
 
 | Account | Email | Reaches |
 |---|---|---|
@@ -390,8 +392,8 @@ back the four demo accounts, all signing in with that password:
 The invite code is the same hospital's. Every night at 03:00 Sri Lanka time the
 API deletes the accounts visitors made, removes the invite codes the demo
 administrator issued, returns every alert to new, and puts the demo accounts and
-code back. Accounts you made are never touched, but alert reviews are undone, so
-keep demo mode for a deployment meant for visitors.
+code back. Accounts you made are never touched, but alert reviews are undone,
+so switch demo mode off on a database whose reviews you want to keep.
 
 ### Injecting an outbreak
 
@@ -675,6 +677,8 @@ These are documented on purpose and are not defects.
   28% of the time, and the median time to detect across all injected outbreaks
   is 140 hours, because a 7-day window only fills as an outbreak grows. See
   [Measured detection](#measured-detection).
+- **Demo mode is on by default**, so its accounts and its nightly reset come
+  with every run unless `SENTINEL_DEMO_MODE=false`.
 - **Demo mode undoes alert reviews and leaves reports.** Its nightly reset
   returns every alert to new, the owner's reviews included, because a status
   change is not recorded against an account; and it cannot remove a visitor's
