@@ -59,8 +59,8 @@ describe('AlertList', () => {
         .getAllByRole('listitem')
         .map((line) => line.textContent),
     ).toEqual([
-      '17 reports within 2 km from 7 facilities, near Peradeniya; 5.6 expected at its usual share',
-      '6 reports within 2 km from 3 facilities, near Peradeniya; 5.6 expected at its usual share',
+      '17 reports within 2 km from 7 facilities, near Peradeniya; 3.3 expected at its usual share',
+      '6 reports within 2 km from 3 facilities, near Peradeniya; 3.3 expected at its usual share',
     ])
   })
 

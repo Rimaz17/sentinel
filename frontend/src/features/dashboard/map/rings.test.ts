@@ -63,7 +63,7 @@ describe('cluster words', () => {
   })
 
   it('says what the ring would usually have held', () => {
-    expect(expectedWords(cluster())).toBe('5.6 expected at its usual share')
+    expect(expectedWords(cluster())).toBe('3.3 expected at its usual share')
   })
 
   it('labels a ring with its alert, group, cluster and place', () => {

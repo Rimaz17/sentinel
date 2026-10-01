@@ -52,7 +52,7 @@ export function nearWords(cluster: Cluster): string | null {
   return cluster.nearestFacilityName === null ? null : `near ${cluster.nearestFacilityName}`
 }
 
-/** "5.6 expected at its usual share" */
+/** "3.3 expected at its usual share" */
 export function expectedWords(cluster: Cluster): string {
   return `${formatDecimal(cluster.expectedCount)} expected at its usual share`
 }

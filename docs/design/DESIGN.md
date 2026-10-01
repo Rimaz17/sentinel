@@ -396,7 +396,7 @@ the landing page, set as sheet panels.
   and hovering anywhere in the ring gives the whole line. An ended alert's
   rings are not drawn, and switching a group off in the key takes its rings
   with it. Under a rule in the key, each ring is a line of words: "A-1003 ·
-  Dengue-like · 17 reports within 2 km from 7 facilities, near Peradeniya; 5.6
+  Dengue-like · 17 reports within 2 km from 7 facilities, near Peradeniya; 3.3
   expected at its usual share". The ring is the only alert red on the map, and
   it is never shown on the public dashboard.
 - **The chart** is four small multiples, one per symptom group: nine weekly

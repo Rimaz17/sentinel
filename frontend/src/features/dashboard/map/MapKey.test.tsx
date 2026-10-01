@@ -150,7 +150,7 @@ describe('MapKey', () => {
     expect(screen.getByText('Cluster rings')).toHaveTextContent('Cluster rings2')
     const items = screen.getAllByRole('listitem')
     expect(items.map((item) => item.textContent)).toEqual([
-      'A-1002 · Dengue-like · 17 reports within 2 km from 7 facilities, near Peradeniya; 5.6 expected at its usual share',
+      'A-1002 · Dengue-like · 17 reports within 2 km from 7 facilities, near Peradeniya; 3.3 expected at its usual share',
       'A-1001 · Influenza-like · 9 reports within 2 km from 3 facilities; 1.2 expected at its usual share',
     ])
   })

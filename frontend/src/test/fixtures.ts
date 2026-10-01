@@ -49,7 +49,7 @@ export function cluster(overrides: Partial<Cluster> = {}): Cluster {
     radiusMetres: 2000,
     reportCount: 17,
     facilityCount: 7,
-    expectedCount: 5.61,
+    expectedCount: 3.28,
     nearestFacilityCode: 'LKY0001016',
     nearestFacilityName: 'Peradeniya',
     ...overrides,
