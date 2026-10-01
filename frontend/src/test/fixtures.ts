@@ -1,5 +1,6 @@
 import type {
   Alert,
+  Cluster,
   DistrictSummary,
   LocatedReport,
   WeeklyCounts,
@@ -34,6 +35,23 @@ export function alert(overrides: Partial<Alert> = {}): Alert {
     verdict: null,
     verdictAt: null,
     published: false,
+    clustersCheckedAt: '2026-09-28T06:00:00Z',
+    clusters: [],
+    ...overrides,
+  }
+}
+
+/** Kandy's worked example: 17 of the week's 41 reports within 2 km, from 7 facilities. */
+export function cluster(overrides: Partial<Cluster> = {}): Cluster {
+  return {
+    latitude: 7.291,
+    longitude: 80.634,
+    radiusMetres: 2000,
+    reportCount: 17,
+    facilityCount: 7,
+    expectedCount: 5.61,
+    nearestFacilityCode: 'LKY0001016',
+    nearestFacilityName: 'Peradeniya',
     ...overrides,
   }
 }
