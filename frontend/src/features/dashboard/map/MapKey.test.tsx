@@ -1,10 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { report } from '@/test/fixtures'
+import { alert, cluster, report } from '@/test/fixtures'
 import type { Facility, SymptomGroup } from '../api/types'
 import { MAP_LIMIT } from './counts'
 import { MapKey } from './MapKey'
+import { ringsOf } from './rings'
 
 const REPORTS = [
   report({ id: '1' }),
@@ -25,7 +26,7 @@ function facility(code: string, located: boolean): Facility {
 }
 
 const ALL_SHOWN: ReadonlySet<SymptomGroup> = new Set()
-const toggles = { hidden: ALL_SHOWN, onToggle: () => {} }
+const toggles = { hidden: ALL_SHOWN, onToggle: () => {}, rings: [] }
 
 describe('MapKey', () => {
   it('states in words what the dots show', () => {
@@ -105,6 +106,7 @@ describe('MapKey', () => {
         areaName="Kandy"
         hidden={new Set<SymptomGroup>(['INFLUENZA_LIKE'])}
         onToggle={onToggle}
+        rings={[]}
       />,
     )
 
@@ -113,5 +115,51 @@ describe('MapKey', () => {
 
     await userEvent.click(screen.getByRole('checkbox', { name: /gastrointestinal/i }))
     expect(onToggle).toHaveBeenCalledWith('GASTROINTESTINAL')
+  })
+
+  it('lists each cluster ring in words, so the rings never rely on colour or sight', () => {
+    const rings = ringsOf(
+      [
+        alert({ code: 'A-1002', clusters: [cluster()] }),
+        alert({
+          code: 'A-1001',
+          symptomGroup: 'INFLUENZA_LIKE',
+          clusters: [
+            cluster({
+              reportCount: 9,
+              facilityCount: 3,
+              expectedCount: 1.2,
+              nearestFacilityName: null,
+            }),
+          ],
+        }),
+      ],
+      ALL_SHOWN,
+    )
+    render(
+      <MapKey
+        reports={REPORTS}
+        reportsInArea={3}
+        facilities={[]}
+        areaName="Kandy"
+        {...toggles}
+        rings={rings}
+      />,
+    )
+
+    expect(screen.getByText('Cluster rings')).toHaveTextContent('Cluster rings2')
+    const items = screen.getAllByRole('listitem')
+    expect(items.map((item) => item.textContent)).toEqual([
+      'A-1002 · Dengue-like · 17 reports within 2 km from 7 facilities, near Peradeniya; 5.6 expected at its usual share',
+      'A-1001 · Influenza-like · 9 reports within 2 km from 3 facilities; 1.2 expected at its usual share',
+    ])
+  })
+
+  it('says nothing of rings when none is drawn', () => {
+    render(
+      <MapKey reports={REPORTS} reportsInArea={3} facilities={[]} areaName="Kandy" {...toggles} />,
+    )
+
+    expect(screen.queryByText(/cluster ring/i)).not.toBeInTheDocument()
   })
 })

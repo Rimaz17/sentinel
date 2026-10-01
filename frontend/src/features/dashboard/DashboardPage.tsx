@@ -99,6 +99,8 @@ export function DashboardPage() {
     selected === null ? SRI_LANKA : boundsOf(located.length > 0 ? located : (reports.data ?? []))
   const frameKey = `${selected ?? 'LK'}:${located.length}:${reports.isSuccess ? 'r' : ''}`
 
+  const rings = ringsOf(alerts.data ?? [], hidden)
+
   const unknownDistrict =
     selected !== null && !outOfScope && districts.isSuccess && district === undefined
 
@@ -213,7 +215,7 @@ export function DashboardPage() {
                 <ReportMap
                   reports={(reports.data ?? []).filter((r) => !hidden.has(r.symptomGroup))}
                   facilities={facilities.data ?? []}
-                  rings={ringsOf(alerts.data ?? [], hidden)}
+                  rings={rings}
                   bounds={bounds}
                   frameKey={frameKey}
                 />
@@ -228,6 +230,7 @@ export function DashboardPage() {
                     reports={data}
                     reportsInArea={reportsInArea ?? data.length}
                     facilities={facilities.data ?? []}
+                    rings={rings}
                     areaName={areaName}
                     hidden={hidden}
                     onToggle={toggle}
