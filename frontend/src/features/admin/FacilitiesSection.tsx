@@ -1,9 +1,11 @@
 import { useId, useState } from 'react'
+import { fieldControl, fieldLabel } from '@/components/ui/controls'
 import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
+import { Select } from '@/components/ui/Select'
 import { formatCount, formatDateTime } from '@/features/dashboard/format'
 import { EmptyState, LoadingRows, QueryView } from '@/features/dashboard/QueryView'
-import { caps, cx, labelSm, sectionTitle, tnum } from '@/styles/recipes'
+import { cx, labelSm, sectionTitle, tnum } from '@/styles/recipes'
 import {
   type AdminFacility,
   type IssuedCode,
@@ -49,24 +51,24 @@ export function FacilitiesSection() {
         </div>
         <div className="grid gap-sm border-t border-t-ink-14 pt-md">
           <div className="grid gap-3xs">
-            <label htmlFor={districtId} className={cx(labelSm, caps, 'text-ink-70')}>
+            <label htmlFor={districtId} className={fieldLabel}>
               District
             </label>
-            <select
+            <Select
               id={districtId}
               value={district}
               onChange={(event) => setDistrict(event.target.value)}
-              className="h-[2.75rem] w-full max-w-field-lg rounded-control border border-ink-24 bg-paper-raised px-xs text-body"
+              className="max-w-field-lg"
             >
               {options.map((option) => (
                 <option key={option.code} value={option.code}>
                   {option.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
           <div className="grid gap-3xs">
-            <label htmlFor={filterId} className={cx(labelSm, caps, 'text-ink-70')}>
+            <label htmlFor={filterId} className={fieldLabel}>
               Name contains
             </label>
             <input
@@ -74,7 +76,7 @@ export function FacilitiesSection() {
               type="search"
               value={filter}
               onChange={(event) => setFilter(event.target.value)}
-              className="h-[2.75rem] w-full max-w-field-lg rounded-control border border-ink-24 bg-paper-raised px-xs text-body"
+              className={cx(fieldControl(), 'h-[2.75rem] max-w-field-lg px-sm text-body')}
             />
           </div>
         </div>

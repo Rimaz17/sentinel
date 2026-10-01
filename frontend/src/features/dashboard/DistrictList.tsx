@@ -1,6 +1,8 @@
 import { type UseQueryResult } from '@tanstack/react-query'
 import { useId, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { fieldControl, fieldLabel } from '@/components/ui/controls'
+import { Select } from '@/components/ui/Select'
 import { caps, cx, labelSm, tnum } from '@/styles/recipes'
 import type { DistrictSummary } from './api/types'
 import { formatCount } from './format'
@@ -67,7 +69,7 @@ export function DistrictList({
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Find a district"
                   autoComplete="off"
-                  className="w-full rounded-control border border-ink-24 bg-paper-raised px-xs py-2xs text-small"
+                  className={cx(fieldControl(), 'h-[2.5rem] px-sm text-small')}
                 />
               </div>
             ) : null}
@@ -209,14 +211,13 @@ export function DistrictPicker({
   const id = useId()
   return (
     <div className="grid gap-3xs">
-      <label htmlFor={id} className={cx(labelSm, caps, 'text-ink-70')}>
+      <label htmlFor={id} className={fieldLabel}>
         District
       </label>
-      <select
+      <Select
         id={id}
         value={selected ?? ''}
         onChange={(event) => void navigate(districtPath(event.target.value || null))}
-        className="w-full border border-ink-24 bg-paper-raised px-xs py-2xs text-small"
       >
         <option value="">{allLabel}</option>
         {districts.map((district) => (
@@ -225,7 +226,7 @@ export function DistrictPicker({
             {district.openAlerts > 0 ? ` (${district.openAlerts} open)` : ''}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   )
 }

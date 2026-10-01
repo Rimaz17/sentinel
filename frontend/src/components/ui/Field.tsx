@@ -1,5 +1,6 @@
 import { type InputHTMLAttributes, type ReactNode, useId } from 'react'
-import { caps, cx, labelSm } from '@/styles/recipes'
+import { cx } from '@/styles/recipes'
+import { fieldControl, fieldLabel } from './controls'
 
 /**
  * How wide the input is, from what goes in it: an age or a coordinate, an
@@ -27,9 +28,9 @@ type FieldProps = {
 } & Omit<InputHTMLAttributes<HTMLInputElement>, 'id' | 'aria-describedby' | 'aria-invalid'>
 
 /**
- * A labelled text input. The label is a real <label>, the hint and the error
- * are tied to the input for screen readers, and a refused field says why in
- * words beside a rule, never in colour alone.
+ * A labelled text input. The label is a real <label>, in sentence case above
+ * the box; the hint and the error are tied to the input for screen readers,
+ * and a refused field says why in words beside a rule, never in colour alone.
  */
 export function Field({ label, hint, error, width, className, ...input }: FieldProps) {
   const id = useId()
@@ -39,7 +40,7 @@ export function Field({ label, hint, error, width, className, ...input }: FieldP
 
   return (
     <div className={cx('grid content-start gap-3xs', className)}>
-      <label htmlFor={id} className={cx(labelSm, caps, 'text-ink-70')}>
+      <label htmlFor={id} className={fieldLabel}>
         {label}
       </label>
       <div className="flex flex-wrap items-start gap-x-sm gap-y-3xs">
@@ -48,10 +49,10 @@ export function Field({ label, hint, error, width, className, ...input }: FieldP
           aria-describedby={describedBy || undefined}
           aria-invalid={error ? true : undefined}
           className={cx(
+            fieldControl(Boolean(error)),
             // One height for every kind, so a date beside a number sits level with it.
-            'h-[2.75rem] w-full border bg-paper-raised px-xs py-2xs text-body',
+            'h-[2.75rem] px-sm text-body',
             width ? WIDTHS[width] : null,
-            error ? 'border-ink' : 'border-ink-24',
           )}
           {...input}
         />

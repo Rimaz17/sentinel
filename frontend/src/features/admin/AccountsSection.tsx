@@ -1,6 +1,7 @@
 import { type FormEvent, useId, useState } from 'react'
 import { SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
+import { fieldControl, fieldLabel } from '@/components/ui/controls'
 import { Email } from '@/components/ui/Email'
 import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
@@ -11,7 +12,7 @@ import type { Role } from '@/lib/api/session'
 import { formatCount, formatDateTime } from '@/features/dashboard/format'
 import { EmptyState, LoadingRows, QueryView } from '@/features/dashboard/QueryView'
 import { ApiError } from '@/lib/api/client'
-import { caps, cx, labelSm, sectionTitle } from '@/styles/recipes'
+import { cx, labelSm, sectionTitle } from '@/styles/recipes'
 import {
   type AdminAccount,
   type DistrictName,
@@ -164,10 +165,10 @@ function NewInspectorForm({
         error={error?.problemWith('email')}
       />
       <fieldset className="m-0 grid gap-xs border-0 p-0">
-        <legend className={cx(labelSm, caps, 'mb-2xs text-ink-70')}>Districts covered</legend>
+        <legend className={cx(fieldLabel, 'mb-2xs')}>Districts covered</legend>
         <label
           className={cx(
-            'flex cursor-pointer items-center gap-xs rounded-control border border-ink-24 bg-paper-raised px-xs py-sm text-small',
+            'flex cursor-pointer items-center gap-xs rounded-control border border-ink-24 bg-field px-xs py-sm text-small shadow-field',
             'transition-colors duration-(--dur-fast) ease-out hover:border-ink-70',
             'has-checked:border-ink has-checked:bg-ink-08 has-checked:font-medium',
           )}
@@ -285,7 +286,7 @@ function AccountList({
                     placeholder="Find an account by name or email"
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
-                    className="w-full rounded-control border border-ink-24 bg-paper-raised px-xs py-2xs text-small placeholder:text-ink-70"
+                    className={cx(fieldControl(), 'h-[2.5rem] px-sm text-small')}
                   />
                 </div>
               ) : null}

@@ -1,7 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Action, SubmitButton } from '@/components/ui/Action'
+import { SubmitButton } from '@/components/ui/Action'
+import { Button, ButtonLink } from '@/components/ui/Button'
 import { Field, FormError } from '@/components/ui/Field'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { useDemo } from '@/features/demo/api'
@@ -194,7 +195,7 @@ export function SignInPage() {
                 No account? Sentinel is a demonstration, so you can sign in with one of its demo
                 accounts.
               </p>
-              <QuietButton onClick={showDemoAccounts}>Try a demo account</QuietButton>
+              <Button onClick={showDemoAccounts}>Try a demo account</Button>
             </div>
           ) : null}
         </form>
@@ -213,7 +214,7 @@ function SignedIn({ session }: { session: Session }) {
         Signed in as <span className="font-medium">{displayName}</span>, {ROLE_NAMES[role]}.
       </p>
       <div className="flex flex-wrap items-center gap-md">
-        <Action to={homeFor(role)}>Continue</Action>
+        <ButtonLink to={homeFor(role)}>Continue</ButtonLink>
         <QuietButton onClick={() => void signOut(queryClient)}>Sign out</QuietButton>
       </div>
     </div>

@@ -1,7 +1,6 @@
 import { Panel } from '@/components/ui/Panel'
-import { QuietButton } from '@/components/ui/QuietButton'
+import { Button } from '@/components/ui/Button'
 import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
-import { caps, cx, labelSm } from '@/styles/recipes'
 import { type Demo, resetTime } from './api'
 
 /**
@@ -40,19 +39,19 @@ export function DemoInvitePanel({
       </div>
       <div className="grid gap-x-lg gap-y-md border-t border-t-ink pt-md md:grid-cols-2">
         <div className="grid content-start gap-xs">
-          <dl className="grid gap-2xs">
-            <div className="grid gap-3xs">
-              <dt className={cx(labelSm, caps, 'text-ink-70')}>Invite code</dt>
-              <dd className="font-mono text-body">{demo.invite.code}</dd>
+          <dl className="grid max-w-field-lg gap-xs rounded-control border border-ink-08 bg-paper-raised px-xs py-xs">
+            <div className="grid gap-[0.125rem]">
+              <dt className="text-label text-ink-70">Invite code</dt>
+              <dd className="text-body font-medium">{demo.invite.code}</dd>
             </div>
-            <div className="grid gap-3xs">
-              <dt className={cx(labelSm, caps, 'text-ink-70')}>Facility</dt>
-              <dd className="text-small">{demo.invite.facilityName}, Colombo</dd>
+            <div className="grid gap-[0.125rem]">
+              <dt className="text-label text-ink-70">Facility</dt>
+              <dd className="text-small font-medium">{demo.invite.facilityName}, Colombo</dd>
             </div>
           </dl>
           {onUse ? (
             <div>
-              <QuietButton onClick={() => onUse(demo.invite.code)}>Use this code</QuietButton>
+              <Button onClick={() => onUse(demo.invite.code)}>Use this code</Button>
             </div>
           ) : null}
         </div>
