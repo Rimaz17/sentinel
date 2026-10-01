@@ -4,8 +4,9 @@ Left to its baseline, the simulator produces a quiet country, and the public
 dashboard shows no alert. So that a visitor always finds some, the simulator
 runs this schedule unless told not to (`--quiet`):
 
-  - a new outbreak starts every 7 days, at full strength from its first hour
-    (the "step" profile), and lasts 10 days, so one or two are always running;
+  - a new outbreak starts every three and a half days, at full strength from its
+    first hour (the "step" profile), and lasts 10 days, so two or three are
+    always running;
   - each is a point outbreak, bunched around one spot, as a local outbreak is;
   - each adds 20 times the square root of its district and group's usual week,
     so the detector's z-score passes 3 within about a day and the public
@@ -13,14 +14,14 @@ runs this schedule unless told not to (`--quiet`):
     inspector. From its eighth day the outbreak's first days fall into the
     8-week baseline and its z-score sinks, below 3 about a day and a half after
     it ends; its alert stays open a day longer, so each is public for about ten
-    and a half days, and with a new one every week one or two always are;
-  - at every moment at least one running outbreak stands well above 5 (about 7
-    at the weakest moment, with no noise), so even a detector's very first
-    check, straight after a backfill, publishes one. Modelled with Poisson noise
-    it does so more than 99 times in 100;
-  - they rotate through twelve districts and symptom groups, Colombo's four
-    groups every third week among them, so no pair recurs within 84 days and
-    each one's 8-week baseline is never raised by its own last outbreak.
+    and a half days, and three or four always are;
+  - at every moment at least two running outbreaks stand above 5, so even a
+    detector's very first check, straight after a backfill, publishes two. In a
+    model with Poisson noise, 500 such first checks published at least two 494
+    times and at least one every time;
+  - they rotate through 24 districts and symptom groups, Colombo's four groups
+    every three weeks among them, so no pair recurs within 84 days and each
+    one's 8-week baseline is never raised by its own last outbreak.
 
 The schedule is fixed to the calendar, not to when the simulator starts, so a
 backfill and a later live run agree on which outbreaks are running, and each
@@ -43,7 +44,7 @@ from sentinel_simulator.outbreaks import Outbreak
 
 # A Monday, 05:30 in Sri Lanka: the schedule's first outbreak starts here.
 EPOCH = datetime(2026, 1, 5, 0, 0, tzinfo=UTC)
-EVERY = timedelta(days=7)
+EVERY = timedelta(days=3.5)
 LASTS = timedelta(days=10)
 STRENGTH = 20.0
 
@@ -51,15 +52,27 @@ ROTATION: tuple[tuple[str, str], ...] = (
     ("CMB", DENGUE_LIKE),
     ("KDY", DENGUE_LIKE),
     ("GAL", LEPTOSPIROSIS_LIKE),
-    ("CMB", GASTROINTESTINAL),
     ("JAF", DENGUE_LIKE),
     ("KUR", INFLUENZA_LIKE),
-    ("CMB", INFLUENZA_LIKE),
     ("RAT", LEPTOSPIROSIS_LIKE),
+    ("CMB", GASTROINTESTINAL),
     ("GMP", DENGUE_LIKE),
-    ("CMB", LEPTOSPIROSIS_LIKE),
     ("BTC", GASTROINTESTINAL),
     ("ANU", INFLUENZA_LIKE),
+    ("KEG", LEPTOSPIROSIS_LIKE),
+    ("MTR", DENGUE_LIKE),
+    ("CMB", INFLUENZA_LIKE),
+    ("KLT", GASTROINTESTINAL),
+    ("PTM", DENGUE_LIKE),
+    ("BDL", INFLUENZA_LIKE),
+    ("TRC", GASTROINTESTINAL),
+    ("HMB", DENGUE_LIKE),
+    ("CMB", LEPTOSPIROSIS_LIKE),
+    ("NEL", INFLUENZA_LIKE),
+    ("AMP", GASTROINTESTINAL),
+    ("MTL", DENGUE_LIKE),
+    ("POL", LEPTOSPIROSIS_LIKE),
+    ("VAV", INFLUENZA_LIKE),
 )
 
 

@@ -18,23 +18,23 @@ from sentinel_simulator.scenario import (
 NOW = datetime(2026, 10, 2, 9, 30, tzinfo=UTC)
 
 
-def test_one_or_two_outbreaks_are_always_running():
+def test_two_or_three_outbreaks_are_always_running():
     moment = NOW
     while moment < NOW + timedelta(days=365):
-        assert 1 <= len(running(moment)) <= 2, moment
+        assert 2 <= len(running(moment)) <= 3, moment
         moment += timedelta(hours=1)
 
 
-def test_a_new_outbreak_starts_every_week_and_lasts_ten_days():
+def test_a_new_outbreak_starts_twice_a_week_and_lasts_ten_days():
     first, second = scheduled(40), scheduled(41)
 
-    assert second.start - first.start == EVERY == timedelta(days=7)
+    assert second.start - first.start == EVERY == timedelta(days=3.5)
     assert first.end - first.start == LASTS == timedelta(days=10)
     assert first.profile == "step" and first.spread == "point"
 
 
 def test_no_district_and_group_recurs_within_twelve_weeks():
-    assert len(set(ROTATION)) == len(ROTATION) == 12
+    assert len(set(ROTATION)) == len(ROTATION) == 24
     for index in range(-30, 200):
         later = scheduled(index + len(ROTATION))
         now = scheduled(index)
@@ -46,9 +46,9 @@ def test_no_district_and_group_recurs_within_twelve_weeks():
         assert later.start - now.end >= timedelta(days=63)
 
 
-def test_colombo_has_an_outbreak_every_third_week():
+def test_colombo_has_an_outbreak_every_three_weeks():
     colombo = [i for i, (district, _) in enumerate(ROTATION) if district == "CMB"]
-    assert colombo == [0, 3, 6, 9]
+    assert colombo == [0, 6, 12, 18]
     assert {ROTATION[i][1] for i in colombo} == set(WEEKLY_BASELINES["CMB"])
 
 

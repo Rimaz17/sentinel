@@ -165,8 +165,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{len(facilities):,} facilities in the registry, {located:,} with a location")
             if demo:
                 print(
-                    "The demo's outbreaks run on top of the baseline, a new one every 7 days"
-                    " (--quiet leaves them out). Running now:"
+                    "The demo's outbreaks run on top of the baseline, a new one every three and"
+                    " a half days (--quiet leaves them out). Running now:"
                 )
                 for outbreak in running(now):
                     print(f"  {outbreak.describe()}")
