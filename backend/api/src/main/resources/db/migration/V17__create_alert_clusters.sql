@@ -20,8 +20,8 @@ create table alert_clusters (
     -- This week's reports in the series within the ring, and the facilities they came from.
     report_count        integer not null,
     facility_count      integer not null,
-    -- How many reports the ring would hold this week were it ordinary: of all it
-    -- held over the nine weeks, this week's share of the series.
+    -- How many of this week's reports the ring would hold at its share of the
+    -- eight baseline weeks: the usual figure an inspector reads it against.
     expected_count      numeric(8, 2) not null,
     -- The facility with a verified location nearest the centre, in the same district.
     nearest_facility_id bigint references facilities (id),
