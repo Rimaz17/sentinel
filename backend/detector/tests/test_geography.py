@@ -12,6 +12,7 @@ from sentinel_detector.geography import (
     concentration,
     distance_km,
     expected_in_ring,
+    find_clusters,
 )
 
 # Kandy town, and one degree of latitude in kilometres.
@@ -143,3 +144,66 @@ def test_the_concentration_must_pass_the_threshold():
 
     assert assess(ring(), threshold=score) is None
     assert assess(ring(), threshold=score - 0.01) is not None
+
+
+def ring_counter(points, baseline=(), week_total=None, baseline_total=200):
+    """Counts as the store would, from points in memory: this week's in `points`, and
+    `baseline` as the eight weeks before."""
+
+    def ring_at(latitude, longitude):
+        inside = [
+            p for p in points if distance_km((latitude, longitude), (p.latitude, p.longitude)) <= 2
+        ]
+        before = [
+            p
+            for p in baseline
+            if distance_km((latitude, longitude), (p.latitude, p.longitude)) <= 2
+        ]
+        return Ring(
+            latitude,
+            longitude,
+            len(inside),
+            len({p.facility_id for p in inside}),
+            len(before),
+            len(points) if week_total is None else week_total,
+            baseline_total,
+        )
+
+    return ring_at
+
+
+def test_finds_a_local_outbreak_from_several_facilities():
+    rng = random.Random(5)
+    outbreak = around(KANDY, 15, 0.5, rng, facilities=(1, 2, 3, 4, 5))
+
+    [cluster] = find_clusters(outbreak, ring_counter(outbreak, week_total=40))
+
+    assert distance_km((cluster.latitude, cluster.longitude), KANDY) < 0.5
+    assert cluster.reports == 15 and cluster.facilities == 5
+
+
+def test_passes_over_a_place_that_always_holds_this_many():
+    rng = random.Random(6)
+    week = around(KANDY, 15, 0.5, rng, facilities=(1, 2, 3, 4, 5))
+    usual = around(KANDY, 120, 0.5, rng)
+
+    assert find_clusters(week, ring_counter(week, usual, week_total=40, baseline_total=320)) == []
+
+
+def test_reports_one_place_once_from_its_strongest_centre():
+    rng = random.Random(7)
+    # Two dense patches 1.5 km apart, too far for DBSCAN to join, near enough to share a ring.
+    near = offset(KANDY, 1.5, 0)
+    week = around(KANDY, 8, 0.1, rng) + around(near, 12, 0.1, rng)
+
+    [cluster] = find_clusters(week, ring_counter(week, week_total=60))
+
+    assert cluster.reports == 20
+
+
+def test_reports_places_further_apart_separately():
+    rng = random.Random(8)
+    far = offset(KANDY, 8, 0)
+    week = around(KANDY, 10, 0.3, rng) + around(far, 10, 0.3, rng)
+
+    assert len(find_clusters(week, ring_counter(week, week_total=60))) == 2

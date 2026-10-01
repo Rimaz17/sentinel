@@ -16,7 +16,7 @@ being dense is not enough: the ring must hold far more than its usual share.
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 import numpy as np
@@ -159,3 +159,29 @@ def candidate_centres(points: Sequence[Point]) -> list[tuple[float, float]]:
 def distance_km(a: tuple[float, float], b: tuple[float, float]) -> float:
     """Great-circle distance between two (latitude, longitude) points, in kilometres."""
     return float(haversine_distances(np.radians([a, b]))[0, 1] * EARTH_RADIUS_KM)
+
+
+def find_clusters(
+    points: Sequence[Point],
+    ring_at: Callable[[float, float], Ring],
+    threshold: float = CONCENTRATION_THRESHOLD,
+) -> list[Cluster]:
+    """The clusters among a flagged series' located reports for the week, strongest first.
+
+    `points` are the week's located reports; `ring_at` counts what lies within
+    RING_KM of a centre, which the store asks of PostGIS. Two places whose
+    centres lie within a ring of each other are one place, seen from the
+    stronger.
+    """
+    passed = [
+        cluster
+        for centre in candidate_centres(points)
+        if (cluster := assess(ring_at(*centre), threshold)) is not None
+    ]
+    passed.sort(key=lambda cluster: cluster.concentration, reverse=True)
+    kept: list[Cluster] = []
+    for cluster in passed:
+        here = (cluster.latitude, cluster.longitude)
+        if all(distance_km(here, (k.latitude, k.longitude)) >= RING_KM for k in kept):
+            kept.append(cluster)
+    return kept
