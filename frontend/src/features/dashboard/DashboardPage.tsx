@@ -22,6 +22,7 @@ import { ALL_OF_SRI_LANKA, DistrictList, DistrictPicker } from './DistrictList'
 import { boundsOf, SRI_LANKA } from './map/geometry'
 import { MapKey } from './map/MapKey'
 import { ReportMap } from './map/ReportMap'
+import { ringsOf } from './map/rings'
 import { districtPath } from './paths'
 import { LoadingRows, QueryView } from './QueryView'
 
@@ -212,6 +213,7 @@ export function DashboardPage() {
                 <ReportMap
                   reports={(reports.data ?? []).filter((r) => !hidden.has(r.symptomGroup))}
                   facilities={facilities.data ?? []}
+                  rings={ringsOf(alerts.data ?? [], hidden)}
                   bounds={bounds}
                   frameKey={frameKey}
                 />
