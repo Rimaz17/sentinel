@@ -13,6 +13,7 @@ from sentinel_detector.geography import (
     distance_km,
     expected_in_ring,
     find_clusters,
+    usual_in_ring,
 )
 
 # Kandy town, and one degree of latitude in kilometres.
@@ -112,6 +113,11 @@ def test_expects_nothing_of_a_ring_that_holds_nothing():
     assert concentration(ring(reports=0, baseline_reports=0, week_total=0, baseline_total=0)) == 0
 
 
+def test_shows_an_inspector_the_rings_baseline_share_of_this_week():
+    assert usual_in_ring(ring()) == pytest.approx(41 * 16 / 200)
+    assert usual_in_ring(ring(baseline_total=0, baseline_reports=0)) == 0
+
+
 def test_scores_concentration_as_a_binomial_count_at_this_weeks_share():
     share = 41 / 241
     spread = math.sqrt(33 * share * (1 - share))
@@ -131,7 +137,8 @@ def test_a_ring_far_above_its_usual_share_from_several_facilities_is_a_cluster()
     assert cluster is not None
     assert (cluster.latitude, cluster.longitude) == KANDY
     assert (cluster.reports, cluster.facilities) == (17, 7)
-    assert cluster.expected == 5.61
+    # 16 of the baseline's 200 reports, applied to this week's 41.
+    assert cluster.expected == 3.28
     assert cluster.concentration > 3
 
 

@@ -79,6 +79,8 @@ class Cluster:
     longitude: float
     reports: int
     facilities: int
+    # What the ring would hold this week at its share of the baseline weeks: the
+    # figure shown to inspectors (see usual_in_ring).
     expected: float
     concentration: float
 
@@ -96,6 +98,19 @@ def expected_in_ring(ring: Ring) -> float:
     would hold this week's share of the series this week.
     """
     return (ring.reports + ring.baseline_reports) * week_share(ring)
+
+
+def usual_in_ring(ring: Ring) -> float:
+    """This week's reports at the ring's share of the eight baseline weeks.
+
+    The figure an inspector reads beside a cluster: of this week's reports in
+    the series, how many would fall in this ring in an ordinary week. The test
+    itself uses `expected_in_ring`, which also allows for the baseline weeks
+    being few, and so is pulled up by the outbreak it is testing.
+    """
+    if ring.baseline_total == 0:
+        return 0.0
+    return ring.week_total * ring.baseline_reports / ring.baseline_total
 
 
 def concentration(ring: Ring) -> float:
@@ -133,7 +148,7 @@ def assess(ring: Ring, threshold: float = CONCENTRATION_THRESHOLD) -> Cluster | 
         ring.longitude,
         ring.reports,
         ring.facilities,
-        round(expected_in_ring(ring), 2),
+        round(usual_in_ring(ring), 2),
         round(score, 2),
     )
 
