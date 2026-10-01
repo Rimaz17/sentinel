@@ -49,6 +49,27 @@ export type Alert = {
   verdictAt: string | null
   /** Whether the public dashboard shows it: confirmed, or unjudged past the higher threshold. */
   published: boolean
+  /** When the geographic check last looked at its reports; null if it never has. */
+  clustersCheckedAt: string | null
+  /** Where its reports are bunched, the most reports first; empty if nowhere. */
+  clusters: Cluster[]
+}
+
+/**
+ * A place an alert's reports are bunched, as the detector's geographic check
+ * found it: a ring around a centre rounded to about 100 m, what the ring held
+ * this week, and what it would have held had it kept its usual share.
+ */
+export type Cluster = {
+  latitude: number
+  longitude: number
+  radiusMetres: number
+  reportCount: number
+  facilityCount: number
+  expectedCount: number
+  /** Null, with the name, when the alert's district has no located facility. */
+  nearestFacilityCode: string | null
+  nearestFacilityName: string | null
 }
 
 /** GET /api/reports/locations */

@@ -182,6 +182,34 @@ class AlertPushTest {
   }
 
   /** A stored inspector's Authorization header. */
+  @Test
+  void carriesTheClustersTheDetectorWroteWithTheAlert() throws Exception {
+    Inbox kandy = subscribed(inspector("kandy@example.org", "KDY"));
+    String code = raise("KDY");
+    kandy.next("RAISED");
+
+    // As the detector writes them: the alert extended and its clusters replaced, in one
+    // transaction, so the push that follows the commit reads both.
+    jdbc.update(
+        """
+        with extended as (
+          update alerts set last_detected_at = now(), clusters_checked_at = now()
+          where code = ? returning id
+        )
+        insert into alert_clusters (alert_id, latitude, longitude, radius_metres, report_count,
+          facility_count, expected_count)
+        select id, 7.291, 80.634, 2000, 17, 7, 5.61 from extended
+        """,
+        code);
+
+    JsonNode alert = kandy.next("UPDATED").get("alert");
+    assertThat(alert.get("clustersCheckedAt").isNull()).isFalse();
+    JsonNode cluster = alert.get("clusters").get(0);
+    assertThat(cluster.get("latitude").asDouble()).isEqualTo(7.291);
+    assertThat(cluster.get("reportCount").asInt()).isEqualTo(17);
+    assertThat(cluster.get("facilityCount").asInt()).isEqualTo(7);
+  }
+
   private String inspector(String email, String... districts) {
     return accounts.bearer(accounts.inspector(email, "a long password", districts));
   }

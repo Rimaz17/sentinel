@@ -1,7 +1,7 @@
 [project]
 name = "sentinel-detector"
 version = "0.1.0"
-description = "Hourly z-score check of each district and symptom group against its own baseline"
+description = "Hourly z-score check of each district and symptom group against its own baseline, and DBSCAN clustering of flagged series"
 requires-python = ">=3.12"
 # Runtime dependencies are pinned in requirements.txt, development tools in requirements-dev.txt.
 

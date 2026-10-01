@@ -22,6 +22,7 @@ import { ALL_OF_SRI_LANKA, DistrictList, DistrictPicker } from './DistrictList'
 import { boundsOf, SRI_LANKA } from './map/geometry'
 import { MapKey } from './map/MapKey'
 import { ReportMap } from './map/ReportMap'
+import { ringsOf } from './map/rings'
 import { districtPath } from './paths'
 import { LoadingRows, QueryView } from './QueryView'
 
@@ -97,6 +98,8 @@ export function DashboardPage() {
   const bounds =
     selected === null ? SRI_LANKA : boundsOf(located.length > 0 ? located : (reports.data ?? []))
   const frameKey = `${selected ?? 'LK'}:${located.length}:${reports.isSuccess ? 'r' : ''}`
+
+  const rings = ringsOf(alerts.data ?? [], hidden)
 
   const unknownDistrict =
     selected !== null && !outOfScope && districts.isSuccess && district === undefined
@@ -212,6 +215,7 @@ export function DashboardPage() {
                 <ReportMap
                   reports={(reports.data ?? []).filter((r) => !hidden.has(r.symptomGroup))}
                   facilities={facilities.data ?? []}
+                  rings={rings}
                   bounds={bounds}
                   frameKey={frameKey}
                 />
@@ -226,6 +230,7 @@ export function DashboardPage() {
                     reports={data}
                     reportsInArea={reportsInArea ?? data.length}
                     facilities={facilities.data ?? []}
+                    rings={rings}
                     areaName={areaName}
                     hidden={hidden}
                     onToggle={toggle}

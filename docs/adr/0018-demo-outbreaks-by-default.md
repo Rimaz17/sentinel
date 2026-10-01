@@ -1,6 +1,6 @@
 # 0018, The simulator runs rolling demo outbreaks by default
 
-Status: accepted · 2026-10-02
+Status: accepted · 2026-10-02 · amended 2026-10-02: influenza-like outbreaks are waves
 
 ## Context
 
@@ -22,7 +22,9 @@ find them as it would any other.
   (`--quiet`), in both `backfill` and `live`, on top of the baseline and any
   `--outbreak` given. The schedule is `sentinel_simulator.scenario`.
 - **A new outbreak every three and a half days, each lasting ten,** at full
-  strength throughout ("step"), bunched around one spot ("point"). Each adds
+  strength throughout ("step"), bunched around one spot ("point"), except the
+  influenza-like ones, which spread across their district ("wave"); see the
+  amendment below. Each adds
   20 times the square root of its district and group's usual week, rounded:
   +100 a week on Kandy's dengue-like 25, +35 on Colombo's leptospirosis-like 3.
 - **Why those numbers.** The detector compares the last 7 days with the 8 weeks
@@ -64,3 +66,14 @@ find them as it would any other.
 - A database backfilled before this change has no demo outbreaks in its past;
   `live` adds them from the moment it starts, so alerts appear within about two
   days, or at once after a fresh backfill.
+
+## Amendment, 2026-10-02: influenza-like outbreaks are waves
+
+With the geographic check (ADR 0020), an alert whose reports bunch in one place
+gets a cluster ring on the inspectors' map, and one whose rise is spread across
+its district does not. Were every demo outbreak a point, every demo alert would
+be ringed, and a visitor would never see the distinction the check exists to
+draw. So the influenza-like outbreaks in the rotation (Kurunegala, Anuradhapura,
+Colombo, Badulla, Nuwara Eliya and Vavuniya) are waves, as a seasonal influenza
+rise is, and the rest stay points. Strength, timing and rotation are unchanged,
+and so is what the z-score sees: where patients live does not change the counts.

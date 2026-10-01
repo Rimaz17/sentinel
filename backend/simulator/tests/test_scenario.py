@@ -2,7 +2,7 @@ import math
 import random
 from datetime import UTC, datetime, timedelta
 
-from sentinel_simulator.baselines import WEEKLY_BASELINES
+from sentinel_simulator.baselines import INFLUENZA_LIKE, WEEKLY_BASELINES
 from sentinel_simulator.generator import Facility, Generator
 from sentinel_simulator.scenario import (
     EPOCH,
@@ -31,6 +31,14 @@ def test_a_new_outbreak_starts_twice_a_week_and_lasts_ten_days():
     assert second.start - first.start == EVERY == timedelta(days=3.5)
     assert first.end - first.start == LASTS == timedelta(days=10)
     assert first.profile == "step" and first.spread == "point"
+
+
+def test_influenza_like_outbreaks_are_waves_and_the_rest_are_local():
+    for index in range(len(ROTATION)):
+        outbreak = scheduled(index)
+        expected = "wave" if outbreak.symptom_group == INFLUENZA_LIKE else "point"
+        assert outbreak.spread == expected, outbreak.describe()
+    assert {scheduled(i).spread for i in range(len(ROTATION))} == {"point", "wave"}
 
 
 def test_no_district_and_group_recurs_within_twelve_weeks():

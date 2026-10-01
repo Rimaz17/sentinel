@@ -21,7 +21,8 @@ def migration_files():
 def database_url():
     from testcontainers.community.postgres import PostgresContainer
 
-    with PostgresContainer("postgres:17-alpine", driver=None) as postgres:
+    # The local compose image: PostgreSQL 17 with PostGIS, which the migrations enable.
+    with PostgresContainer("postgis/postgis:17-3.5-alpine", driver=None) as postgres:
         url = postgres.get_connection_url()
         with psycopg.connect(url, autocommit=True) as connection:
             for migration in migration_files():

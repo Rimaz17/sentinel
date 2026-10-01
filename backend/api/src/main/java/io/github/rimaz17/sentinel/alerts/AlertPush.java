@@ -2,6 +2,7 @@ package io.github.rimaz17.sentinel.alerts;
 
 import io.github.rimaz17.sentinel.auth.SocketPrincipal;
 import java.time.Instant;
+import java.util.List;
 import java.util.function.Predicate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUser;
@@ -36,8 +37,11 @@ class AlertPush {
         .ifPresent(
             alert -> {
               Instant now = alerts.now();
+              List<AlertCluster> clusters =
+                  alerts.clustersOf(List.of(alert)).getOrDefault(alert.getId(), List.of());
               AlertEvent event =
-                  new AlertEvent(change, AlertResponse.from(alert, now, alerts.publicThreshold()));
+                  new AlertEvent(
+                      change, AlertResponse.from(alert, clusters, now, alerts.publicThreshold()));
               String district = alert.getDistrict().getCode();
               send(event, connection -> connection.mayReceive(district, now));
             });

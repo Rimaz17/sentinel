@@ -4,6 +4,7 @@ python -m sentinel_detector run
 python -m sentinel_detector run --at 2026-09-27T12:00+05:30
 python -m sentinel_detector watch
 python -m sentinel_detector evaluate
+python -m sentinel_detector evaluate-geography
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ import psycopg
 
 from sentinel_detector.check import CheckResult, InsufficientHistory, run_check
 from sentinel_detector.config import ConfigError, connection_settings
+from sentinel_detector.geography import RING_KM
 from sentinel_detector.zscore import DEFAULT_THRESHOLD
 
 # Checks start a minute past the hour, so reports stamped just before it have landed.
@@ -52,6 +54,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=52,
         help="weeks without outbreaks for the false-alarm rate (default: 52)",
     )
+    geography = commands.add_parser(
+        "evaluate-geography",
+        help="measure the geographic check against point and wave outbreaks; needs no database"
+        " (a few minutes)",
+    )
+    geography.add_argument("--seed", type=int, default=2026, help="random seed (default: 2026)")
+    geography.add_argument(
+        "--quiet-weeks",
+        type=int,
+        default=52,
+        help="weeks without outbreaks whose false alarms are looked at (default: 52)",
+    )
     for command in (run, watch):
         command.add_argument(
             "--threshold",
@@ -80,6 +94,14 @@ def describe(result: CheckResult) -> str:
             f" {alert.district_code} {alert.symptom_group:<19}"
             f" {alert.observed} reports, {alert.z_score:.1f} sd above baseline"
         )
+        for cluster in alert.clusters:
+            lines.append(
+                f"{'':11}cluster at {cluster.latitude:.3f}, {cluster.longitude:.3f}:"
+                f" {cluster.reports} reports within {RING_KM:g} km from {cluster.facilities}"
+                f" facilities, {cluster.expected:.1f} expected"
+            )
+        if not alert.clusters:
+            lines.append(f"{'':11}no cluster: not bunched in any one place")
     return "\n".join(lines)
 
 
@@ -124,10 +146,23 @@ def evaluate(seed: int, quiet_weeks: int) -> str:
     return evaluation.report(trials, false_alarms, seed, quiet_weeks)
 
 
+def evaluate_geography(seed: int, quiet_weeks: int) -> str:
+    from sentinel_detector import geography_evaluation
+
+    rng = random.Random(seed)
+    facilities = geography_evaluation.registry_facilities()
+    trials = geography_evaluation.outbreak_trials(rng, facilities)
+    quiet = geography_evaluation.quiet_rings(rng, facilities, quiet_weeks)
+    return geography_evaluation.report(trials, quiet, seed)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     if args.command == "evaluate":
         print(evaluate(args.seed, args.quiet_weeks), end="")
+        return 0
+    if args.command == "evaluate-geography":
+        print(evaluate_geography(args.seed, args.quiet_weeks), end="")
         return 0
     try:
         settings = connection_settings()

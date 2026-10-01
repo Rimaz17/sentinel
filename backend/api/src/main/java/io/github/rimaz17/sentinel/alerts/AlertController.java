@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.util.List;
+import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +34,10 @@ class AlertController {
       @RequestParam(defaultValue = "50") @Min(1) @Max(200) int limit,
       @RequestParam(required = false) @Pattern(regexp = "[A-Z]{3}") String district) {
     List<Alert> found = alerts.recent(caller.districtsFor(district), limit);
-    return found.stream().map(this::respond).toList();
+    Map<Long, List<AlertCluster>> clusters = alerts.clustersOf(found);
+    return found.stream()
+        .map(alert -> respond(alert, clusters.getOrDefault(alert.getId(), List.of())))
+        .toList();
   }
 
   record StatusChange(@NotNull AlertStatus status) {}
@@ -62,6 +66,10 @@ class AlertController {
   }
 
   private AlertResponse respond(Alert alert) {
-    return AlertResponse.from(alert, alerts.now(), alerts.publicThreshold());
+    return respond(alert, alerts.clustersOf(List.of(alert)).getOrDefault(alert.getId(), List.of()));
+  }
+
+  private AlertResponse respond(Alert alert, List<AlertCluster> clusters) {
+    return AlertResponse.from(alert, clusters, alerts.now(), alerts.publicThreshold());
   }
 }

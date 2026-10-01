@@ -1,10 +1,11 @@
 import 'leaflet/dist/leaflet.css'
 import { useEffect } from 'react'
-import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet'
+import { Circle, CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import type { Facility, LocatedReport } from '../api/types'
 import { SYMPTOM_GROUP_STYLES } from '../symptomGroups'
 import { type Bounds, SRI_LANKA } from './geometry'
 import { facilityLabel, reportLabel } from './labels'
+import { type MapRing, ringLabel } from './rings'
 
 /*
  * OpenStreetMap's own tiles: free, no API key, no billing, under the OSM Tile
@@ -26,11 +27,18 @@ const TILE_TREATMENT = 'grayscale opacity-60'
 const INK = '#15222b'
 /** Paper, for the halo that separates overlapping dots; matches --color-paper. */
 const PAPER = '#eaeeee'
+/** The alert vocabulary, for cluster rings; matches --color-alert. */
+const ALERT = '#e0443e'
+
+/** Metres in a degree of latitude, to set a ring's label on its northern edge. */
+const METRES_PER_DEGREE = 111_195
 
 type ReportMapProps = {
   reports: LocatedReport[]
   /** The district in view's facilities, drawn as rings; empty on the national view. */
   facilities: Facility[]
+  /** Where open alerts' reports are bunched, drawn as dashed alert-red rings. */
+  rings: MapRing[]
   /** Where to frame the map. Reframed only when `frameKey` changes. */
   bounds: Bounds
   /**
@@ -44,10 +52,13 @@ type ReportMapProps = {
 /**
  * The internal map: each report at its stored position, rounded to about
  * 100 m at ingestion, coloured by symptom group; facilities in the district in
- * view as ink rings. This view is for inspectors only. The public dashboard
- * never shows individual reports.
+ * view as ink rings; and each cluster the detector found under an open alert
+ * as a dashed alert-red ring of its own radius, 2 km, named by its alert's
+ * code on its northern edge so the colour never stands alone. This view is
+ * for inspectors only. The public dashboard never shows individual reports or
+ * clusters.
  */
-export function ReportMap({ reports, facilities, bounds, frameKey }: ReportMapProps) {
+export function ReportMap({ reports, facilities, rings, bounds, frameKey }: ReportMapProps) {
   return (
     <MapContainer
       bounds={SRI_LANKA}
@@ -62,6 +73,40 @@ export function ReportMap({ reports, facilities, bounds, frameKey }: ReportMapPr
     >
       <TileLayer url={TILES} attribution={ATTRIBUTION} maxZoom={19} className={TILE_TREATMENT} />
       <Frame bounds={bounds} frameKey={frameKey} />
+
+      {/* Under the dots, so every report stays visible inside its ring. */}
+      {rings.map((ring) => (
+        <Circle
+          key={ring.key}
+          center={[ring.cluster.latitude, ring.cluster.longitude]}
+          radius={ring.cluster.radiusMetres}
+          pathOptions={{
+            color: ALERT,
+            weight: 2,
+            dashArray: '6 4',
+            fillColor: ALERT,
+            fillOpacity: 0.06,
+          }}
+        >
+          <Tooltip sticky>{ringLabel(ring)}</Tooltip>
+        </Circle>
+      ))}
+      {rings.map((ring) => (
+        <CircleMarker
+          key={`${ring.key}:label`}
+          center={[
+            ring.cluster.latitude + ring.cluster.radiusMetres / METRES_PER_DEGREE,
+            ring.cluster.longitude,
+          ]}
+          radius={0}
+          pathOptions={{ stroke: false, fill: false }}
+          interactive={false}
+        >
+          <Tooltip permanent direction="top" className="font-mono text-label-sm font-medium">
+            {ring.alertCode}
+          </Tooltip>
+        </CircleMarker>
+      ))}
 
       {reports.map((report) => (
         <CircleMarker

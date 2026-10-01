@@ -146,13 +146,23 @@ class PublicApiTest {
   void nothingPublicCarriesAPositionOrAFacility() throws Exception {
     store("KDY");
     alert("KDY", 5.6, "CONFIRMED", 1);
+    // A cluster under the published alert, ringed beside a named facility.
+    jdbc.update(
+        """
+        insert into alert_clusters (alert_id, latitude, longitude, radius_metres, report_count,
+          facility_count, expected_count, nearest_facility_id)
+        select a.id, 7.312, 80.655, 2000, 17, 7, 5.61,
+          (select id from facilities where district_code = 'KDY' order by code limit 1)
+        from alerts a
+        """);
 
     for (String path :
         new String[] {"/api/public/districts", "/api/public/alerts", "/api/public/trends"}) {
       String body = mvc.perform(get(path)).andReturn().getResponse().getContentAsString();
       assertThat(body)
           .as(path)
-          .doesNotContain("latitude", "longitude", "7.291", "80.634", "facility", "LKY");
+          .doesNotContain("latitude", "longitude", "7.291", "80.634", "facility", "LKY")
+          .doesNotContain("cluster", "7.312", "80.655", "radius", "reportCount", "5.61");
     }
   }
 

@@ -3,12 +3,15 @@ import { SYMPTOM_GROUPS, type Facility, type LocatedReport, type SymptomGroup } 
 import { formatCount } from '../format'
 import { SYMPTOM_GROUP_STYLES } from '../symptomGroups'
 import { countByGroup, MAP_LIMIT } from './counts'
+import { expectedWords, type MapRing, ringLabel } from './rings'
 
 type MapKeyProps = {
   reports: LocatedReport[]
   /** All of the area's reports over the same seven days, located or not. */
   reportsInArea: number
   facilities: Facility[]
+  /** The cluster rings drawn, each described here in words. */
+  rings: MapRing[]
   areaName: string
   /** Groups the reader has taken off the map. */
   hidden: ReadonlySet<SymptomGroup>
@@ -18,7 +21,9 @@ type MapKeyProps = {
 /**
  * The map in words, and its key. A screen reader user, or anyone who cannot
  * tell the group colours apart, gets the same counts the dots show, and the
- * key says what is not drawn and why.
+ * key says what is not drawn and why. Each cluster ring is listed in words:
+ * its alert, group, what it held, the nearest facility, and what it would
+ * usually have held.
  *
  * Each group can be taken off the map. Two pairs of the fixed group hues sit
  * close together (gastrointestinal and leptospirosis-like for everyone,
@@ -29,6 +34,7 @@ export function MapKey({
   reports,
   reportsInArea,
   facilities,
+  rings,
   areaName,
   hidden,
   onToggle,
@@ -85,6 +91,28 @@ export function MapKey({
           </p>
         ) : null}
       </fieldset>
+
+      {rings.length > 0 ? (
+        <div className="grid gap-3xs border-t border-t-ink-14 pt-xs">
+          <p className="inline-flex items-center gap-[0.4rem] text-small font-medium">
+            <span
+              aria-hidden="true"
+              className="inline-block size-[0.75rem] rounded-full border-[1.5px] border-dashed border-alert"
+            />
+            {rings.length === 1 ? 'Cluster ring' : 'Cluster rings'}
+            <span className={cx(labelSm, 'font-normal text-ink-70', tnum)}>
+              {formatCount(rings.length)}
+            </span>
+          </p>
+          <ul className="grid gap-3xs">
+            {rings.map((ring) => (
+              <li key={ring.key} className="text-small text-ink-70">
+                <span className="text-ink">{ringLabel(ring)}</span>; {expectedWords(ring.cluster)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   )
 }
