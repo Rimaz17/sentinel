@@ -7,11 +7,17 @@ runs this schedule unless told not to (`--quiet`):
   - a new outbreak starts every 7 days, at full strength from its first hour
     (the "step" profile), and lasts 10 days, so one or two are always running;
   - each is a point outbreak, bunched around one spot, as a local outbreak is;
-  - each adds 12 times the square root of its district and group's usual week,
-    so the detector's z-score passes 3 within about two days and the public
-    threshold of 5 within about three, and the alert is published without an
-    inspector. It stays open for about a week after the outbreak ends, while its
-    reports leave the 7-day window, so each alert is public for about 12 days;
+  - each adds 20 times the square root of its district and group's usual week,
+    so the detector's z-score passes 3 within about a day and the public
+    threshold of 5 within about two, and the alert is published without an
+    inspector. From its eighth day the outbreak's first days fall into the
+    8-week baseline and its z-score sinks, below 3 about a day and a half after
+    it ends; its alert stays open a day longer, so each is public for about ten
+    and a half days, and with a new one every week one or two always are;
+  - at every moment at least one running outbreak stands well above 5 (about 7
+    at the weakest moment, with no noise), so even a detector's very first
+    check, straight after a backfill, publishes one. Modelled with Poisson noise
+    it does so more than 99 times in 100;
   - they rotate through twelve districts and symptom groups, Colombo's four
     groups every third week among them, so no pair recurs within 84 days and
     each one's 8-week baseline is never raised by its own last outbreak.
@@ -39,7 +45,7 @@ from sentinel_simulator.outbreaks import Outbreak
 EPOCH = datetime(2026, 1, 5, 0, 0, tzinfo=UTC)
 EVERY = timedelta(days=7)
 LASTS = timedelta(days=10)
-STRENGTH = 12.0
+STRENGTH = 20.0
 
 ROTATION: tuple[tuple[str, str], ...] = (
     ("CMB", DENGUE_LIKE),
@@ -58,8 +64,8 @@ ROTATION: tuple[tuple[str, str], ...] = (
 
 
 def strength(district: str, group: str) -> float:
-    """Extra reports a week: 12 times the square root of the usual week."""
-    return STRENGTH * math.sqrt(WEEKLY_BASELINES[district][group])
+    """Extra reports a week, whole: 20 times the square root of the usual week."""
+    return float(round(STRENGTH * math.sqrt(WEEKLY_BASELINES[district][group])))
 
 
 def scheduled(index: int) -> Outbreak:

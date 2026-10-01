@@ -56,10 +56,10 @@ def test_each_outbreak_is_strong_enough_to_publish_without_an_inspector():
     for district, group in ROTATION:
         mean = WEEKLY_BASELINES[district][group]
         extra = strength(district, group)
-        assert extra == 12 * math.sqrt(mean)
+        assert extra == round(20 * math.sqrt(mean))
         # A full week of it stands this many square roots of the usual week above it: the
         # detector floors the standard deviation there, and publishes from 5.
-        assert extra / math.sqrt(mean) >= 10
+        assert extra / math.sqrt(mean) >= 19
 
 
 def test_lists_exactly_the_outbreaks_running_in_a_window():
