@@ -3,12 +3,14 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { SkipLink } from '@/components/layout/SkipLink'
+import { fieldLabel } from '@/components/ui/controls'
 import { Panel, PanelHeading } from '@/components/ui/Panel'
+import { Select } from '@/components/ui/Select'
 import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
 import { WeeklyChart } from '@/features/dashboard/chart/WeeklyChart'
 import { formatClock, formatCount, formatDay } from '@/features/dashboard/format'
 import { LoadingRows, QueryView } from '@/features/dashboard/QueryView'
-import { caps, cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
+import { cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
 import {
   type PublicAlert,
   type PublicDistrict,
@@ -215,14 +217,14 @@ function DistrictPicker({
   const sorted = [...districts].sort((a, b) => a.name.localeCompare(b.name))
   return (
     <div className="grid gap-3xs">
-      <label htmlFor={id} className={cx(labelSm, caps, 'text-ink-70')}>
+      <label htmlFor={id} className={fieldLabel}>
         Your district
       </label>
-      <select
+      <Select
         id={id}
         value={selected ?? ''}
         onChange={(event) => onChoose(event.target.value || null)}
-        className="w-full max-w-[22rem] border border-ink-24 bg-paper-raised px-xs py-xs text-body"
+        className="max-w-[22rem]"
       >
         <option value="">All of Sri Lanka</option>
         {sorted.map((district) => (
@@ -230,7 +232,7 @@ function DistrictPicker({
             {district.name}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   )
 }
