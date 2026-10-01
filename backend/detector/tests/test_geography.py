@@ -102,21 +102,27 @@ def ring(reports=17, facilities=7, baseline_reports=16, week_total=41, baseline_
     return Ring(*KANDY, reports, facilities, baseline_reports, week_total, baseline_total)
 
 
-def test_expects_the_rings_usual_share_of_this_weeks_reports():
-    # (16 + 0.5) / (200 + 1) of 41.
-    assert expected_in_ring(ring()) == pytest.approx(3.366, abs=0.001)
+def test_expects_the_ring_to_hold_this_weeks_share_of_its_nine_weeks():
+    # 33 reports in the ring over nine weeks; this week holds 41 of the series' 241.
+    assert expected_in_ring(ring()) == pytest.approx(33 * 41 / 241, abs=0.001)
 
 
-def test_expects_a_little_even_where_nothing_was_reported_before():
-    assert expected_in_ring(ring(baseline_reports=0)) > 0
+def test_expects_nothing_of_a_ring_that_holds_nothing():
+    assert expected_in_ring(ring(reports=0, baseline_reports=0)) == 0
+    assert concentration(ring(reports=0, baseline_reports=0, week_total=0, baseline_total=0)) == 0
 
 
-def test_scores_concentration_as_the_z_score_scores_a_week():
-    assert concentration(ring()) == pytest.approx((17 - 3.366) / math.sqrt(3.366), abs=0.01)
-    # An expectation below one report is spread as one report.
-    assert concentration(ring(baseline_reports=0, week_total=10)) == pytest.approx(
-        17 - 10 * 0.5 / 201, abs=0.001
-    )
+def test_scores_concentration_as_a_binomial_count_at_this_weeks_share():
+    share = 41 / 241
+    spread = math.sqrt(33 * share * (1 - share))
+    assert concentration(ring()) == pytest.approx((17 - 33 * share) / spread, abs=0.001)
+
+
+def test_never_takes_the_spread_as_less_than_one_report():
+    # Four reports where there were none, in a quiet week: expected 4 * 10 / 210.
+    assert concentration(
+        ring(reports=4, baseline_reports=0, week_total=10, baseline_total=200)
+    ) == pytest.approx(4 - 40 / 210, abs=0.001)
 
 
 def test_a_ring_far_above_its_usual_share_from_several_facilities_is_a_cluster():
@@ -125,7 +131,7 @@ def test_a_ring_far_above_its_usual_share_from_several_facilities_is_a_cluster()
     assert cluster is not None
     assert (cluster.latitude, cluster.longitude) == KANDY
     assert (cluster.reports, cluster.facilities) == (17, 7)
-    assert cluster.expected == 3.37
+    assert cluster.expected == 5.61
     assert cluster.concentration > 3
 
 

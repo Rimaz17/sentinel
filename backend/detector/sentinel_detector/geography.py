@@ -83,25 +83,34 @@ class Cluster:
     concentration: float
 
 
+def week_share(ring: Ring) -> float:
+    """The current week's share of the series' located reports across all nine weeks."""
+    total = ring.week_total + ring.baseline_total
+    return ring.week_total / total if total else 0.0
+
+
 def expected_in_ring(ring: Ring) -> float:
     """This week's reports the ring would hold if it kept its usual share of the series.
 
-    The share is taken from the eight baseline weeks, with half a report added
-    to the ring and one to the whole, so an area that had no reports before
-    still expects a little rather than nothing.
+    Of the reports the ring held across all nine weeks, a ring like any other
+    would hold this week's share of the series this week.
     """
-    share = (ring.baseline_reports + 0.5) / (ring.baseline_total + 1)
-    return ring.week_total * share
+    return (ring.reports + ring.baseline_reports) * week_share(ring)
 
 
 def concentration(ring: Ring) -> float:
     """How far the ring's reports run above its usual share, in standard deviations.
 
-    The same form as the z-score: a Poisson count's spread is the square root of
-    its mean, never taken as less than one report.
+    The usual comparison of two Poisson counts: given the ring's reports across
+    all nine weeks, this week's are a binomial draw at this week's share of the
+    series, if the ring is ordinary. Taking the spread from both periods allows
+    for the baseline weeks being few, which a share taken from them alone would
+    not. As with the z-score, the spread is never taken as less than one report.
     """
-    expected = expected_in_ring(ring)
-    return (ring.reports - expected) / math.sqrt(max(expected, 1.0))
+    held = ring.reports + ring.baseline_reports
+    share = week_share(ring)
+    spread = math.sqrt(held * share * (1 - share))
+    return (ring.reports - expected_in_ring(ring)) / max(spread, 1.0)
 
 
 def assess(ring: Ring, threshold: float = CONCENTRATION_THRESHOLD) -> Cluster | None:
