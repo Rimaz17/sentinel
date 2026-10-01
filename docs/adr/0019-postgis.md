@@ -55,7 +55,7 @@ ingestion (V4).
   (`docker compose ... up -d` does it); their data volume is kept.
 - A managed PostgreSQL without PostGIS cannot run Sentinel from Phase 6. Every
   mainstream managed PostgreSQL offers it as an extension.
-- The `location` columns cost a little storage and a second index per table;
+- The `location` columns cost a little storage and a spatial index per table;
   at the simulated national rate of about 1,100 reports a week that is
   negligible.
 - Report and facility coordinates now exist twice, as numbers and as points,
