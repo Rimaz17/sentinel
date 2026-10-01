@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { cx, monoLink } from '@/styles/recipes'
+import { BUTTON } from './controls'
 
 type Variant = 'primary' | 'quiet'
 
@@ -40,8 +41,8 @@ const VARIANTS: Record<Variant, { link: string[]; trailing: string }> = {
 }
 
 /**
- * The primary shape as a form's submit button: the same ruled box, so a form
- * adds no third action shape. Dimmed while the form is on its way.
+ * A form's submit button: the solid primary button, as tall as the fields
+ * above it. Dimmed while the form is on its way.
  */
 export function SubmitButton({
   children,
@@ -51,27 +52,17 @@ export function SubmitButton({
   busy?: boolean
 }) {
   return (
-    <button
-      type="submit"
-      disabled={busy}
-      aria-busy={busy}
-      className={cx(
-        'group/action inline-flex cursor-pointer items-center gap-[0.7rem] font-medium whitespace-nowrap',
-        monoLink,
-        ...VARIANTS.primary.link,
-        'disabled:cursor-default disabled:border-ink-40 disabled:text-ink-70 disabled:hover:bg-[length:100%_0%]',
-      )}
-    >
+    <button type="submit" disabled={busy} aria-busy={busy} className={BUTTON.primary}>
       {children}
     </button>
   )
 }
 
 /**
- * The page has exactly two action shapes: a ruled box for the thing most
- * visitors came to do, and a quiet underlined link for everything else. There
- * is no third. A filled button would be a third voice on a page that is
- * carrying its hierarchy with rules and weight.
+ * The landing page's two action shapes: a ruled box for the thing most
+ * visitors came to do, and a quiet underlined link for everything else. Forms
+ * and the staff pages use the solid and white buttons in `controls.ts`
+ * instead.
  */
 export function Action({ to, variant = 'primary', children, trailing, className }: ActionProps) {
   const styles = VARIANTS[variant]
