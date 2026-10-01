@@ -40,10 +40,16 @@ false alarms. While a series stays high, each hourly check extends the same aler
 rather than raising a new one. See
 [ADR 0007](docs/adr/0007-detection-v1.md).
 
-A second, geographic check will run alongside it from Phase 6. DBSCAN clustering
-on report coordinates looks for reports bunched within ~2 km arriving from several
-different facilities. A tight cluster from many sources suggests a real local outbreak; a rise
-spread evenly across a district suggests a wider seasonal wave.
+A second, geographic check runs alongside it. For every series the z-score
+flags, DBSCAN looks at that week's report coordinates for places where reports
+bunch, and each place is judged in a 2 km ring: its reports must come from at
+least three facilities, and run more than three standard deviations above the
+share of the series that ring usually holds. A tight cluster from many sources
+suggests a real local outbreak; a rise spread evenly across a district, which
+leaves every place holding its usual share, suggests a wider seasonal wave.
+Inspectors see each cluster as a ring on the map. See
+[ADR 0020](docs/adr/0020-geographic-check.md) and
+[Measured geography](#measured-geography).
 
 ## Build status
 
@@ -54,7 +60,7 @@ spread evenly across a district suggests a wider seasonal wave.
 | 3 | Dashboard v1, React + Leaflet, polling | **Built** |
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | **Built** |
 | 5 | Real-time, Kafka, Redis windows, WebSocket alerts | **Built** |
-| 6 | Geography, PostGIS, DBSCAN, cluster rings | Not started |
+| 6 | Geography, PostGIS, DBSCAN, cluster rings | **Built** |
 | 7 | Ship it, Docker Compose, CI, deployed demo | Not started |
 | n/a | **Landing page**, the public entry point at `/` | **Built** |
 
@@ -115,6 +121,24 @@ See [ADR 0014](docs/adr/0014-kafka-between-ingestion-and-storage.md),
 [ADR 0016](docs/adr/0016-alerts-pushed-over-websocket.md), and
 [Measured pipeline](#measured-pipeline) for how fast it runs.
 
+Phase 6 adds geography:
+
+- **PostGIS.** Each located report and facility has a geographic point,
+  generated from its stored coordinates and spatially indexed, so the database
+  answers "reports within 2 km of here" and "the facility nearest here". The
+  local database runs on the PostGIS image.
+- **DBSCAN on flagged series.** At each hourly check, every alert raised or
+  extended gets the geographic check described above, and its clusters are
+  stored under it with the facility nearest each.
+- **2 km cluster rings.** The internal map draws each open alert's clusters as
+  dashed alert-red rings named by the alert's code; the map's key and the alert
+  itself say the same in words ("17 reports within 2 km from 7 facilities, near
+  Peradeniya"), or that an alert's reports are not bunched anywhere. Clusters
+  are internal only: the public API never carries them.
+
+See [ADR 0019](docs/adr/0019-postgis.md) and
+[ADR 0020](docs/adr/0020-geographic-check.md).
+
 **Demo mode** opens the staff side to visitors without an account. It is on
 unless `SENTINEL_DEMO_MODE=false`: the sign-in page lists four demo accounts with their password (an administrator,
 an inspector for every district, an inspector for Colombo, and a data provider
@@ -165,6 +189,52 @@ describe. They measure the detector against this simulator, not against real
 disease: series are independent, baselines hold no past epidemics, and every
 report arrives on time. Throughput and end-to-end latency are pipeline figures;
 see [Measured pipeline](#measured-pipeline).
+
+## Measured geography
+
+The simulator also decides whether an outbreak is a point (patients bunched
+within about 2 km of one spot, seen by the nearest six facilities) or a wave
+(patients spread across the district like its everyday load), so the
+geographic check can be scored on what it is for: ringing point outbreaks and
+not waves. These figures come from an actual run of
+`python -m sentinel_detector evaluate-geography` (seed 2026, about five minutes
+on its own): 600 outbreaks of the same sizes and shapes as above, once as
+points and once as waves,
+with located reports from the simulator's own generator and the real facility
+registry, checked every hour as the detector checks; and every alert of 52
+quiet weeks. Shares of ringed outbreaks are of those the z-score alerted on,
+at 3.0 sd. How it works:
+[ADR 0020](docs/adr/0020-geographic-check.md).
+
+| Outbreak | Alerted | Ringed at first alert | Ringed while alerted | Median hours, alert to ring |
+|---|---|---|---|---|
+| Point | 60% | 65% | 79% | 0 |
+| Point at +50% | 34% | 47% | 60% | 0 |
+| Point at +100% | 58% | 72% | 81% | 0 |
+| Point at +200% | 88% | 67% | 85% | 0 |
+| Wave | 64% | 0% | 1% | 34 |
+| Wave at +50% | 36% | 0% | 1% | 24 |
+| Wave at +100% | 66% | 0% | 1% | 152 |
+| Wave at +200% | 89% | 1% | 2% | 34 |
+| False alarm, quiet weeks | 161 alerts | n/a | 0% | n/a |
+
+"Ringed while alerted" counts a ring at any hourly check while the series stayed
+flagged; a ring under a wave or a quiet week's false alarm is a false ring. Two
+other seeds (1 and 7) gave 79% and 80% of point outbreaks ringed, 2% of waves,
+and 0% and 1% of 196 and 179 quiet-week false alarms.
+
+Kandy dengue-like, where a usual week is about 25 reports, at 3.0 sd: every
+alerted point outbreak was ringed at its first alert, from 8 to 19 reports
+within 2 km from 5 facilities where 1.7 to 3.7 were expected; no alerted wave
+was ever ringed.
+
+What these numbers say: when the z-score flags a local outbreak, the map rings
+it about four times in five, usually at the first alert, and a district-wide
+rise almost never. The misses are mostly in series that usually see only a few
+reports a week, where an outbreak large enough to flag is still too few
+reports to show four from three facilities in one place. As with detection,
+this measures the check against the simulator, whose outbreaks are exactly a
+point or a wave and whose reports all have a location.
 
 ## Measured pipeline
 
@@ -305,7 +375,10 @@ docker compose --env-file .env -f infra/docker-compose.yml up -d
 
 PostgreSQL listens on `localhost:5433`, Kafka on `localhost:9094` and Redis on
 `localhost:6380`, each one above its usual port, so none collides with one
-already installed. Kafka keeps its messages on a volume; Redis keeps nothing on
+already installed. The database is PostgreSQL 17 with PostGIS
+(`postgis/postgis:17-3.5-alpine`). A database started before Phase 6 on the
+plain image keeps its data: the same command recreates the container on the
+new image, and the API's next start adds PostGIS to it. Kafka keeps its messages on a volume; Redis keeps nothing on
 disk, because the API rebuilds its windows from PostgreSQL
 ([ADR 0015](docs/adr/0015-seven-day-windows-in-redis.md)).
 
@@ -347,7 +420,9 @@ points it at another API.
 show ([ADR 0018](docs/adr/0018-demo-outbreaks-by-default.md)). On top of the
 baseline, a new outbreak starts every three and a half days and lasts ten, each
 far enough above its district's usual week that the detector publishes it
-without an inspector, so after a backfill and one check two or three alerts are
+without an inspector. Most are bunched around one spot, so they get a cluster
+ring; the influenza-like ones are spread across their district, as a seasonal
+wave is, so they do not, so after a backfill and one check two or three alerts are
 active on the public dashboard. They are far larger and more frequent than real
 outbreaks, on purpose. `--quiet` leaves them out, for the baseline alone; a
 backfill from before this change has none in its past, so start a fresh one, or
@@ -372,7 +447,8 @@ pip install -r requirements.txt
 python -m sentinel_detector run
 ```
 
-`run` checks once; `watch` checks at a minute past every hour until stopped. A
+It also needs scikit-learn, for DBSCAN. `run` checks once; `watch` checks at a
+minute past every hour until stopped. A
 check refuses to run until reports reach back 63 days, which the backfill
 provides. Alerts are written to the `alerts` table, numbered from `A-1001`, and
 appear in the dashboard's alert list within one poll.
@@ -479,7 +555,7 @@ activation are limited to 10 requests a minute from one address.
 | Endpoint | What it does |
 |---|---|
 | `GET /api/districts` · `GET /api/districts/{code}` | The districts the inspector covers, each with its reports over the last seven days and its open alerts. |
-| `GET /api/alerts` | Alerts, most recently detected first; `?limit=` 1 to 200, `?district=KDY`. `open` is true while an alert is not closed and was detected within the last 24 hours; `published` says whether the public sees it. |
+| `GET /api/alerts` | Alerts, most recently detected first; `?limit=` 1 to 200, `?district=KDY`. `open` is true while an alert is not closed and was detected within the last 24 hours; `published` says whether the public sees it. `clusters` lists where its reports are bunched, most reports first, each with its centre, `radiusMetres`, `reportCount`, `facilityCount`, `expectedCount` at its usual share and the nearest facility; `clustersCheckedAt` is when the geographic check last looked, null if it never has. |
 | `POST /api/alerts/{code}/status` | Moves an alert on: `ACKNOWLEDGED`, `INVESTIGATING`, `CLOSED`. Never back. |
 | `POST /api/alerts/{code}/verdict` | `CONFIRMED`, which publishes it, or `FALSE_ALARM`, which closes it. Final. |
 | `GET /api/reports` | Recent reports, newest reported first; `?limit=` 1 to 500, `?district=KDY`. |
@@ -541,13 +617,14 @@ The submission page at `/submit` never asks for any identity field at all.
 
 | Command | Run from | What it does |
 |---|---|---|
-| `./mvnw verify` | `backend/api` | Formatting check, unit tests, and integration tests against a real PostgreSQL, Kafka and Redis started by Testcontainers (needs Docker) |
+| `./mvnw verify` | `backend/api` | Formatting check, unit tests, and integration tests against a real PostgreSQL with PostGIS, Kafka and Redis started by Testcontainers (needs Docker) |
 | `./mvnw spotless:apply` | `backend/api` | Format the Java sources |
 | `pip install -r requirements-dev.txt` | `backend/simulator` | Install pytest, Ruff and Black |
 | `pytest` · `ruff check .` · `black .` | `backend/simulator` or `scripts/facility-registry` | Test, lint and format either Python project |
 | `pip install -r requirements-dev.txt` | `backend/detector` | Install the detector's packages with pytest, Ruff, Black and Testcontainers |
 | `pytest` · `ruff check .` · `black .` | `backend/detector` | Test (the integration tests need Docker), lint and format |
 | `python -m sentinel_detector evaluate` | `backend/detector` | Measure detection against simulated outbreaks, as in [Measured detection](#measured-detection); `--seed N` for another run |
+| `python -m sentinel_detector evaluate-geography` | `backend/detector` | Measure the geographic check against point and wave outbreaks, as in [Measured geography](#measured-geography); a few minutes |
 | `python measure_pipeline.py` | `scripts/measure-pipeline` | Measure throughput and latency against a running stack, as in [Measured pipeline](#measured-pipeline); it adds reports, so use a throwaway one. See [its README](scripts/measure-pipeline/README.md) |
 | `pytest` · `ruff check .` · `black .` | `scripts/measure-pipeline` | Test, lint and format the measurement |
 
@@ -562,7 +639,8 @@ sentinel/
 │   │                      WebSocket push, administration, the public API, and
 │   │                      demo mode
 │   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
-│   ├── detector/          Python: hourly z-score check, alerts, evaluation
+│   ├── detector/          Python: hourly z-score check, alerts, DBSCAN cluster check,
+│   │                      and the evaluations of both
 │   └── simulator/         Python: simulated reports and outbreaks, backfill and live modes
 ├── frontend/
 │   └── src/
@@ -575,9 +653,10 @@ sentinel/
 │           ├── admin/     Inspector accounts and facility invite codes
 │           ├── demo/      The demo accounts and invite code panels, in demo mode
 │           └── dashboard/ The internal dashboard at /app: alert list and review,
-│                          district list, Leaflet map, weekly chart, and the alert socket
+│                          district list, Leaflet map with cluster rings, weekly chart,
+│                          and the alert socket
 ├── infra/
-│   ├── docker-compose.yml Local PostgreSQL, Kafka and Redis
+│   ├── docker-compose.yml Local PostgreSQL with PostGIS, Kafka and Redis
 │   └── .env.example       Local settings, dummy values; copy to .env at the root
 ├── docs/
 │   ├── adr/               Architecture decision records
@@ -693,6 +772,17 @@ These are documented on purpose and are not defects.
   28% of the time, and the median time to detect across all injected outbreaks
   is 140 hours, because a 7-day window only fills as an outbreak grows. See
   [Measured detection](#measured-detection).
+- **Small local outbreaks may get no ring.** A cluster needs at least four
+  reports from three facilities in one place, so in a series that usually sees
+  a few reports a week a local outbreak is ringed only once it has grown, if
+  at all; and a wave is, rarely, ringed by chance. See
+  [Measured geography](#measured-geography).
+- **A ring describes the week, not the outbreak's edge.** It is drawn at 2 km
+  around the centre of the bunched reports, rounded to about 110 m, and counts
+  only reports with a location from the alert's own district, so an outbreak
+  across a district boundary is seen as two, or by one side only.
+- **The database needs PostGIS.** A PostgreSQL without the extension cannot
+  run Sentinel from Phase 6. See [ADR 0019](docs/adr/0019-postgis.md).
 - **Demo mode is on by default**, so its accounts and its nightly reset come
   with every run unless `SENTINEL_DEMO_MODE=false`.
 - **Demo mode undoes alert reviews and leaves reports.** Its nightly reset
