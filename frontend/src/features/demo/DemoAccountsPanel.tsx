@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 import { Email } from '@/components/ui/Email'
 import { Panel } from '@/components/ui/Panel'
-import { QuietButton } from '@/components/ui/QuietButton'
+import { Button } from '@/components/ui/Button'
 import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
 import { type Demo, type DemoAccount, resetTime } from './api'
 
@@ -112,9 +112,9 @@ export function DemoAccountsPanel({
                 </div>
               </dl>
               <div>
-                <QuietButton onClick={() => onUse(account, label)}>
+                <Button onClick={() => onUse(account, label)}>
                   Use this account<span className="sr-only">: {label}</span>
-                </QuietButton>
+                </Button>
               </div>
             </li>
           )
