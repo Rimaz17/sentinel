@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useId, useState } from 'react'
 import { SkipLink } from '@/components/layout/SkipLink'
 import { SubmitButton } from '@/components/ui/Action'
+import { fieldLabel } from '@/components/ui/controls'
 import { Field, FormError } from '@/components/ui/Field'
 import { Panel, PanelHeading } from '@/components/ui/Panel'
 import { SYMPTOM_GROUPS, type SymptomGroup } from '@/features/dashboard/api/types'
@@ -9,7 +10,7 @@ import { SYMPTOM_GROUP_STYLES } from '@/features/dashboard/symptomGroups'
 import { StaffHeader } from '@/features/auth/AccountBar'
 import { useAccount } from '@/features/auth/session'
 import { ApiError, apiRequest } from '@/lib/api/client'
-import { caps, cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
+import { cx, labelSm, sectionTitle, shell } from '@/styles/recipes'
 
 /** POST /api/ingestion/reports */
 type Receipt = { reportId: string; receivedAt: string }
@@ -170,7 +171,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
         className="m-0 grid gap-2xs border-0 p-0"
         aria-describedby={missingGroup ? `${groupLegendId}-error` : undefined}
       >
-        <legend id={groupLegendId} className={cx(labelSm, caps, 'mb-2xs text-ink-70')}>
+        <legend id={groupLegendId} className={cx(fieldLabel, 'mb-2xs')}>
           Symptom group
         </legend>
         <div className="grid grid-cols-2 gap-2xs phone:grid-cols-1">
@@ -178,7 +179,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
             <label
               key={option}
               className={cx(
-                'flex cursor-pointer items-center gap-xs rounded-control border border-ink-24 bg-paper-raised px-xs py-sm text-small',
+                'flex cursor-pointer items-center gap-xs rounded-control border border-ink-24 bg-field px-xs py-sm text-small shadow-field',
                 'transition-colors duration-(--dur-fast) ease-out hover:border-ink-70',
                 'has-checked:border-ink has-checked:bg-ink-08 has-checked:font-medium',
               )}
@@ -238,9 +239,7 @@ function ReportForm({ onSubmitted }: { onSubmitted: (report: Submitted) => void 
       </div>
       <div className="border-t border-t-ink-14 pt-md">
         <fieldset className="m-0 grid gap-xs border-0 p-0">
-          <legend className={cx(labelSm, caps, 'mb-3xs text-ink-70')}>
-            Where the patient lives, if known
-          </legend>
+          <legend className={cx(fieldLabel, 'mb-3xs')}>Where the patient lives, if known</legend>
           <p className="text-small text-ink-70">
             Decimal degrees. Rounded to about 100 m before it is stored, and never shown to the
             public.
