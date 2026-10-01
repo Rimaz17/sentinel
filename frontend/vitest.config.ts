@@ -14,6 +14,10 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    // A file's first test pays for its imports. With every file running in
+    // parallel on a busy machine that took over five seconds now and then, and
+    // the default limit failed tests that had nothing wrong with them.
+    testTimeout: 15_000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
