@@ -63,7 +63,7 @@ does not exist on the page the reference was taken from.
 | `--color-ink` | `#15222b` | Body text, rules at full strength, the footer ground |
 | `--color-ochre` | `#8f6203` | The accent. Text-safe at 4.59:1 on paper |
 | `--color-ochre-bright` | `#c88a05` | Reserved for marks on dark surfaces, 2.70:1 on paper, so never type there |
-| `--color-alert` | `#e0443e` | The alert vocabulary only: the mark beside an open or active alert, always with a word, and the fill of a public district with an active alert, always with a heavier outline |
+| `--color-alert` | `#e0443e` | The alert vocabulary only: the mark beside an open or active alert, always with a word, the fill of a public district with an active alert, always with a heavier outline, and the dashed cluster ring of an open alert on the internal map, always named by its code |
 
 Ink alphas and their measured ratios on paper:
 
@@ -376,7 +376,11 @@ the landing page, set as sheet panels.
 - **The alert queue** is a ruled list under a full-ink top rule inside its panel.
 - **Alert state is words first.** "Open · New", "Ended · New" or "Closed", with a
   filled alert-red square while open and a hollow ink-40 square after. Wording is
-  the internal register: "A-1003, 55 reports, 4.3σ above baseline".
+  the internal register: "A-1003, 55 reports, 4.3σ above baseline", with ",
+  cluster confirmed across 7 facilities" when the geographic check found one.
+  A "Where" row among the figures gives each cluster in words, or "No cluster:
+  not bunched in any one place", or "Not checked for clusters" for an alert
+  raised before the check existed.
 - **The ochre is spent once**, on the simulated-data notice under the header,
   the same component as the landing page's (`SimulatedNotice`). Nothing on the
   dashboard is ochre otherwise.
@@ -384,6 +388,17 @@ the landing page, set as sheet panels.
   the only colour on it is the symptom groups'. Report dots are 4px canvas
   circles in the group hue with a 1px paper halo; facilities are 6px ink rings.
   Its key doubles as its text alternative and lets each group be switched off.
+- **Cluster rings.** Where the detector's geographic check found an open
+  alert's reports bunched (ADR 0020), the map draws the ring it judged them in,
+  2 km across the ground: alert red, 2px, dashed 6 on 4, with a 6% alert fill,
+  drawn under the dots so every report inside stays visible. Its alert's code
+  sits on the ring's northern edge in mono, so the colour never stands alone,
+  and hovering anywhere in the ring gives the whole line. An ended alert's
+  rings are not drawn, and switching a group off in the key takes its rings
+  with it. Under a rule in the key, each ring is a line of words: "A-1003 ·
+  Dengue-like · 17 reports within 2 km from 7 facilities, near Peradeniya; 5.6
+  expected at its usual share". The ring is the only alert red on the map, and
+  it is never shown on the public dashboard.
 - **The chart** is four small multiples, one per symptom group: nine weekly
   columns, the eight baseline weeks at 32% of the group hue, the last seven days
   at full hue, a dashed ink line at the baseline mean, and a figure only on the
