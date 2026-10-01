@@ -1,13 +1,26 @@
-"""One detection check: read the last nine weeks, score every series, record alerts."""
+"""One detection check: read the last nine weeks, score every series, record alerts.
+
+Every series the z-score flags is then looked at on the map, and the places its
+week's reports bunch in are recorded under its alert (docs/adr/0020).
+"""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 
 import psycopg
 
-from sentinel_detector.store import RaisedAlert, earliest_report, read_weekly_counts, record_alerts
+from sentinel_detector.geography import find_clusters
+from sentinel_detector.store import (
+    RaisedAlert,
+    earliest_report,
+    read_weekly_counts,
+    record_alerts,
+    record_clusters,
+    ring_counter,
+    week_points,
+)
 from sentinel_detector.windows import HISTORY, check_time, history_start
 from sentinel_detector.zscore import DEFAULT_THRESHOLD, score
 
@@ -47,5 +60,19 @@ def run_check(
         )
     with connection.transaction():
         scored = score(read_weekly_counts(connection, end), threshold)
-        alerts = record_alerts(connection, scored, end, threshold)
+        alerts = [
+            locate(connection, alert, end)
+            for alert in record_alerts(connection, scored, end, threshold)
+        ]
     return CheckResult(end, len(scored), alerts)
+
+
+def locate(connection: psycopg.Connection, alert: RaisedAlert, end: datetime) -> RaisedAlert:
+    """Find and record where a flagged series' week of reports is bunched, if anywhere."""
+    district, group = alert.district_code, alert.symptom_group
+    clusters = find_clusters(
+        week_points(connection, district, group, end),
+        ring_counter(connection, district, group, end),
+    )
+    record_clusters(connection, alert.code, clusters)
+    return replace(alert, clusters=tuple(clusters))
