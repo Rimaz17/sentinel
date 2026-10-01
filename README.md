@@ -224,9 +224,9 @@ other seeds (1 and 7) gave 79% and 80% of point outbreaks ringed, 2% of waves,
 and 0% and 1% of 196 and 179 quiet-week false alarms.
 
 Kandy dengue-like, where a usual week is about 25 reports, at 3.0 sd: every
-alerted point outbreak was ringed at its first alert, from 8 to 19 reports
-within 2 km from 5 facilities where 1.7 to 3.7 were expected; no alerted wave
-was ever ringed.
+alerted point outbreak was ringed at its first alert, with 8 to 19 reports
+within 2 km from 5 facilities where its usual share of the week was 0.2 to 0.6
+reports; no alerted wave was ever ringed.
 
 What these numbers say: when the z-score flags a local outbreak, the map rings
 it about four times in five, usually at the first alert, and a district-wide
