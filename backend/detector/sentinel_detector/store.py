@@ -1,11 +1,14 @@
-"""Reading report counts from PostgreSQL and writing alerts back.
+"""Reading report counts and locations from PostgreSQL and writing alerts back.
 
-The detector only reads reports and writes alerts. It is never called from the
-ingestion path; it runs on its own schedule against what has been stored.
+The detector only reads reports and writes alerts and their clusters. It is
+never called from the ingestion path; it runs on its own schedule against what
+has been stored. Distances are PostGIS's, on the same sphere as the geographic
+check's own (docs/adr/0019-postgis.md).
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -13,7 +16,8 @@ import pandas as pd
 import psycopg
 
 from sentinel_detector.episodes import continues
-from sentinel_detector.windows import history_start
+from sentinel_detector.geography import RING_KM, Point, Ring
+from sentinel_detector.windows import WEEK, history_start
 from sentinel_detector.zscore import weekly_counts
 
 # Serialises alert writing, so two detectors running at once cannot both raise
@@ -29,6 +33,43 @@ COUNTS_SQL = """
     from reports
     where reported_at >= %(start)s and reported_at < %(end)s
     group by 1, 2, 3
+"""
+
+# A series' located reports in the current week, [end - 7 days, end).
+WEEK_POINTS_SQL = """
+    select latitude::float8, longitude::float8, facility_id
+    from reports
+    where district_code = %(district)s and symptom_group = %(group)s
+      and reported_at >= %(week_start)s and reported_at < %(end)s
+      and location is not null
+"""
+
+# A series' located reports in the current week, and in the eight weeks before it.
+LOCATED_TOTALS_SQL = """
+    select count(*) filter (where reported_at >= %(week_start)s),
+           count(*) filter (where reported_at < %(week_start)s)
+    from reports
+    where district_code = %(district)s and symptom_group = %(group)s
+      and reported_at >= %(start)s and reported_at < %(end)s
+      and location is not null
+"""
+
+# The same, within a distance of a point; and this week's facilities there. The
+# final false measures on a sphere rather than the spheroid, as the haversine
+# distances DBSCAN works with do, so the two agree on what is within the ring.
+RING_SQL = """
+    select count(*) filter (where reported_at >= %(week_start)s),
+           count(distinct facility_id) filter (where reported_at >= %(week_start)s),
+           count(*) filter (where reported_at < %(week_start)s)
+    from reports
+    where district_code = %(district)s and symptom_group = %(group)s
+      and reported_at >= %(start)s and reported_at < %(end)s
+      and st_dwithin(
+          location,
+          st_setsrid(st_makepoint(%(longitude)s, %(latitude)s), 4326)::geography,
+          %(metres)s,
+          false
+      )
 """
 
 
@@ -48,6 +89,48 @@ def districts(connection: psycopg.Connection) -> list[str]:
 
 def earliest_report(connection: psycopg.Connection) -> datetime | None:
     return connection.execute("select min(reported_at) from reports").fetchone()[0]
+
+
+def week_points(
+    connection: psycopg.Connection, district: str, group: str, end: datetime
+) -> list[Point]:
+    """The series' located reports from the seven days to `end`."""
+    rows = connection.execute(
+        WEEK_POINTS_SQL,
+        {"district": district, "group": group, "week_start": end - WEEK, "end": end},
+    ).fetchall()
+    return [Point(*row) for row in rows]
+
+
+def ring_counter(
+    connection: psycopg.Connection, district: str, group: str, end: datetime
+) -> Callable[[float, float], Ring]:
+    """Counts what lies within RING_KM of a point, for the series' week to `end`."""
+    window = {
+        "district": district,
+        "group": group,
+        "start": history_start(end),
+        "week_start": end - WEEK,
+        "end": end,
+    }
+    week_total, baseline_total = connection.execute(LOCATED_TOTALS_SQL, window).fetchone()
+
+    def ring_at(latitude: float, longitude: float) -> Ring:
+        reports, facilities, baseline_reports = connection.execute(
+            RING_SQL,
+            {**window, "latitude": latitude, "longitude": longitude, "metres": RING_KM * 1000},
+        ).fetchone()
+        return Ring(
+            latitude,
+            longitude,
+            reports,
+            facilities,
+            baseline_reports,
+            week_total,
+            baseline_total,
+        )
+
+    return ring_at
 
 
 def read_weekly_counts(connection: psycopg.Connection, end: datetime) -> pd.DataFrame:
