@@ -16,7 +16,7 @@ import pandas as pd
 import psycopg
 
 from sentinel_detector.episodes import continues
-from sentinel_detector.geography import RING_KM, Point, Ring
+from sentinel_detector.geography import RING_KM, Cluster, Point, Ring
 from sentinel_detector.windows import WEEK, history_start
 from sentinel_detector.zscore import weekly_counts
 
@@ -81,6 +81,7 @@ class RaisedAlert:
     observed: int
     z_score: float
     is_new: bool
+    clusters: tuple[Cluster, ...] = ()
 
 
 def districts(connection: psycopg.Connection) -> list[str]:
@@ -147,6 +148,11 @@ def record_alerts(
     continues it, and raises a new alert otherwise. A check older than the
     latest alert's last detection changes nothing: the alert already reflects a
     later check.
+
+    Each alert written is marked as geographically checked at `detected_at`:
+    the caller records its clusters in the same transaction. Marking it here,
+    in the statement that writes the alert anyway, keeps the change to one
+    announcement (V12's trigger) rather than two.
     """
     connection.execute("select pg_advisory_xact_lock(%s)", (ALERT_WRITER_LOCK,))
     raised = []
@@ -178,7 +184,7 @@ def record_alerts(
                 set last_detected_at = %(at)s, observed_count = %(observed)s,
                     baseline_mean = %(mean)s, baseline_sd = %(sd)s, z_score = %(z)s,
                     peak_z_score = greatest(peak_z_score, %(z)s::numeric(9, 2)),
-                    threshold = %(threshold)s
+                    threshold = %(threshold)s, clusters_checked_at = %(at)s
                 where id = %(id)s
                 returning code
                 """,
@@ -190,9 +196,9 @@ def record_alerts(
                 """
                 insert into alerts (district_code, symptom_group, first_detected_at,
                     last_detected_at, observed_count, baseline_mean, baseline_sd, z_score,
-                    peak_z_score, threshold)
+                    peak_z_score, threshold, clusters_checked_at)
                 values (%(district)s, %(group)s, %(at)s, %(at)s, %(observed)s, %(mean)s, %(sd)s,
-                    %(z)s, %(z)s, %(threshold)s)
+                    %(z)s, %(z)s, %(threshold)s, %(at)s)
                 returning code
                 """,
                 figures,
@@ -200,3 +206,40 @@ def record_alerts(
             is_new = True
         raised.append(RaisedAlert(code, district, group, figures["observed"], figures["z"], is_new))
     return raised
+
+
+def record_clusters(connection: psycopg.Connection, code: str, clusters: list[Cluster]) -> None:
+    """Replace the alert's clusters with those of its latest check.
+
+    Each cluster is stored with the facility nearest its centre in the same
+    district, found by distance on the facilities' spatial index.
+    """
+    connection.execute(
+        "delete from alert_clusters where alert_id = (select id from alerts where code = %s)",
+        (code,),
+    )
+    for cluster in clusters:
+        connection.execute(
+            """
+            insert into alert_clusters (alert_id, latitude, longitude, radius_metres,
+                report_count, facility_count, expected_count, nearest_facility_id)
+            select a.id, %(latitude)s, %(longitude)s, %(metres)s, %(reports)s, %(facilities)s,
+                %(expected)s,
+                (select f.id from facilities f
+                 where f.district_code = a.district_code and f.location is not null
+                 order by f.location
+                     <-> st_setsrid(st_makepoint(%(longitude)s, %(latitude)s), 4326)::geography
+                 limit 1)
+            from alerts a
+            where a.code = %(code)s
+            """,
+            {
+                "code": code,
+                "latitude": cluster.latitude,
+                "longitude": cluster.longitude,
+                "metres": round(RING_KM * 1000),
+                "reports": cluster.reports,
+                "facilities": cluster.facilities,
+                "expected": cluster.expected,
+            },
+        )
