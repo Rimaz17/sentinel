@@ -6,7 +6,10 @@ import pytest
 from test_check import END, alerts, seed_history
 
 from sentinel_detector import cli
-from sentinel_detector.cli import main, parse_args, watch
+from sentinel_detector.check import CheckResult
+from sentinel_detector.cli import describe, main, parse_args, watch
+from sentinel_detector.geography import Cluster
+from sentinel_detector.store import RaisedAlert
 
 
 @pytest.fixture
@@ -101,3 +104,20 @@ def test_evaluate_prints_the_measurements_as_markdown_without_a_database(monkeyp
     assert "| Threshold | Detected | at +50% | at +100% | at +200% |" in out
     assert out.count(" sd | ") == 4
     assert "Kandy dengue-like (usual week about 25 reports) at 3.0 sd:" in out
+
+
+def test_describes_where_each_alert_is_bunched_or_that_it_is_not():
+    clustered = RaisedAlert(
+        "A-1001", "KDY", "DENGUE_LIKE", 41, 5.2, True, (Cluster(7.291, 80.634, 17, 7, 3.37, 7.4),)
+    )
+    spread = RaisedAlert("A-1002", "CMB", "INFLUENZA_LIKE", 110, 4.1, False)
+
+    out = describe(CheckResult(END, 100, [clustered, spread]))
+
+    assert out.splitlines()[1:] == [
+        "  A-1001   new      KDY DENGUE_LIKE         41 reports, 5.2 sd above baseline",
+        "           cluster at 7.291, 80.634: 17 reports within 2 km from 7 facilities,"
+        " 3.4 expected",
+        "  A-1002   ongoing  CMB INFLUENZA_LIKE      110 reports, 4.1 sd above baseline",
+        "           no cluster: not bunched in any one place",
+    ]

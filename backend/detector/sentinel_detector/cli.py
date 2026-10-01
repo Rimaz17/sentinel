@@ -19,6 +19,7 @@ import psycopg
 
 from sentinel_detector.check import CheckResult, InsufficientHistory, run_check
 from sentinel_detector.config import ConfigError, connection_settings
+from sentinel_detector.geography import RING_KM
 from sentinel_detector.zscore import DEFAULT_THRESHOLD
 
 # Checks start a minute past the hour, so reports stamped just before it have landed.
@@ -80,6 +81,14 @@ def describe(result: CheckResult) -> str:
             f" {alert.district_code} {alert.symptom_group:<19}"
             f" {alert.observed} reports, {alert.z_score:.1f} sd above baseline"
         )
+        for cluster in alert.clusters:
+            lines.append(
+                f"{'':11}cluster at {cluster.latitude:.3f}, {cluster.longitude:.3f}:"
+                f" {cluster.reports} reports within {RING_KM:g} km from {cluster.facilities}"
+                f" facilities, {cluster.expected:.1f} expected"
+            )
+        if not alert.clusters:
+            lines.append(f"{'':11}no cluster: not bunched in any one place")
     return "\n".join(lines)
 
 
