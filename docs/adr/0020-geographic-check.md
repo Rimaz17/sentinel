@@ -49,8 +49,12 @@ place usually holds is.
 - **One place is reported once.** Two passing rings whose centres lie within 2
   km of each other are one place, kept from the stronger.
 - **Stored under the alert, replaced at each check.** `alert_clusters` (V17)
-  holds each ring: centre, radius, reports, facilities, the count expected at
-  its usual share, and the nearest located facility in the district. The alert
+  holds each ring: centre, radius, reports, facilities, the count it would
+  hold at its share of the baseline weeks, and the nearest located facility in
+  the district. That count is the plain figure an inspector reads the ring
+  against, this week's reports times the ring's baseline share; the test's own
+  expectation, which conditions on everything the ring held, is pulled up by
+  the outbreak under test and would read as a strangely large "expected". The alert
   records when the check last looked (`clusters_checked_at`), so "no cluster"
   and "never looked" are told apart. Both are written in the transaction that
   writes the alert, so the WebSocket push (ADR 0016) carries them.
