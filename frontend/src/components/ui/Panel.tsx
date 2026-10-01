@@ -1,19 +1,8 @@
 import { type ReactNode } from 'react'
 import { cx } from '@/styles/recipes'
 
-type PanelTone = 'sheet' | 'ruled'
-
-const TONES: Record<PanelTone, string> = {
-  /* The dashboards and the report form: a rounded sheet on a low shadow. */
-  sheet: 'rounded-panel border border-ink-08 bg-card shadow-panel',
-  /* The staff sign-in pages: a square box in a 2px ink rule on the page's own
-     paper, flat, so the box is drawn by its line alone. */
-  ruled: 'border-2 border-ink bg-paper',
-}
-
 type PanelProps = {
   as?: 'section' | 'div' | 'nav' | 'aside'
-  tone?: PanelTone
   /** The id of the panel's heading, so the panel is announced by its name. */
   labelledBy?: string
   className?: string
@@ -21,20 +10,18 @@ type PanelProps = {
 }
 
 /**
- * One piece of a working page, set on its own sheet so the page reads as a set
- * of panels rather than one long column. Every panel is named by its heading.
+ * One piece of a working page, set on its own sheet (a rounded card on a low
+ * shadow) so the page reads as a set of panels rather than one long column.
+ * Every panel is named by its heading.
  */
-export function Panel({
-  as: Tag = 'section',
-  tone = 'sheet',
-  labelledBy,
-  className,
-  children,
-}: PanelProps) {
+export function Panel({ as: Tag = 'section', labelledBy, className, children }: PanelProps) {
   return (
     <Tag
       aria-labelledby={labelledBy}
-      className={cx('grid min-w-0 content-start gap-sm p-sm md:p-md', TONES[tone], className)}
+      className={cx(
+        'grid min-w-0 content-start gap-sm rounded-panel border border-ink-08 bg-card p-sm shadow-panel md:p-md',
+        className,
+      )}
     >
       {children}
     </Tag>

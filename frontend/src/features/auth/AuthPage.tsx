@@ -19,10 +19,10 @@ type AuthPageProps = {
 
 /**
  * The frame for signing in, registering and activating, on the landing page's
- * shared two-column grid. Each half is boxed in a 1px ink rule: the title, the
- * rail and the notes on the left, the form on the right. From 68rem the two
- * boxes stand side by side, their tops and feet level; below that the form's
- * box follows the other.
+ * shared two-column grid. Each half is a sheet panel, as on the dashboards and
+ * report submission: the title, the rail and the notes on the left, the form on
+ * the right. From 68rem the two sheets stand side by side, their tops and feet
+ * level; below that the form's sheet follows the other.
  */
 export function AuthPage({ title, intro, rail, children, aside }: AuthPageProps) {
   return (
@@ -31,7 +31,7 @@ export function AuthPage({ title, intro, rail, children, aside }: AuthPageProps)
       <SiteHeader />
       <main id="main" className="flex-1 py-lg">
         <div className={cx(shell, 'grid gap-md xl:gap-lg', SPLIT_COLUMNS)}>
-          <Panel as="div" tone="ruled" className="gap-lg md:p-lg">
+          <Panel as="div" className="gap-lg md:p-lg">
             <div className="grid gap-sm">
               <h1 className={sectionTitle}>{title}</h1>
               <div className="max-w-measure-narrow text-body text-ink-70">{intro}</div>
@@ -41,7 +41,7 @@ export function AuthPage({ title, intro, rail, children, aside }: AuthPageProps)
               <div className="grid max-w-measure-narrow gap-xs text-small text-ink-70">{aside}</div>
             ) : null}
           </Panel>
-          <Panel as="div" tone="ruled" className="gap-md md:p-lg">
+          <Panel as="div" className="gap-md md:p-lg">
             {children}
           </Panel>
         </div>

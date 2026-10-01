@@ -15,7 +15,9 @@ const SECTIONS = [
 /**
  * Administration: inspector accounts, which are created here and nowhere else,
  * and the facility registry's invite codes, the only way a data provider can
- * register.
+ * register. Each section is set as sheet panels, like the dashboards, under a
+ * pair of section tabs; the section in view is inked in, paper on ink, as the
+ * staff pages' step rail marks the current step.
  */
 export function AdminPage() {
   const account = useAccount()
@@ -28,30 +30,31 @@ export function AdminPage() {
     <div className="flex min-h-screen flex-col">
       <SkipLink />
       <StaffHeader section="Administration" account={account} />
-      <nav aria-label="Administration" className="border-b border-b-ink-14">
-        <ul className={cx(shell, 'flex flex-wrap gap-x-lg')}>
-          {SECTIONS.map((section) => (
-            <li key={section.to}>
-              <NavLink
-                to={section.to}
-                end={section.end}
-                className={({ isActive }) =>
-                  cx(
-                    monoLink,
-                    'inline-block border-b-2 py-xs font-medium no-underline',
-                    isActive
-                      ? 'border-b-ink text-ink'
-                      : 'border-b-transparent text-ink-70 hover:text-ink',
-                  )
-                }
-              >
-                {section.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <main id="main" className={cx(shell, 'grid flex-1 content-start gap-xl py-xl')}>
+      <main id="main" className={cx(shell, 'grid flex-1 content-start gap-md py-md')}>
+        <nav aria-label="Administration">
+          <ul className="flex flex-wrap gap-2xs">
+            {SECTIONS.map((section) => (
+              <li key={section.to}>
+                <NavLink
+                  to={section.to}
+                  end={section.end}
+                  className={({ isActive }) =>
+                    cx(
+                      monoLink,
+                      'inline-block rounded-control border px-sm py-xs font-medium no-underline',
+                      'transition-[color,background-color,border-color] duration-(--dur-fast) ease-out',
+                      isActive
+                        ? 'border-ink bg-ink text-paper'
+                        : 'border-ink-14 bg-card text-ink-70 hover:border-ink-40 hover:text-ink',
+                    )
+                  }
+                >
+                  {section.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <Routes>
           <Route index element={<AccountsSection />} />
           <Route path="facilities" element={<FacilitiesSection />} />
