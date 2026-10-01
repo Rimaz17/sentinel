@@ -1,8 +1,11 @@
+import random
 from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from sentinel_detector.check import InsufficientHistory, run_check
+from sentinel_detector.geography import MIN_FACILITIES, candidate_centres
+from sentinel_detector.store import ring_counter, week_points
 from sentinel_detector.windows import WEEK, history_start
 
 END = datetime(2026, 9, 27, 6, tzinfo=UTC)
@@ -150,3 +153,108 @@ def test_window_edges_count_each_report_exactly_once(db):
     [raised] = run_check(db, END).alerts
 
     assert (raised.district_code, raised.observed) == ("CMB", 5)
+
+
+KM_PER_DEGREE = 111.195
+
+# Colombo's influenza-like baseline: a busy series in a district dense with facilities.
+COLOMBO_BASELINE = [58, 62, 55, 64, 60, 57, 63, 61]
+
+
+def located_facilities(db, district):
+    return db.execute(
+        """
+        select id, latitude::float8, longitude::float8 from facilities
+        where district_code = %s and location is not null order by id
+        """,
+        (district,),
+    ).fetchall()
+
+
+def add_located(db, district, reported_at, facility, near, spread_km, rng):
+    """A dengue-like report from `facility`, placed normally around `near`."""
+    latitude = near[0] + rng.gauss(0, spread_km) / KM_PER_DEGREE
+    longitude = near[1] + rng.gauss(0, spread_km) / KM_PER_DEGREE
+    db.execute(
+        """
+        insert into reports (id, facility_id, district_code, symptom_group, age_band,
+            latitude, longitude, reported_at, received_at)
+        values (gen_random_uuid(), %s, %s, 'DENGUE_LIKE', '30-39', %s, %s, %s, %s)
+        """,
+        (facility, district, round(latitude, 3), round(longitude, 3), reported_at, reported_at),
+    )
+
+
+def everyday(db, district, reported_at, count, facilities, rng):
+    """Reports placed as the simulator places a district's everyday load: near any facility."""
+    for _ in range(count):
+        facility, *where = rng.choice(facilities)
+        add_located(db, district, reported_at, facility, where, 2.0, rng)
+
+
+def seed_located_history(db, district, baseline, rng):
+    """Eight baseline weeks spread over the district's facilities; returns the facilities."""
+    facilities = located_facilities(db, district)
+    for weeks_back, count in zip(range(8, 0, -1), baseline, strict=True):
+        everyday(db, district, END - weeks_back * WEEK - WEEK / 2, count, facilities, rng)
+    add_reports(db, "ANU", "GASTROINTESTINAL", history_start(END))
+    return facilities
+
+
+def clusters(db, code):
+    return db.execute(
+        """
+        select c.report_count, c.facility_count, c.radius_metres, c.nearest_facility_id
+        from alert_clusters c join alerts a on a.id = c.alert_id where a.code = %s
+        """,
+        (code,),
+    ).fetchall()
+
+
+def test_a_flagged_series_bunched_in_one_place_records_a_cluster(db):
+    rng = random.Random(2026)
+    facilities = seed_located_history(db, "KDY", KANDY_BASELINE, rng)
+    everyday(db, "KDY", END - WEEK / 2, 25, facilities, rng)
+    # A local outbreak: 16 patients within a kilometre or so of one facility, seen by the
+    # four facilities nearest to it.
+    centre = facilities[0][1:]
+    nearest = sorted(facilities, key=lambda f: (f[1] - centre[0]) ** 2 + (f[2] - centre[1]) ** 2)
+    for i in range(16):
+        add_located(db, "KDY", END - WEEK / 2, nearest[i % 4][0], centre, 0.5, rng)
+
+    [raised] = run_check(db, END).alerts
+
+    [cluster] = raised.clusters
+    assert cluster.reports >= 16 and cluster.facilities >= 3
+    [(reports, facilities_seen, radius, nearest_facility)] = clusters(db, raised.code)
+    assert (reports, facilities_seen, radius) == (cluster.reports, cluster.facilities, 2000)
+    assert nearest_facility is not None
+
+
+def test_a_flagged_series_risen_everywhere_records_no_cluster(db):
+    rng = random.Random(2026)
+    facilities = seed_located_history(db, "CMB", COLOMBO_BASELINE, rng)
+    # A seasonal wave: nearly twice the usual week, spread as the everyday load is.
+    everyday(db, "CMB", END - WEEK / 2, 110, facilities, rng)
+
+    [raised] = run_check(db, END).alerts
+
+    # Central Colombo is dense with facilities, so the week does bunch there, from
+    # several of them; but no more than it always does, so it is no cluster.
+    points = week_points(db, "CMB", "DENGUE_LIKE", END)
+    ring_at = ring_counter(db, "CMB", "DENGUE_LIKE", END)
+    rings = [ring_at(*centre) for centre in candidate_centres(points)]
+    assert any(ring.facilities >= MIN_FACILITIES for ring in rings)
+    assert raised.clusters == ()
+    assert clusters(db, raised.code) == []
+    assert db.execute(
+        "select clusters_checked_at from alerts where code = %s", (raised.code,)
+    ).fetchone() == (END,)
+
+
+def test_a_series_without_located_reports_is_still_checked(db):
+    seed_history(db, current=41)
+
+    [raised] = run_check(db, END).alerts
+
+    assert raised.clusters == ()
