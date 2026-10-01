@@ -4,6 +4,7 @@ import io.github.rimaz17.sentinel.web.ApiProblem;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,14 +28,17 @@ public class AlertService {
       "Someone else changed this alert a moment ago. Reload it and try again.";
 
   private final AlertRepository alerts;
+  private final AlertClusterRepository clusters;
   private final Clock clock;
   private final BigDecimal publicThreshold;
 
   AlertService(
       AlertRepository alerts,
+      AlertClusterRepository clusters,
       Clock clock,
       @Value("${sentinel.alerts.public-threshold:5.0}") BigDecimal publicThreshold) {
     this.alerts = alerts;
+    this.clusters = clusters;
     this.clock = clock;
     this.publicThreshold = publicThreshold;
   }
@@ -111,6 +115,20 @@ public class AlertService {
         .stream()
         .filter(alert -> alert.isPublic(publicThreshold))
         .toList();
+  }
+
+  /**
+   * Each alert's clusters, the most reports first, keyed by the alert's id; an alert without any is
+   * absent. One query for however many alerts.
+   */
+  public Map<Long, List<AlertCluster>> clustersOf(Collection<Alert> of) {
+    if (of.isEmpty()) {
+      return Map.of();
+    }
+    return clusters
+        .findByAlertIdInOrderByReportCountDescIdAsc(of.stream().map(Alert::getId).toList())
+        .stream()
+        .collect(Collectors.groupingBy(AlertCluster::getAlertId));
   }
 
   /** How many alerts are open in each district right now. Districts with none are absent. */

@@ -82,6 +82,13 @@ public class Alert {
   @Column(name = "verdict_at")
   private Instant verdictAt;
 
+  /**
+   * When the detector's geographic check last looked at this alert's reports. Null for an alert
+   * raised before the check existed, so "no cluster found" and "never looked" can be told apart.
+   */
+  @Column(name = "clusters_checked_at")
+  private Instant clustersCheckedAt;
+
   protected Alert() {}
 
   /**
@@ -100,6 +107,10 @@ public class Alert {
   public boolean isPublic(BigDecimal publicThreshold) {
     return verdict == Verdict.CONFIRMED
         || (verdict == null && peakZScore.compareTo(publicThreshold) >= 0);
+  }
+
+  public Long getId() {
+    return id;
   }
 
   public String getCode() {
@@ -156,5 +167,9 @@ public class Alert {
 
   public Instant getVerdictAt() {
     return verdictAt;
+  }
+
+  public Instant getClustersCheckedAt() {
+    return clustersCheckedAt;
   }
 }
