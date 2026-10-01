@@ -25,7 +25,8 @@ the page (it strips link underlines and resets heading sizes). Layers are
 declared `theme, base, utilities` before anything else, so every utility beats
 the reset. Utility sets the page repeats are named once in
 `src/styles/recipes.ts` (`shell`, `split()`, `sectionTitle`, `labelSm`, `caps`,
-`tnum`, `monoLink`).
+`tnum`, `monoLink`); the look every form control shares is in
+`src/components/ui/controls.ts` (`fieldLabel`, `fieldControl()`, `BUTTON`).
 
 The migration from plain CSS was verified as rendering-identical: full-page
 screenshots of every route at 375, 768, 1280 and 1440px match the plain-CSS
@@ -39,9 +40,10 @@ monospace, and, on the landing page, content separated by rules rather than boxe
 into panels. What keeps it from being editorial pastiche is that the annotations
 are real: every mono string in running text is a count, a window, a threshold or a
 district figure. The one other use of mono is the small caps label that names a
-field, a column or a disclosure ("Email address", "District", "The numbers as a
-table"), the form's own register; a mono string that is neither a measured value
-nor such a label is in the wrong face.
+column, a status or a disclosure ("Reports · 7 days", "Shown once", "The numbers
+as a table"); a mono string that is neither a measured value nor such a label is
+in the wrong face. Form fields are no longer among them: since 2026-10-02 a
+field's label is sentence case in the body face (see Staff pages).
 
 Every section that splits in two uses **one shared grid**, the same 50/50 ratio
 and the same gap, so the column edges line up from the header to the footer.
@@ -55,7 +57,8 @@ does not exist on the page the reference was taken from.
 | Token | Value | Use |
 |---|---|---|
 | `--color-paper` | `#eaeeee` | Page ground |
-| `--color-paper-raised` | `#f1f4f4` | Raised ground |
+| `--color-paper-raised` | `#f1f4f4` | Raised ground; the quiet well that holds a demo account's credentials |
+| `--color-field` | `#ffffff` | Inside a form field and a white button, a step lighter than the card |
 | `--color-paper-sunk` | `#dfe4e4` | The dashboard map's ground, behind the tiles |
 | `--color-ink` | `#15222b` | Body text, rules at full strength, the footer ground |
 | `--color-ochre` | `#8f6203` | The accent. Text-safe at 4.59:1 on paper |
@@ -305,9 +308,19 @@ screens. The theme restores a plain `:hover` so the page behaves as it always ha
 
 ## Components
 
-- **Two action shapes, and no third.** A ruled box (`<Action>`) for the thing
-  most visitors came to do; a quiet underlined link (`<Action variant="quiet">`)
-  for everything else. A filled button would be a third voice.
+- **On the landing page, two action shapes.** A ruled box (`<Action>`) for the
+  thing most visitors came to do; a quiet underlined link
+  (`<Action variant="quiet">`) for everything else.
+- **On the staff pages and the demo panels, two buttons** (`Button`,
+  `ButtonLink`, `SubmitButton`), at the user's direction (2026-10-02) that the
+  ruled mono box read as dated there. **Primary** is solid ink with paper text,
+  sentence case in the body face at body size, on the control radius and as
+  tall as a field (`2.75rem`), lightening to ink-85 under the pointer; it is the
+  one thing a form is for, and below `30rem` it spans its column. **Secondary**
+  is white with a hairline ink-24 edge and a contact shadow, `2.5rem` tall, at
+  small size, for a helping step beside the primary one ("Try a demo account",
+  "Use this account"). The quiet underlined button stays for small row actions
+  in lists ("Disable", "Issue a code") and for "Sign out".
 - **The mono label** (the `labelSm` recipe, plus `caps` for terms) is the only
   place mono appears, and it always carries a measured value.
 - **Rules on the landing page, panels on the working pages.** Every rule is a 1px
@@ -487,16 +500,25 @@ beneath.
   drop under it when the row cannot hold the input and a `12rem` hint. The invite
   code's hint sits beside its box on a wide screen and under it on a phone. A field
   with no width keeps its hint under the input.
-- **Fields** are a mono caps label, the optional hint in ink-70, and a 1px ink-24
-  box on paper-raised. A refused field turns its box to full ink and says why
-  underneath, beside a 2px ink rule, never in colour alone.
-- **Values are set in the value face.** An email address, an invite code (in its
-  hint's example too) and a facility number are Geist Mono; the words around
-  them stay Schibsted.
-- **Submit** is the landing page's ruled box as a `<button>`, so forms add no
-  third action shape. When a visitor reaches sign-in already signed in,
-  "Continue" is that same ruled box (`<Action>`) beside a quiet "Sign out",
-  because continuing is the thing they came to do.
+- **Fields** are a sentence-case label in the body face (small, medium weight,
+  full ink), the optional hint in ink-70, and a white box (`--color-field`) on
+  the control radius with a 1px contact shadow. Its edge is ink-55, 3.72:1 on
+  white, so the box's boundary passes the 3:1 a control needs; it darkens to
+  ink-70 under the pointer and goes to full ink with focus, inside the page's
+  usual focus ring. A refused field keeps its edge at full ink and says why
+  underneath, beside a 2px ink rule, never in colour alone. A select is the same
+  box with the platform's arrow hidden and a drawn chevron in its place
+  (`Select`), and the same look carries to every search and picker: the
+  facility filters, the account search, and both dashboards' district pickers.
+  Group labels (`<legend>`: "Symptom group", "Districts covered") take the
+  field label's style, and the choice tiles take the white ground.
+- **Values are set in the value face** where they sit in running text: a facility
+  number, and the invite code's example in its hint, are Geist Mono; the words
+  around them stay Schibsted. The demo panels are the exception: their
+  credentials are for reading and typing, so they sit in the body face.
+- **Submit** is the solid primary button. When a visitor reaches sign-in already
+  signed in, "Continue" is the same solid button as a link (`ButtonLink`)
+  beside a quiet "Sign out", because continuing is the thing they came to do.
 - **A secret shown once**, an invite code or an activation link, sits on its own
   panel, headed with what it is and "Shown once" in mono caps: the value in mono
   in a full-ink rounded box, who it is for, then "Copy" and "Done". The panel takes
@@ -532,17 +554,24 @@ full width under their two halves. Nothing about it shows otherwise.
 
 - **"Demo accounts"** on sign-in: a heading, a line on how it works and when it
   resets, and the simulated-data notice on its right, the page's one spend of
-  ochre. Under a full-ink rule, the four accounts side by side from `68rem` (two
-  by two from `48rem`, stacked and parted by hairlines on a phone): each a title
-  ("Public health inspector · Colombo"), what signing in shows, then the email
-  and password as a small description list in mono, in plain sight. Emails wrap
-  before their `@`, never mid-word. Each ends in a quiet "Use this account",
-  which fills the form, moves focus to "Sign in" and says so in a status line
-  under the fields; it never signs in by itself. Rows share one grid, so the
-  labels and buttons sit level across the four.
-- **"Demo invite code"** on registration: the same head, then the code in mono
-  with its facility and a quiet "Use this code", which fills the first step and
-  moves focus to "Check the code". Beside it, in medium weight, the request to
+  ochre. Under a full-ink rule, the four accounts side by side from `88rem`,
+  the first width at which the longest demo email fits its column on one line
+  (two by two from `48rem`, stacked and parted by hairlines on a phone). Each is
+  a column of five rows on one shared grid (CSS subgrid), so every row starts on
+  the same line across the columns and the space between rows is the same in
+  each: the role ("Public health inspector"), its reach as a small rounded chip
+  ("Colombo only"), one sentence of what signing in shows (the four are kept to
+  about the same length), the email and password in a quiet paper-raised well
+  in the body face at medium weight (emails wrap before their `@`, never
+  mid-word), and a white "Use this account" button, which fills the form, moves
+  focus to "Sign in" and says so in a status line under the fields; it never
+  signs in by itself.
+- **"Try a demo account"** on the sign-in form: under a hairline below "Sign
+  in", one line and a white button that scrolls to the demo accounts and moves
+  focus to their heading, smoothly unless the visitor prefers reduced motion.
+- **"Demo invite code"** on registration: the same head, then the code and its
+  facility in the same quiet well, and a white "Use this code", which fills the
+  first step and moves focus to "Check the code". Beside it, in medium weight, the request to
   use a made-up name and email address. Once the code is accepted the button
   goes and the request stays.
 - **In administration**, the demo administrator's header says what is switched
