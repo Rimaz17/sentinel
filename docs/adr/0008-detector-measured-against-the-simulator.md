@@ -55,7 +55,7 @@ counts, in memory, in under a minute:
   - Only counts are measured. Where patients live does not affect the z-score;
     the geographic check arrives in Phase 6 and will need its own measurement.
   - Throughput and end-to-end latency are properties of the pipeline, not the
-    detector, and are measured when Kafka arrives in Phase 5.
+    detector. Phase 5 measures them separately, with `scripts/measure-pipeline`.
 
 ## Alternatives considered
 

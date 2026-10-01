@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
+import io.github.rimaz17.sentinel.TestReports;
 import io.github.rimaz17.sentinel.reports.AgeBand;
 import io.github.rimaz17.sentinel.reports.AnonymisedReport;
 import io.github.rimaz17.sentinel.reports.ReportService;
@@ -30,10 +31,11 @@ class DistrictControllerTest {
   @Autowired TestAccounts testAccounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestReports testReports;
 
   @BeforeEach
   void storeActivity() {
-    jdbc.update("delete from reports");
+    testReports.clear();
     jdbc.update("delete from alerts");
     store("LKY0001016", "KDY", 1);
     store("LKY0001016", "KDY", 6 * 24);

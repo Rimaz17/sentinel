@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
+import io.github.rimaz17.sentinel.TestReports;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
@@ -22,15 +23,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
- * Nothing identifying reaches the logs, not even with the web and persistence layers logging
- * everything they can, and not even when a submission is rejected.
+ * Nothing identifying reaches the logs, not even with the web, stream and persistence layers
+ * logging everything they can, and not even when a submission is rejected.
  */
 @IntegrationTest
 @ExtendWith(OutputCaptureExtension.class)
 class IngestionLoggingTest {
 
   private static final List<String> VERBOSE =
-      List.of("org.springframework.web", "org.hibernate.SQL", "org.hibernate.orm.jdbc.bind");
+      List.of(
+          "org.springframework.web",
+          "org.springframework.kafka",
+          "org.hibernate.SQL",
+          "org.hibernate.orm.jdbc.bind");
 
   private static final String NAME = "Nimali Perera";
   private static final String NIC = "198912345678";
@@ -39,6 +44,7 @@ class IngestionLoggingTest {
   private static final String ADDRESS = "12 Temple Road, Kandy";
 
   @Autowired MockMvc mvc;
+  @Autowired TestReports testReports;
 
   private final LoggingSystem logging = LoggingSystem.get(getClass().getClassLoader());
 
@@ -61,6 +67,8 @@ class IngestionLoggingTest {
     submit("LKY0001016", valid.replace("\"age\": 37", "\"age\": \"thirty\""));
     submit("LXX9999999", valid);
     submit("LKY0001016", valid.substring(0, valid.indexOf(ADDRESS) + 5));
+    // The accepted report is stored by the stream processor after the reply.
+    testReports.awaitStreamStored();
 
     assertThat(output.getAll())
         .as("verbose logging was captured, so its absence of identity means something")

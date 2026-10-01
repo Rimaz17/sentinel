@@ -1,6 +1,5 @@
 package io.github.rimaz17.sentinel.reports;
 
-import io.github.rimaz17.sentinel.facilities.FacilityService;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -9,10 +8,13 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @Transactional
@@ -20,19 +22,84 @@ public class ReportService {
 
   static final Duration WEEK = Duration.ofDays(7);
 
-  private final ReportRepository reports;
-  private final FacilityService facilities;
-  private final Clock clock;
+  /**
+   * How many times a count rebuilds the windows before giving up on a Redis that keeps emptying.
+   */
+  static final int REBUILD_ATTEMPTS = 3;
 
-  ReportService(ReportRepository reports, FacilityService facilities, Clock clock) {
+  private final ReportRepository reports;
+  private final ReportWindows windows;
+  private final Clock clock;
+  private final Object rebuilding = new Object();
+
+  ReportService(ReportRepository reports, ReportWindows windows, Clock clock) {
     this.reports = reports;
-    this.facilities = facilities;
+    this.windows = windows;
     this.clock = clock;
   }
 
-  /** Stores a report that has already been through ingestion's anonymiser. */
-  public void record(AnonymisedReport report) {
-    reports.save(new Report(report, facilities.reference(report.facilityId())));
+  /**
+   * Stores a report that has already been through ingestion's anonymiser, noting when it was
+   * stored, and once that is committed adds it to its seven-day window. A report already stored is
+   * left as it was, but still added to its window, in case an earlier attempt stored it and then
+   * failed to reach Redis. Returns whether this call stored it.
+   *
+   * <p>A failure to reach Redis is thrown after the commit, so the stream processor retries the
+   * report, which is then stored as it was and added again.
+   */
+  public boolean record(AnonymisedReport report) {
+    boolean stored =
+        reports.insertIfAbsent(
+                report.id(),
+                report.facilityId(),
+                report.districtCode(),
+                report.symptomGroup().name(),
+                report.ageBand().label(),
+                report.latitude(),
+                report.longitude(),
+                report.reportedAt(),
+                report.receivedAt(),
+                clock.instant())
+            == 1;
+    WindowEntry entry = WindowEntry.of(report);
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            windows.add(entry, clock.instant());
+          }
+        });
+    return stored;
+  }
+
+  /**
+   * How many reports each of the given districts has had over the seven days up to now, read from
+   * the live windows. If Redis has lost them, they are rebuilt from storage first, so the answer is
+   * the same either way.
+   */
+  @Transactional(readOnly = true)
+  public Map<String, Long> countsLast7Days(List<String> districtCodes) {
+    for (int attempt = 0; attempt < REBUILD_ATTEMPTS; attempt++) {
+      Instant now = clock.instant();
+      Optional<Map<String, Long>> counts = windows.counts(districtCodes, now.minus(WEEK), now);
+      if (counts.isPresent()) {
+        return counts.get();
+      }
+      rebuildWindows();
+    }
+    throw new DataAccessResourceFailureException(
+        "The seven-day windows were lost again each time they were rebuilt");
+  }
+
+  /** One rebuild at a time: a count that waited for another's finds the windows complete. */
+  private void rebuildWindows() {
+    synchronized (rebuilding) {
+      Instant now = clock.instant();
+      if (windows.counts(List.of(), now, now).isPresent()) {
+        return;
+      }
+      windows.rebuild(reports.findWindowEntriesSince(now.minus(WEEK)));
+    }
   }
 
   /*
@@ -69,13 +136,6 @@ public class ReportService {
       return List.of();
     }
     return reports.findLocatedIn(from, now, districtCodes, Limit.of(limit));
-  }
-
-  /** How many reports each district has, by when the patient presented, in [from, to). */
-  @Transactional(readOnly = true)
-  public Map<String, Long> countsByDistrict(Instant from, Instant to) {
-    return reports.countByDistrict(from, to).stream()
-        .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]));
   }
 
   /**

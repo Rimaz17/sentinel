@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
+import io.github.rimaz17.sentinel.TestReports;
 import io.github.rimaz17.sentinel.reports.AgeBand;
 import io.github.rimaz17.sentinel.reports.AnonymisedReport;
 import io.github.rimaz17.sentinel.reports.ReportService;
@@ -41,10 +42,11 @@ class DistrictScopeEnforcementTest {
   @Autowired TestAccounts accounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestReports testReports;
 
   @BeforeEach
   void storeActivityInThreeDistricts() {
-    jdbc.update("delete from reports");
+    testReports.clear();
     jdbc.update("delete from alerts");
     for (String district : List.of("KDY", "CMB", "MTL")) {
       store(district);

@@ -1,6 +1,6 @@
 # 0009, Dashboard v1: polling, and what its figures mean
 
-Status: accepted · 2026-09-28
+Status: accepted · 2026-09-28 · alert polling replaced in Phase 5 by a push, see [0016](0016-alerts-pushed-over-websocket.md)
 
 ## Context
 

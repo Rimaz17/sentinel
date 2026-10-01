@@ -2,9 +2,6 @@ package io.github.rimaz17.sentinel.districts;
 
 import io.github.rimaz17.sentinel.alerts.AlertService;
 import io.github.rimaz17.sentinel.reports.ReportService;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,19 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DistrictService {
 
-  static final Duration WEEK = Duration.ofDays(7);
-
   private final DistrictRepository districts;
   private final ReportService reports;
   private final AlertService alerts;
-  private final Clock clock;
 
-  DistrictService(
-      DistrictRepository districts, ReportService reports, AlertService alerts, Clock clock) {
+  DistrictService(DistrictRepository districts, ReportService reports, AlertService alerts) {
     this.districts = districts;
     this.reports = reports;
     this.alerts = alerts;
-    this.clock = clock;
   }
 
   /** Every district, alphabetically by name. */
@@ -41,14 +33,15 @@ public class DistrictService {
 
   /**
    * Every district's current activity, alphabetically, including districts with no reports or
-   * alerts at all. The seven days run up to now rather than to the detector's last check, so a
-   * report shows here as soon as it is stored.
+   * alerts at all. The seven days run up to now rather than to the detector's last check, and are
+   * read from the live windows, so a report shows here as soon as it is stored.
    */
   public List<DistrictActivity> activity() {
-    Instant now = clock.instant();
-    Map<String, Long> reportCounts = reports.countsByDistrict(now.minus(WEEK), now);
+    List<District> all = all();
+    Map<String, Long> reportCounts =
+        reports.countsLast7Days(all.stream().map(District::getCode).toList());
     Map<String, Long> openAlerts = alerts.openCountsByDistrict();
-    return all().stream()
+    return all.stream()
         .map(
             district ->
                 new DistrictActivity(

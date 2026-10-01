@@ -7,12 +7,15 @@ import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
 import { cx, labelSm, shell } from '@/styles/recipes'
 import { POLL_INTERVAL_MS } from './api/queries'
 import { formatClock } from './format'
+import type { LiveStatus } from './live/useAlertStream'
 
 type DashboardHeaderProps = {
   /** The inspector signed in. */
   account: Account
   /** When the newest figures on screen arrived, or null before any have. */
   updatedAt: number | null
+  /** Whether alerts are arriving by push. */
+  live: LiveStatus
   refreshing: boolean
   onRefresh: () => void
 }
@@ -24,6 +27,7 @@ type DashboardHeaderProps = {
 export function DashboardHeader({
   account,
   updatedAt,
+  live,
   refreshing,
   onRefresh,
 }: DashboardHeaderProps) {
@@ -40,7 +44,7 @@ export function DashboardHeader({
         <p className="border-l border-l-ink-24 ps-md text-small text-ink-70">Internal dashboard</p>
 
         <div className="ms-auto flex flex-wrap items-center gap-x-md gap-y-3xs">
-          <RefreshStatus updatedAt={updatedAt} />
+          <RefreshStatus updatedAt={updatedAt} live={live} />
           <QuietButton onClick={onRefresh} disabled={refreshing}>
             {refreshing ? 'Refreshing' : 'Refresh now'}
           </QuietButton>
@@ -59,16 +63,23 @@ export function DashboardHeader({
   )
 }
 
-export function RefreshStatus({ updatedAt }: { updatedAt: number | null }) {
+/** How alerts reach the page, said in words so no state rests on a colour. */
+const LIVE_WORDS: Record<LiveStatus, string> = {
+  connecting: 'connecting for live alerts',
+  live: 'alerts arrive live',
+  reconnecting: 'live alerts reconnecting',
+}
+
+export function RefreshStatus({ updatedAt, live }: { updatedAt: number | null; live: LiveStatus }) {
   const every = `every ${POLL_INTERVAL_MS / 1000} s`
   return (
     <p className={cx(labelSm, 'text-ink-70')}>
       {updatedAt === null ? (
-        `Loading · refreshes ${every}`
+        `Loading · refreshes ${every} · ${LIVE_WORDS[live]}`
       ) : (
         <>
           Updated <time dateTime={new Date(updatedAt).toISOString()}>{formatClock(updatedAt)}</time>{' '}
-          Sri Lanka time · refreshes {every}
+          Sri Lanka time · refreshes {every} · {LIVE_WORDS[live]}
         </>
       )}
     </p>

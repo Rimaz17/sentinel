@@ -6,6 +6,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Limit;
@@ -47,9 +48,11 @@ public class AlertService {
   }
 
   public Alert find(String code) {
-    return alerts
-        .findByCode(code)
-        .orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, NO_SUCH_ALERT));
+    return findByCode(code).orElseThrow(() -> new ApiProblem(HttpStatus.NOT_FOUND, NO_SUCH_ALERT));
+  }
+
+  public Optional<Alert> findByCode(String code) {
+    return alerts.findByCode(code);
   }
 
   /** Moves an alert on through its investigation. It never moves back. */

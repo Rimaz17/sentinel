@@ -1,5 +1,6 @@
 package io.github.rimaz17.sentinel.reports;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -7,9 +8,38 @@ import java.util.UUID;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 interface ReportRepository extends JpaRepository<Report, UUID> {
+
+  /**
+   * Stores a report unless one with its id is already stored, and returns the number of rows
+   * written: 1, or 0 for a report seen before. Kafka can deliver a message more than once, and the
+   * id assigned at ingestion makes the second delivery harmless.
+   */
+  @Modifying
+  @Query(
+      nativeQuery = true,
+      value =
+          """
+          insert into reports (id, facility_id, district_code, symptom_group, age_band, latitude,
+                               longitude, reported_at, received_at, stored_at)
+          values (:id, :facilityId, :districtCode, :symptomGroup, :ageBand, :latitude,
+                  :longitude, :reportedAt, :receivedAt, :storedAt)
+          on conflict (id) do nothing
+          """)
+  int insertIfAbsent(
+      UUID id,
+      long facilityId,
+      String districtCode,
+      String symptomGroup,
+      String ageBand,
+      BigDecimal latitude,
+      BigDecimal longitude,
+      Instant reportedAt,
+      Instant receivedAt,
+      Instant storedAt);
 
   @EntityGraph(attributePaths = "facility")
   List<Report> findAllByOrderByReportedAtDescIdDesc(Limit limit);
@@ -40,16 +70,15 @@ interface ReportRepository extends JpaRepository<Report, UUID> {
   List<Report> findLocatedIn(
       Instant from, Instant to, Collection<String> districtCodes, Limit limit);
 
-  /**
-   * Reports per district in [from, to), as {@code [districtCode, count]}; empty districts omitted.
-   */
+  /** Every report that presented at or after {@code since}, as the seven-day windows hold it. */
   @Query(
       """
-      select r.districtCode, count(r) from Report r
-      where r.reportedAt >= :from and r.reportedAt < :to
-      group by r.districtCode
+      select new io.github.rimaz17.sentinel.reports.WindowEntry(
+          r.id, r.districtCode, r.symptomGroup, r.reportedAt)
+      from Report r
+      where r.reportedAt >= :since
       """)
-  List<Object[]> countByDistrict(Instant from, Instant to);
+  List<WindowEntry> findWindowEntriesSince(Instant since);
 
   /**
    * Reports per symptom group and week in [start, end), as {@code [symptomGroup, weeksAgo, count]}.

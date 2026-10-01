@@ -53,7 +53,7 @@ spread evenly across a district suggests a wider seasonal wave.
 | 2 | Detection v1, z-score baseline job writing alerts | **Built** |
 | 3 | Dashboard v1, React + Leaflet, polling | **Built** |
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | **Built** |
-| 5 | Real-time, Kafka, Redis windows, WebSocket alerts | Not started |
+| 5 | Real-time, Kafka, Redis windows, WebSocket alerts | **Built** |
 | 6 | Geography, PostGIS, DBSCAN, cluster rings | Not started |
 | 7 | Ship it, Docker Compose, CI, deployed demo | Not started |
 | n/a | **Landing page**, the public entry point at `/` | **Built** |
@@ -91,6 +91,29 @@ See [ADR 0011](docs/adr/0011-accounts-tokens-and-district-scope.md),
 
 Every route in the plan is now built. Until Phase 4 the unbuilt ones said so;
 see [ADR 0002](docs/adr/0002-unbuilt-routes-render-placeholders.md).
+
+Phase 5 makes the pipeline real-time:
+
+- **Kafka between ingestion and storage.** Ingestion anonymises a report,
+  publishes it to the `sentinel.reports` topic keyed by its district, and
+  answers 202 once Kafka has it; a stream processor in the API stores it. A
+  report delivered twice is stored once, a database outage leaves reports
+  waiting on the topic rather than lost, and a message that can never be stored
+  is set aside on a dead-letter topic.
+- **Seven-day windows in Redis.** One sorted set per district and symptom group
+  holds the last seven days' reports. Each district's figure on the internal
+  list and on the public dashboard is read from them, and if Redis loses them
+  they are rebuilt from PostgreSQL before the next answer.
+- **Alerts pushed over WebSocket.** When the detector raises or extends an
+  alert, or an inspector moves one on, the database announces it as the change
+  commits, and the API pushes it over STOMP to every inspector whose districts
+  cover it, and to nobody else. The dashboard stops polling alerts while the
+  socket is open, says so in its header, and polls again while it is not.
+
+See [ADR 0014](docs/adr/0014-kafka-between-ingestion-and-storage.md),
+[ADR 0015](docs/adr/0015-seven-day-windows-in-redis.md) and
+[ADR 0016](docs/adr/0016-alerts-pushed-over-websocket.md), and
+[Measured pipeline](#measured-pipeline) for how fast it runs.
 
 ## Measured detection
 
@@ -130,8 +153,49 @@ inside ordinary week-to-week variation. Each lower threshold buys detection
 with false alarms, which is the trade-off the overview's "two thresholds"
 describe. They measure the detector against this simulator, not against real
 disease: series are independent, baselines hold no past epidemics, and every
-report arrives on time. Throughput and end-to-end latency are pipeline figures
-and are measured when Kafka arrives in Phase 5.
+report arrives on time. Throughput and end-to-end latency are pipeline figures;
+see [Measured pipeline](#measured-pipeline).
+
+## Measured pipeline
+
+Two of the overview's success figures are about the pipeline rather than the
+detector: the rate it sustains without reports piling up on Kafka, and the
+time from a report being submitted to it being stored and counted. These come
+from an actual run of `scripts/measure-pipeline` (seed 2026, 30 seconds a
+rate, 16 concurrent submitters), with the whole stack on one laptop: an Intel
+Core i5-10210U with 16 GB, Windows 11, Docker Desktop given 8 CPUs.
+
+| Target rate | Accepted | Submission round trip, median · 95th | Submitted to stored, median · 95th · slowest | Most waiting on the stream | Sustained |
+|---|---|---|---|---|---|
+| 25/s | 25.0/s | 20 ms · 31 ms | 20 ms · 31 ms · 144 ms | 1 | yes |
+| 50/s | 50.0/s | 19 ms · 27 ms | 18 ms · 26 ms · 81 ms | 2 | yes |
+| 100/s | 100.0/s | 15 ms · 28 ms | 16 ms · 108 ms · 337 ms | 15 | yes |
+| 150/s | 149.9/s | 13 ms · 33 ms | 19 ms · 550 ms · 1.0 s | 73 | yes |
+| 200/s | 200.0/s | 13 ms · 27 ms | 25 ms · 442 ms · 769 ms | 95 | yes |
+| 250/s | 249.8/s | 13 ms · 29 ms | 155 ms · 1.9 s · 2.6 s | 231 | yes, just |
+| 300/s | 299.8/s | 13 ms · 33 ms | 6.8 s · 17.4 s · 19.0 s | 3,139 | no |
+
+A rate counts as sustained when every report was accepted on time, no more
+than a second's worth was still waiting when sending ended, and all were stored
+within two seconds after; see
+[the measurement's README](scripts/measure-pipeline/README.md). No report was
+refused at any rate, and none went to the dead-letter topic.
+
+What these numbers say: storage, not ingestion, is the limit. Ingestion's
+median answer stayed within 20 ms at every rate, and in an earlier run it took
+about 490 reports a second from the same 16 submitters; the stream processor,
+storing one report at a time on three threads, keeps pace up to about 250 a
+second here and falls behind beyond it. An earlier run on the same machine
+sustained 200 a second with a median of 281 ms to storage and fell far behind
+at 400, so read the limit as 200 to 250 and expect it to vary. The simulated
+country sends about 1,100 reports a week, a small fraction of one a second, so
+the limit is far above the load; a 63-day backfill from one sequential
+submitter runs at about 50 a second.
+
+End to end, a report is stored and counted in its district's seven-day window
+about 20 ms after it is submitted, at up to 200 reports a second. The
+dashboard then shows it at its next 30-second poll; an alert raised from it is
+pushed over WebSocket as the detector commits it.
 
 ## Stack
 
@@ -142,6 +206,7 @@ and are measured when Kafka arrives in Phase 5.
 | Event stream | Kafka |
 | Database | PostgreSQL + PostGIS, Flyway |
 | Live counters | Redis |
+| Realtime | WebSocket (STOMP) for alert push |
 | Frontend | React + TypeScript + Vite, Tailwind CSS, TanStack Query |
 | Maps | Leaflet with OpenStreetMap tiles |
 | Local stack | Docker Compose |
@@ -187,8 +252,10 @@ them elsewhere.
 To try it end to end: sign in as the administrator from `.env`, create an
 inspector at `/app/admin` and open the link it gives you, then issue a facility a
 code under **Facilities and invite codes** and register with it at `/register`.
-Every internal panel polls every 30 seconds while the tab is visible, and
-**Refresh now** asks at once; the public dashboard refreshes every minute.
+Alerts reach the internal dashboard over a WebSocket the moment they are raised
+or change, and are polled only while it is not open; the header says which.
+Every other internal panel polls every 30 seconds while the tab is visible, and
+**Refresh now** asks at once. The public dashboard refreshes every minute.
 
 ### Frontend scripts
 
@@ -209,11 +276,12 @@ Every internal panel polls every 30 seconds while the tab is visible, and
 Requires **Docker**, **Java 17** and, for the simulator, **Python 3.12 or later**.
 Maven is not needed; the Maven wrapper fetches it.
 
-**1. Start the database.** From the repository root, copy the example settings,
-then start PostgreSQL. In `.env`, change the database password and fill in the
-four Phase 4 settings with real values: `SENTINEL_JWT_SECRET` and
-`SENTINEL_FEED_KEY` each from `openssl rand -base64 48`, and an address and a
-password of 12 characters or more for the administrator.
+**1. Start the database, Kafka and Redis.** From the repository root, copy the
+example settings, then start the three. In `.env`, change the database password
+and fill in the four Phase 4 settings with real values: `SENTINEL_JWT_SECRET`
+and `SENTINEL_FEED_KEY` each from `openssl rand -base64 48`, and an address and
+a password of 12 characters or more for the administrator. An `.env` from before
+Phase 5 needs the four Kafka and Redis settings added from `infra/.env.example`.
 
 ```bash
 cp infra/.env.example .env
@@ -223,14 +291,18 @@ cp infra/.env.example .env
 docker compose --env-file .env -f infra/docker-compose.yml up -d
 ```
 
-It listens on `localhost:5433`, so it does not collide with a PostgreSQL already
-installed on the default port.
+PostgreSQL listens on `localhost:5433`, Kafka on `localhost:9094` and Redis on
+`localhost:6380`, each one above its usual port, so none collides with one
+already installed. Kafka keeps its messages on a volume; Redis keeps nothing on
+disk, because the API rebuilds its windows from PostgreSQL
+([ADR 0015](docs/adr/0015-seven-day-windows-in-redis.md)).
 
 **2. Start the API.** It reads the repository's `.env`, applies the database
 migrations, seeds the facility registry, and on first start creates the
 administrator named in `SENTINEL_ADMIN_EMAIL`; it never changes that account
 afterwards. It refuses to start without a `SENTINEL_JWT_SECRET` of at least 32
-bytes. On Windows, use `mvnw.cmd`.
+bytes, or without Kafka, whose topics it creates as it starts. On Windows, use
+`mvnw.cmd`.
 
 ```bash
 cd backend/api
@@ -346,7 +418,7 @@ activation are limited to 10 requests a minute from one address.
 
 | Endpoint | What it does |
 |---|---|
-| `POST /api/ingestion/reports` | Submits a report. A data provider's facility is the one in their token; the feed names it in `X-Facility-Code`. Answers `202 Accepted` with the report's id. Limited to 120 a minute per data provider. |
+| `POST /api/ingestion/reports` | Submits a report. A data provider's facility is the one in their token; the feed names it in `X-Facility-Code`. Answers `202 Accepted` with the report's id once Kafka has it, and `503` if Kafka cannot take it; the report is stored a moment later. Limited to 120 a minute per data provider. |
 | `GET /api/facilities` | The registry, for the feed and for inspectors' maps. |
 
 **Inspectors**, within their districts; anything outside them is 403:
@@ -362,6 +434,18 @@ activation are limited to 10 requests a minute from one address.
 | `GET /api/reports/weekly-counts` | Reports per symptom group in each of the last nine weeks, bucketed as the detector buckets them. |
 
 Without `?district=`, an inspector's requests cover every district they may see.
+Each district's reports over the last seven days, here and in the public API,
+are read from Redis; while Redis cannot be reached those two endpoints answer
+`503` and the rest of the API carries on.
+
+**Alerts over WebSocket**, for inspectors
+([ADR 0016](docs/adr/0016-alerts-pushed-over-websocket.md)):
+
+| What | How |
+|---|---|
+| Connect | STOMP over a plain WebSocket at `/api/ws`, from the API's own origin. The CONNECT frame carries `Authorization: Bearer <access token>`; only an inspector's token is accepted. |
+| Subscribe | `/user/queue/alerts`, and nothing else. Nothing may be sent. |
+| Receive | `{"change": "RAISED" or "UPDATED", "alert": {...}}`, the alert as `GET /api/alerts` returns it, for alerts in the inspector's districts only; or `{"change": "RESYNC", "alert": null}`, read every alert again. Nothing arrives once the token has expired, so reconnect with each renewed token. |
 
 **The administrator:**
 
@@ -400,13 +484,15 @@ The submission page at `/submit` never asks for any identity field at all.
 
 | Command | Run from | What it does |
 |---|---|---|
-| `./mvnw verify` | `backend/api` | Formatting check, unit tests, and integration tests against a real PostgreSQL started by Testcontainers (needs Docker) |
+| `./mvnw verify` | `backend/api` | Formatting check, unit tests, and integration tests against a real PostgreSQL, Kafka and Redis started by Testcontainers (needs Docker) |
 | `./mvnw spotless:apply` | `backend/api` | Format the Java sources |
 | `pip install -r requirements-dev.txt` | `backend/simulator` | Install pytest, Ruff and Black |
 | `pytest` · `ruff check .` · `black .` | `backend/simulator` or `scripts/facility-registry` | Test, lint and format either Python project |
 | `pip install -r requirements-dev.txt` | `backend/detector` | Install the detector's packages with pytest, Ruff, Black and Testcontainers |
 | `pytest` · `ruff check .` · `black .` | `backend/detector` | Test (the integration tests need Docker), lint and format |
 | `python -m sentinel_detector evaluate` | `backend/detector` | Measure detection against simulated outbreaks, as in [Measured detection](#measured-detection); `--seed N` for another run |
+| `python measure_pipeline.py` | `scripts/measure-pipeline` | Measure throughput and latency against a running stack, as in [Measured pipeline](#measured-pipeline); it adds reports, so use a throwaway one. See [its README](scripts/measure-pipeline/README.md) |
+| `pytest` · `ruff check .` · `black .` | `scripts/measure-pipeline` | Test, lint and format the measurement |
 
 ## Repository layout
 
@@ -414,8 +500,9 @@ The submission page at `/submit` never asks for any identity field at all.
 sentinel/
 ├── backend/
 │   ├── api/               Spring Boot: accounts and sign-in, facility registry and invite
-│   │                      codes, ingestion, reports, districts, alerts, administration,
-│   │                      and the public API
+│   │                      codes, ingestion onto Kafka, the stream processor storing
+│   │                      reports, the Redis windows, districts, alerts and their
+│   │                      WebSocket push, administration, and the public API
 │   │   └── src/main/resources/db/migration/   Flyway migrations, the only schema authority
 │   ├── detector/          Python: hourly z-score check, alerts, evaluation
 │   └── simulator/         Python: simulated reports and outbreaks, backfill and live modes
@@ -429,9 +516,9 @@ sentinel/
 │           ├── submit/    Report submission for data providers
 │           ├── admin/     Inspector accounts and facility invite codes
 │           └── dashboard/ The internal dashboard at /app: alert list and review,
-│                          district list, Leaflet map, weekly chart
+│                          district list, Leaflet map, weekly chart, and the alert socket
 ├── infra/
-│   ├── docker-compose.yml Local PostgreSQL
+│   ├── docker-compose.yml Local PostgreSQL, Kafka and Redis
 │   └── .env.example       Local settings, dummy values; copy to .env at the root
 ├── docs/
 │   ├── adr/               Architecture decision records
@@ -443,6 +530,7 @@ sentinel/
 │   ├── build-images.py    Regenerates frontend/src/assets from the originals
 │   ├── district-boundaries/ Builds the public map's district outlines from geoBoundaries
 │   ├── facility-registry/ Builds the registry seed from the Ministry of Health list
+│   ├── measure-pipeline/  Measures the pipeline's throughput and latency
 │   └── git-hooks/         commit-msg hook
 └── README.md
 ```
@@ -522,8 +610,21 @@ These are documented on purpose and are not defects.
 - **Map tiles depend on OpenStreetMap's tile server,** whose usage policy suits a
   demonstration but not production traffic. See
   [ADR 0010](docs/adr/0010-openstreetmap-tiles.md).
-- **The dashboard polls rather than being pushed to.** A new report appears
-  within 30 seconds; alerts are pushed over WebSocket from Phase 5.
+- **Only alerts are pushed.** An alert reaches the internal dashboard over
+  WebSocket as it commits, but a new report's dot and count appear at the next
+  30-second poll.
+- **Nothing reads the dead-letter topic.** A message the stream processor could
+  never store waits on `sentinel.reports.dead-letters` for a person with
+  Kafka's own tools. None arrived in any run measured here.
+- **While Redis is down, storage waits for it.** The stream processor retries
+  each report until Redis returns; nothing is lost, but the map stops moving
+  and the district figures answer 503 meanwhile.
+- **Storage keeps pace to about 200 to 250 reports a second** on the laptop
+  measured, storing one report at a time. Far above the simulated load; a
+  real national feed would want reports stored in batches first. See
+  [Measured pipeline](#measured-pipeline).
+- **The local Kafka is a single broker**, so each message is kept once. The
+  topic survives a restart of the broker, not the loss of its disk.
 - **Small or gradual outbreaks are caught late or not at all.** At the shipped
   3 sd, an outbreak adding half again to a district's usual week is detected
   28% of the time, and the median time to detect across all injected outbreaks

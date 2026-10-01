@@ -1,6 +1,6 @@
 # 0005, Ingestion stores reports directly until Kafka arrives
 
-Status: accepted · 2026-09-27
+Status: superseded by [0014](0014-kafka-between-ingestion-and-storage.md) · 2026-09-30
 
 ## Context
 

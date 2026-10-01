@@ -32,7 +32,7 @@ class IngestionController {
     this.ingestion = ingestion;
   }
 
-  /** Accepted rather than created: once Kafka is in place, storage happens after the reply. */
+  /** Accepted rather than created: the report is on the stream, and is stored after the reply. */
   @PostMapping
   @ResponseStatus(HttpStatus.ACCEPTED)
   ReportReceipt submit(

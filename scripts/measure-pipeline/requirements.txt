@@ -1,0 +1,2 @@
+# Runtime dependency, pinned as the detector pins it.
+psycopg[binary]==3.3.6

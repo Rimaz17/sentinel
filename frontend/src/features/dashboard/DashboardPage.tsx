@@ -17,6 +17,7 @@ import { AlertList } from './AlertList'
 import { AreaSummary } from './AreaSummary'
 import { WeeklyChart } from './chart/WeeklyChart'
 import { DashboardHeader } from './DashboardHeader'
+import { useAlertStream } from './live/useAlertStream'
 import { ALL_OF_SRI_LANKA, DistrictList, DistrictPicker } from './DistrictList'
 import { boundsOf, SRI_LANKA } from './map/geometry'
 import { MapKey } from './map/MapKey'
@@ -26,8 +27,9 @@ import { LoadingRows, QueryView } from './QueryView'
 
 /**
  * The inspector's view, for the whole country at /app or one district at
- * /app/districts/:code. Every panel polls on its own; the district in view is
- * the address, so it survives a reload and the back button works.
+ * /app/districts/:code. Alerts are pushed over the alert socket, and polled
+ * only while it is not open; every other panel polls on its own. The district
+ * in view is the address, so it survives a reload and the back button works.
  */
 export function DashboardPage() {
   const account = useAccount()
@@ -49,8 +51,9 @@ export function DashboardPage() {
   const outOfScope = selected !== null && !national && !account.districts.includes(selected)
   const inView = outOfScope ? null : selected
 
+  const live = useAlertStream()
   const districts = useDistricts()
-  const alerts = useAlerts(inView)
+  const alerts = useAlerts(inView, live.status === 'live')
   const reports = useLocatedReports(inView)
   const weekly = useWeeklyCounts(inView)
   const facilities = useFacilities(inView)
@@ -74,9 +77,10 @@ export function DashboardPage() {
     reports.dataUpdatedAt,
     weekly.dataUpdatedAt,
   )
-  // "2 h ago" is measured from when the alerts were fetched, which polling
-  // keeps within half a minute of now, rather than read from the clock mid-render.
-  const now = alerts.dataUpdatedAt
+  // "2 h ago" is measured from the newest fetch rather than read from the clock
+  // mid-render. Pushed alerts are fetched only when they change, but the
+  // district list polls, which keeps this within half a minute of now.
+  const now = Math.max(alerts.dataUpdatedAt, districts.dataUpdatedAt)
 
   const reportsInArea =
     selected === null
@@ -117,9 +121,14 @@ export function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <SkipLink />
+      {/* Always present, so a screen reader hears each new alert as it is raised. */}
+      <p role="status" className="sr-only">
+        {live.announcement}
+      </p>
       <DashboardHeader
         account={account}
         updatedAt={updatedAt > 0 ? updatedAt : null}
+        live={live.status}
         refreshing={refreshing}
         onRefresh={() => void queryClient.refetchQueries({ type: 'active' })}
       />

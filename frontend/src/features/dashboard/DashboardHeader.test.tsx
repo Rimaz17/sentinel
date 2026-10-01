@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
@@ -14,6 +14,7 @@ function renderHeader(props: Partial<Parameters<typeof DashboardHeader>[0]> = {}
         <DashboardHeader
           account={inspectorSession().account}
           updatedAt={Date.parse('2026-09-28T08:30:05Z')}
+          live="live"
           refreshing={false}
           onRefresh={onRefresh}
           {...props}
@@ -28,13 +29,24 @@ describe('DashboardHeader', () => {
   it('says when the figures were last updated, in Sri Lanka time, and how often', () => {
     renderHeader()
     expect(screen.getByText(/updated/i)).toHaveTextContent(
-      'Updated 14:00:05 Sri Lanka time · refreshes every 30 s',
+      'Updated 14:00:05 Sri Lanka time · refreshes every 30 s · alerts arrive live',
     )
+  })
+
+  it('says when live alerts are still connecting or have dropped', () => {
+    renderHeader({ live: 'connecting' })
+    expect(screen.getByText(/updated/i)).toHaveTextContent(/· connecting for live alerts$/)
+    cleanup()
+
+    renderHeader({ live: 'reconnecting' })
+    expect(screen.getByText(/updated/i)).toHaveTextContent(/· live alerts reconnecting$/)
   })
 
   it('says it is loading before any figures arrive', () => {
     renderHeader({ updatedAt: null })
-    expect(screen.getByText(/loading · refreshes every 30 s/i)).toBeInTheDocument()
+    expect(
+      screen.getByText('Loading · refreshes every 30 s · alerts arrive live'),
+    ).toBeInTheDocument()
   })
 
   it('refreshes on request', async () => {

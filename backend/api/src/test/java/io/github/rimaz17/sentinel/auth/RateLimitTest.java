@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
+import io.github.rimaz17.sentinel.TestReports;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -53,10 +54,11 @@ class RateLimitTest {
   @Autowired MockMvc mvc;
   @Autowired TestAccounts accounts;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestReports testReports;
 
   @BeforeEach
   void clear() {
-    jdbc.update("delete from reports");
+    testReports.clear();
     accounts.clear();
   }
 

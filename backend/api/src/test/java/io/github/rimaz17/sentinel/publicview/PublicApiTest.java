@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
+import io.github.rimaz17.sentinel.TestReports;
 import io.github.rimaz17.sentinel.reports.AgeBand;
 import io.github.rimaz17.sentinel.reports.AnonymisedReport;
 import io.github.rimaz17.sentinel.reports.ReportService;
@@ -40,13 +41,14 @@ class PublicApiTest {
   @Autowired TestAccounts accounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestReports testReports;
 
   private long inspector;
 
   @BeforeEach
   void clear() {
     jdbc.update("delete from alerts");
-    jdbc.update("delete from reports");
+    testReports.clear();
     accounts.clear();
     inspector = accounts.inspector("phi@example.org", "a long enough password", "*");
   }

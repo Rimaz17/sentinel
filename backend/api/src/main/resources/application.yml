@@ -16,6 +16,42 @@ spring:
     hibernate:
       # Flyway migrations are the only schema authority.
       ddl-auto: validate
+  # Reports travel from ingestion to storage through Kafka. See
+  # docs/adr/0014-kafka-between-ingestion-and-storage.md.
+  kafka:
+    bootstrap-servers: ${SENTINEL_KAFKA_BOOTSTRAP_SERVERS}
+    admin:
+      # The API creates its topics as it starts. Without Kafka it refuses to
+      # start, rather than run on and accept no report.
+      fail-fast: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      # A report is accepted only once every in-sync copy of it is written, and
+      # a retried send is never written twice.
+      acks: all
+      properties:
+        enable.idempotence: true
+        # With Kafka down, a submission fails within about six seconds, well
+        # inside a client's timeout, instead of hanging.
+        max.block.ms: 3000
+        request.timeout.ms: 3000
+        delivery.timeout.ms: 6000
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      # A new consumer group starts from the oldest report still on the topic,
+      # so nothing published before the first start is skipped.
+      auto-offset-reset: earliest
+  # The seven-day windows the live counts are read from. See
+  # docs/adr/0015-seven-day-windows-in-redis.md.
+  data:
+    redis:
+      url: ${SENTINEL_REDIS_URL}
+      # With Redis down, a request fails in seconds rather than waiting on the
+      # client's one-minute default.
+      connect-timeout: 2s
+      timeout: 2s
 
 sentinel:
   auth:

@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
+import io.github.rimaz17.sentinel.TestReports;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -26,10 +27,11 @@ class ReportControllerTest {
   @Autowired TestAccounts testAccounts;
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestReports testReports;
 
   @BeforeEach
   void storeReports() {
-    jdbc.update("delete from reports");
+    testReports.clear();
     // Stored out of order, and received in a different order from when they were reported, as a
     // backfill would be.
     store("LKY0001016", "KDY", SymptomGroup.DENGUE_LIKE, 30);

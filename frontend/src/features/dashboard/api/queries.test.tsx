@@ -46,6 +46,24 @@ describe('dashboard queries', () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3))
   })
 
+  it('polls alerts while they are not pushed', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const { result } = renderHook(() => useAlerts(null, false), { wrapper })
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS)
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2))
+  })
+
+  it('does not poll alerts while they are pushed', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const { result } = renderHook(() => useAlerts(null, true), { wrapper })
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 3)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
   it('does not fetch facilities until a district is chosen', async () => {
     renderHook(() => useFacilities(null), { wrapper })
     renderHook(() => useFacilities('KDY'), { wrapper })

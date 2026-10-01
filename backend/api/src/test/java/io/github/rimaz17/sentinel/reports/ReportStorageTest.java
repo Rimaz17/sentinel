@@ -3,6 +3,7 @@ package io.github.rimaz17.sentinel.reports;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.rimaz17.sentinel.IntegrationTest;
+import io.github.rimaz17.sentinel.TestReports;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -18,10 +19,11 @@ class ReportStorageTest {
 
   @Autowired ReportService reports;
   @Autowired JdbcTemplate jdbc;
+  @Autowired TestReports testReports;
 
   @BeforeEach
   void clear() {
-    jdbc.update("delete from reports");
+    testReports.clear();
   }
 
   @Test
@@ -73,6 +75,49 @@ class ReportStorageTest {
   }
 
   @Test
+  void storesAReportDeliveredTwiceOnce() {
+    Instant now = Instant.now();
+    AnonymisedReport report =
+        new AnonymisedReport(
+            UUID.randomUUID(),
+            facilityId("LAP0000059"),
+            "AMP",
+            SymptomGroup.GASTROINTESTINAL,
+            AgeBand.AGE_60_69,
+            null,
+            null,
+            now,
+            now);
+
+    assertThat(reports.record(report)).isTrue();
+    assertThat(reports.record(report)).isFalse();
+
+    assertThat(jdbc.queryForObject("select count(*) from reports", Long.class)).isOne();
+  }
+
+  @Test
+  void notesWhenItStoredAReport() {
+    Instant receivedAt = Instant.now().truncatedTo(ChronoUnit.MICROS);
+    UUID id = UUID.randomUUID();
+
+    reports.record(
+        new AnonymisedReport(
+            id,
+            facilityId("LAP0000059"),
+            "AMP",
+            SymptomGroup.DENGUE_LIKE,
+            AgeBand.AGE_20_29,
+            null,
+            null,
+            receivedAt.minusSeconds(600),
+            receivedAt));
+
+    Instant storedAt =
+        jdbc.queryForObject("select stored_at from reports where id = ?", Instant.class, id);
+    assertThat(storedAt).isBetween(receivedAt, Instant.now());
+  }
+
+  @Test
   void theReportsTableHasNoColumnForIdentity() {
     assertThat(
             jdbc.queryForList(
@@ -90,7 +135,8 @@ class ReportStorageTest {
             "latitude",
             "longitude",
             "reported_at",
-            "received_at");
+            "received_at",
+            "stored_at");
   }
 
   private long facilityId(String code) {

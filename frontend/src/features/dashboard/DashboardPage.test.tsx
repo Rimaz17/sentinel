@@ -1,11 +1,13 @@
-import { render, screen, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { resetSession, setSession } from '@/lib/api/session'
+import { FakeStompClient } from '@/test/fakeStomp'
 import { alert, DISTRICTS, inspectorSession, report, weeklyCounts } from '@/test/fixtures'
 import { QueryWrapper } from '@/test/queryWrapper'
 import type { LocatedReport } from './api/types'
+import { ALERTS_DESTINATION } from './live/alertStream'
 import { DashboardPage } from './DashboardPage'
 
 // Leaflet draws to a canvas jsdom does not have; the map's own module is
@@ -229,5 +231,35 @@ describe('DashboardPage', () => {
       '/app',
     )
     expect(fetchMock.mock.calls.map(([url]) => url).join(' ')).not.toMatch(/district=CMB/)
+  })
+
+  it('says alerts arrive live once the alert socket opens', async () => {
+    renderAt('/app')
+    expect(await screen.findByText(/connecting for live alerts/)).toBeInTheDocument()
+
+    await act(() => FakeStompClient.latest().open())
+
+    expect(screen.getByText(/alerts arrive live/)).toBeInTheDocument()
+  })
+
+  it('reads the alerts again and announces a new one the moment it is pushed', async () => {
+    renderAt('/app')
+    await screen.findByRole('heading', { level: 3, name: 'A-1001' })
+    const client = FakeStompClient.latest()
+    await act(() => client.open())
+    const before = requested('/api/alerts').length
+
+    act(() =>
+      client.push(
+        ALERTS_DESTINATION,
+        JSON.stringify({ change: 'RAISED', alert: alert({ code: 'A-1002' }) }),
+      ),
+    )
+
+    expect(screen.getByText('New alert A-1002: Kandy, dengue-like.')).toHaveAttribute(
+      'role',
+      'status',
+    )
+    await waitFor(() => expect(requested('/api/alerts').length).toBeGreaterThan(before))
   })
 })
