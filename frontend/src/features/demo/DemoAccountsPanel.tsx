@@ -3,34 +3,44 @@ import { Email } from '@/components/ui/Email'
 import { Panel } from '@/components/ui/Panel'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { SimulatedNotice } from '@/components/ui/SimulatedNotice'
-import { caps, cx, labelSm } from '@/styles/recipes'
 import { type Demo, type DemoAccount, resetTime } from './api'
 
-/** What each demo account is called on the page, and what signing in with it shows. */
-function describe(account: DemoAccount): { title: string; what: ReactNode } {
+/** The id of the panel's heading, which "Try a demo account" scrolls to and focuses. */
+export const DEMO_ACCOUNTS_HEADING = 'demo-accounts-heading'
+
+/**
+ * What each demo account is called on the page, what it reaches, and what
+ * signing in with it shows. The four descriptions are kept to about the same
+ * length, so they take the same number of lines side by side.
+ */
+function describe(account: DemoAccount): { title: string; scope: string; what: ReactNode } {
   switch (account.role) {
     case 'ADMIN':
       return {
         title: 'Administrator',
-        what: 'Every page of administration. A few changes that would spoil the demo for the next visitor are switched off.',
+        scope: 'Whole system',
+        what: 'All of administration, with changes that break the demo off.',
       }
     case 'DATA_PROVIDER':
       return {
-        title: 'Data provider · one facility',
-        what: `Submits reports for ${account.facilityName ?? 'its facility'}, in Colombo.`,
+        title: 'Data provider',
+        scope: 'One facility in Colombo',
+        what: `Submits reports for ${account.facilityName ?? 'its facility'}.`,
       }
     case 'PHI':
       return account.districts.includes('*')
         ? {
-            title: 'Public health inspector · every district',
-            what: 'The internal dashboard across all 25 districts: alerts, the report map and the weekly chart.',
+            title: 'Public health inspector',
+            scope: 'Every district',
+            what: 'The internal dashboard, alerts and map for all 25 districts.',
           }
         : {
-            title: 'Public health inspector · Colombo',
+            title: 'Public health inspector',
+            scope: 'Colombo only',
             what: (
               <>
-                Covers Colombo only. Once signed in, go to{' '}
-                <span className="font-mono">/app/districts/KDY</span> to see Kandy refused.
+                Once signed in, visit <span className="whitespace-nowrap">/app/districts/KDY</span>{' '}
+                to see Kandy refused.
               </>
             ),
           }
@@ -42,6 +52,12 @@ function describe(account: DemoAccount): { title: string; what: ReactNode } {
  * password are shown as text, and "Use this account" fills them into the form,
  * so a visitor still signs in through the real form rather than a shortcut
  * around it.
+ *
+ * Every account is a column of five rows (title, scope, description,
+ * credentials, button) on one shared grid, so each row starts on the same line
+ * across the columns and the spacing between them is the same in every column.
+ * Four columns wait for 88rem, the first width at which the longest demo email
+ * fits on one line in its column; below it two columns, then one.
  */
 export function DemoAccountsPanel({
   demo,
@@ -51,12 +67,13 @@ export function DemoAccountsPanel({
   onUse: (account: DemoAccount, title: string) => void
 }) {
   return (
-    <Panel labelledBy="demo-accounts-heading" className="gap-md md:p-lg">
+    <Panel labelledBy={DEMO_ACCOUNTS_HEADING} className="gap-md md:p-lg">
       <div className="flex flex-wrap items-start justify-between gap-x-lg gap-y-sm">
         <div className="grid gap-2xs">
           <h2
-            id="demo-accounts-heading"
-            className="text-section leading-snug font-medium tracking-tight"
+            id={DEMO_ACCOUNTS_HEADING}
+            tabIndex={-1}
+            className="scroll-mt-[5.5rem] text-section leading-snug font-medium tracking-tight"
           >
             Demo accounts
           </h2>
@@ -68,31 +85,35 @@ export function DemoAccountsPanel({
         </div>
         <SimulatedNotice />
       </div>
-      <ul className="grid gap-x-lg gap-y-md border-t border-t-ink pt-md md:grid-cols-2 xl:grid-cols-4">
+      <ul className="grid gap-x-lg gap-y-lg border-t border-t-ink pt-md md:grid-cols-2 min-[88rem]:grid-cols-4">
         {demo.accounts.map((account) => {
-          const { title, what } = describe(account)
+          const { title, scope, what } = describe(account)
+          const label = `${title} · ${scope}`
           return (
             <li
               key={account.email}
-              className="grid grid-rows-[auto_1fr_auto_auto] gap-xs border-t border-t-ink-14 pt-md first:border-t-0 first:pt-0 md:border-t-0 md:pt-0"
+              className="row-span-5 grid grid-rows-subgrid gap-y-xs border-t border-t-ink-14 pt-lg first:border-t-0 first:pt-0 md:border-t-0 md:pt-0"
             >
               <h3 className="text-body font-medium">{title}</h3>
+              <p className="w-fit self-start rounded-full bg-ink-08 px-xs py-[0.15rem] text-label font-medium text-ink-85">
+                {scope}
+              </p>
               <p className="text-small text-ink-70">{what}</p>
-              <dl className="grid gap-2xs">
-                <div className="grid gap-3xs">
-                  <dt className={cx(labelSm, caps, 'text-ink-70')}>Email address</dt>
-                  <dd className="font-mono text-small">
+              <dl className="grid content-start gap-xs rounded-control border border-ink-08 bg-paper-raised px-xs py-xs">
+                <div className="grid gap-[0.125rem]">
+                  <dt className="text-label text-ink-70">Email</dt>
+                  <dd className="text-small font-medium break-words">
                     <Email address={account.email} />
                   </dd>
                 </div>
-                <div className="grid gap-3xs">
-                  <dt className={cx(labelSm, caps, 'text-ink-70')}>Password</dt>
-                  <dd className="font-mono text-small break-all">{demo.password}</dd>
+                <div className="grid gap-[0.125rem]">
+                  <dt className="text-label text-ink-70">Password</dt>
+                  <dd className="text-small font-medium break-all">{demo.password}</dd>
                 </div>
               </dl>
               <div>
-                <QuietButton onClick={() => onUse(account, title)}>
-                  Use this account<span className="sr-only">: {title}</span>
+                <QuietButton onClick={() => onUse(account, label)}>
+                  Use this account<span className="sr-only">: {label}</span>
                 </QuietButton>
               </div>
             </li>

@@ -286,10 +286,11 @@ describe('SignInPage in demo mode', () => {
       .map((heading) => heading.textContent)
     expect(names).toEqual([
       'Administrator',
-      'Public health inspector · every district',
-      'Public health inspector · Colombo',
-      'Data provider · one facility',
+      'Public health inspector',
+      'Public health inspector',
+      'Data provider',
     ])
+    expect(within(panel).getByText('Colombo only')).toBeInTheDocument()
     expect(within(panel).getByText('inspector.colombo@demo.sentinel.test')).toBeInTheDocument()
     expect(within(panel).getAllByText('the right password')).toHaveLength(4)
     expect(within(panel).getByText(/every night at 3:00 Sri Lanka time/)).toBeInTheDocument()
@@ -301,7 +302,7 @@ describe('SignInPage in demo mode', () => {
 
     await userEvent.click(
       await screen.findByRole('button', {
-        name: 'Use this account: Public health inspector · Colombo',
+        name: 'Use this account: Public health inspector · Colombo only',
       }),
     )
 
@@ -311,12 +312,33 @@ describe('SignInPage in demo mode', () => {
     expect(screen.getByLabelText('Password')).toHaveValue('the right password')
     expect(screen.getByRole('button', { name: 'Sign in' })).toHaveFocus()
     expect(screen.getByRole('status')).toHaveTextContent(
-      'Filled in the demo account: Public health inspector · Colombo.',
+      'Filled in the demo account: Public health inspector · Colombo only.',
     )
     expect(fetchMock).not.toHaveBeenCalledWith('/api/auth/signin', expect.anything())
 
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
     expect(await screen.findByText('Inspector dashboard')).toBeInTheDocument()
+  })
+})
+
+describe('SignInPage: the way to the demo accounts', () => {
+  it('offers a way down to the demo accounts, and takes focus there', async () => {
+    fetchMock.mockImplementation(inDemoMode)
+    renderAt('/signin')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Try a demo account' }))
+
+    expect(screen.getByRole('heading', { level: 2, name: 'Demo accounts' })).toHaveFocus()
+  })
+
+  it('offers nothing of the kind outside demo mode', async () => {
+    renderAt('/signin')
+
+    await screen.findByLabelText('Email address')
+    await vi.waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith('/api/public/demo', expect.anything()),
+    )
+    expect(screen.queryByRole('button', { name: 'Try a demo account' })).not.toBeInTheDocument()
   })
 })
 

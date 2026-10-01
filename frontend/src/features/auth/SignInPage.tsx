@@ -5,7 +5,7 @@ import { Action, SubmitButton } from '@/components/ui/Action'
 import { Field, FormError } from '@/components/ui/Field'
 import { QuietButton } from '@/components/ui/QuietButton'
 import { useDemo } from '@/features/demo/api'
-import { DemoAccountsPanel } from '@/features/demo/DemoAccountsPanel'
+import { DEMO_ACCOUNTS_HEADING, DemoAccountsPanel } from '@/features/demo/DemoAccountsPanel'
 import { ApiError, apiRequest } from '@/lib/api/client'
 import type { Session } from '@/lib/api/session'
 import { AuthPage, CheckingSession } from './AuthPage'
@@ -62,6 +62,17 @@ export function SignInPage() {
   useEffect(() => {
     document.title = 'Staff sign-in · Sentinel'
   }, [])
+
+  /**
+   * Brings the demo accounts into view and moves focus to their heading, so a
+   * keyboard or screen reader user lands where a sighted visitor is taken.
+   */
+  function showDemoAccounts() {
+    const heading = document.getElementById(DEMO_ACCOUNTS_HEADING)
+    const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    heading?.scrollIntoView?.({ behavior: still ? 'auto' : 'smooth', block: 'start' })
+    heading?.focus({ preventScroll: true })
+  }
 
   /**
    * Fills in a demo account and moves focus to "Sign in", so the visitor signs
@@ -177,6 +188,15 @@ export function SignInPage() {
           <div>
             <SubmitButton busy={busy}>{busy ? 'Signing in' : 'Sign in'}</SubmitButton>
           </div>
+          {demo.data ? (
+            <div className="grid max-w-field-lg justify-items-start gap-xs border-t border-t-ink-14 pt-md">
+              <p className="text-small text-ink-70">
+                No account? Sentinel is a demonstration, so you can sign in with one of its demo
+                accounts.
+              </p>
+              <QuietButton onClick={showDemoAccounts}>Try a demo account</QuietButton>
+            </div>
+          ) : null}
         </form>
       )}
     </AuthPage>
