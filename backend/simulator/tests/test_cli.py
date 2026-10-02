@@ -2,7 +2,14 @@ import random
 from datetime import UTC, datetime, timedelta
 
 from sentinel_simulator.baselines import WEEKLY_BASELINES
-from sentinel_simulator.cli import backfill, live, main, parse_args, planned_demo
+from sentinel_simulator.cli import (
+    backfill,
+    holds_history,
+    live,
+    main,
+    parse_args,
+    planned_demo,
+)
 from sentinel_simulator.generator import Facility, Generator
 
 NOW = datetime(2026, 9, 27, 6, 0, tzinfo=UTC)
@@ -30,6 +37,29 @@ def test_backfill_posts_every_report_in_the_window(capsys):
     assert posted == len(client.submitted) > 0
     assert all(NOW - timedelta(days=7) <= r.reported_at < NOW for r in client.submitted)
     assert "Backfill complete" in capsys.readouterr().out
+
+
+class HoldingClient:
+    def __init__(self, held):
+        self.held = held
+
+    def recent_report_count(self):
+        return self.held
+
+
+def test_a_backfill_if_empty_is_skipped_when_the_api_holds_recent_reports(capsys):
+    assert holds_history(HoldingClient(11_934))
+    assert "already holds 11,934 reports" in capsys.readouterr().out
+
+
+def test_a_backfill_if_empty_goes_ahead_when_the_api_holds_none(capsys):
+    assert not holds_history(HoldingClient(0))
+    assert capsys.readouterr().out == ""
+
+
+def test_if_empty_is_off_unless_asked_for():
+    assert not parse_args(["backfill"]).if_empty
+    assert parse_args(["backfill", "--if-empty"]).if_empty
 
 
 def test_live_posts_each_interval_as_it_ends(capsys):
