@@ -1,0 +1,5 @@
+# The build context is the repository root; the simulator image is built from
+# these files only.
+*
+!backend/simulator/sentinel_simulator
+**/__pycache__
