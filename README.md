@@ -137,7 +137,7 @@ Inspectors see each cluster as a ring on the map. See
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | **Built** |
 | 5 | Real-time, Kafka, Redis windows, WebSocket alerts | **Built** |
 | 6 | Geography, PostGIS, DBSCAN, cluster rings | **Built** |
-| 7 | Ship it, Docker Compose, CI, deployed demo | Not started |
+| 7 | Ship it, Docker Compose, CI, deployed demo | **Built**, except the deployed demo and screen recording |
 | n/a | **Landing page**, the public entry point at `/` | **Built** |
 
 Phase 1 is the backend's walking skeleton: the facility registry seeded from
@@ -224,6 +224,22 @@ all of administration but may change only what visitors made, so nothing it can
 do leaves the demo broken for the next visitor, and every night at 03:00 Sri
 Lanka time what visitors made is removed. See
 [ADR 0017](docs/adr/0017-public-demo-mode.md).
+
+Phase 7 ships it:
+
+- **The whole stack in Docker Compose.** One command builds and starts the API,
+  the site, the simulator and the detector beside PostgreSQL, Kafka and Redis
+  (see [Run it](#run-it)). nginx serves the frontend and passes the API and the
+  alert socket through on one origin; the API counts each visitor, not the
+  proxy, for its sign-in rate limit; nine weeks of history are posted once, and
+  the detector checks as soon as they are in.
+- **Images built in CI.** Every pull request builds the four images, starts the
+  whole stack from them and runs a smoke test against it, as far as the
+  detector's first alerts (see [Continuous integration](#continuous-integration)).
+- **An architecture diagram,** above.
+
+See [ADR 0021](docs/adr/0021-full-stack-in-docker-compose.md). A deployed demo
+and a screen recording are still to come.
 
 ## Measured detection
 
