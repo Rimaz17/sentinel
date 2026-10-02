@@ -33,6 +33,25 @@ FACILITIES = [
 ]
 
 
+# Two of the nine weeks /api/public/trends returns, as the API words them.
+TRENDS = {
+    "districtCode": None,
+    "asOf": "2026-09-27T05:00:00Z",
+    "weeks": [
+        {
+            "start": "2026-09-13T05:00:00Z",
+            "end": "2026-09-20T05:00:00Z",
+            "counts": {"DENGUE_LIKE": 40, "INFLUENZA_LIKE": 2},
+        },
+        {
+            "start": "2026-09-20T05:00:00Z",
+            "end": "2026-09-27T05:00:00Z",
+            "counts": {"DENGUE_LIKE": 0, "GASTROINTESTINAL": 5},
+        },
+    ],
+}
+
+
 class FakeApi(BaseHTTPRequestHandler):
     """Answers as the Sentinel API does, and remembers what it was sent."""
 
@@ -44,6 +63,9 @@ class FakeApi(BaseHTTPRequestHandler):
         FakeApi.connections.add(self.client_address)
         if self.headers.get("X-Feed-Key") != KEY:
             self._reply(401, {"detail": "The feed key is not recognised."})
+            return
+        if self.path == "/api/public/trends":
+            self._reply(200, TRENDS)
             return
         self._reply(200, FACILITIES)
 
@@ -113,6 +135,11 @@ def test_reads_the_facility_registry(api):
     assert [f.code for f in facilities] == ["LKY0001016", "LKY0001008"]
     assert facilities[0].latitude == 7.266279
     assert facilities[1].latitude is None
+
+
+def test_counts_the_reports_held_from_the_last_nine_weeks(api):
+    with SentinelClient(api, KEY) as client:
+        assert client.recent_report_count() == 47
 
 
 def test_submits_a_report_as_its_facility(api):
