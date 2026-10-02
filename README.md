@@ -54,7 +54,13 @@ under [Running the frontend](#running-the-frontend) and
 
 ## Architecture
 
-![Sentinel's architecture: browsers reach one nginx container, which serves the React app and passes the API and the alert socket to the Spring Boot API; ingestion removes identity and publishes to Kafka; the stream processor stores reports in PostgreSQL with PostGIS and counts them in Redis; the hourly Python detector writes alerts, which a database trigger announces to the API, which pushes them over WebSocket to inspectors.](docs/architecture/sentinel-architecture.svg)
+![Sentinel's architecture in seven layers: users (the public, data providers, health inspectors and the administrator, in a React and Leaflet app); the nginx web gateway; the Spring Boot API with its auth, ingestion, facility registry, alerts, live push, public API and admin parts; Apache Kafka and the stream processor; PostgreSQL with PostGIS, Redis and Flyway; the Python detector and report simulator; and Docker, Docker Compose and GitHub Actions. A red arrow shows alerts pushed live to inspectors.](docs/architecture/sentinel-architecture-overview.png)
+
+The overview groups the system into layers.
+[The detailed diagram](docs/architecture/sentinel-architecture.svg) shows
+every flow between the parts exactly, including where an alert starts: the
+detector writes it to PostgreSQL, and a database trigger announces it to the
+API, which pushes it to inspectors.
 
 The same, in words:
 
@@ -80,10 +86,10 @@ The same, in words:
    trends and published alerts, never a report's position, a facility or an
    officer's note.
 
-Map tiles come from OpenStreetMap straight to the browser. In the full stack
-each box tagged with a name is its own container; see
+Map tiles come from OpenStreetMap straight to the browser. In the full stack,
+each box in the detailed diagram tagged with a name is its own container; see
 [ADR 0021](docs/adr/0021-full-stack-in-docker-compose.md). A PNG of the
-diagram, for slides, is beside it in `docs/architecture/`.
+detailed diagram, for slides, is beside it in `docs/architecture/`.
 
 ## Why it exists
 
@@ -777,7 +783,8 @@ sentinel/
 ├── .github/workflows/     CI: tests, image builds and the full-stack smoke test
 ├── docs/
 │   ├── adr/               Architecture decision records
-│   ├── architecture/      The architecture diagram, SVG and PNG
+│   ├── architecture/      The architecture: an illustrated overview, and a
+│   │                      detailed diagram as SVG and PNG
 │   └── design/
 │       ├── PRODUCT.md     Product record
 │       ├── DESIGN.md      Design system, written from the built page
