@@ -9,6 +9,82 @@ that range.
 
 ---
 
+## Run it
+
+The whole system, every service in its own container, starts with one command.
+It needs only **Docker with Compose** (Docker Desktop on Windows and macOS);
+Java, Node and Python are needed only to work on the code. From the repository
+root, copy the example settings:
+
+```bash
+cp infra/.env.example .env
+```
+
+They run as they are, which is how CI runs them, but for anything beyond a look
+on your own machine change the database password (`POSTGRES_PASSWORD` and
+`SENTINEL_DB_PASSWORD` alike), set `SENTINEL_JWT_SECRET` and `SENTINEL_FEED_KEY`
+each to the output of `openssl rand -base64 48`, and give the administrator a
+real address and a password of 12 characters or more. Then build and start:
+
+```bash
+docker compose --env-file .env -f infra/docker-compose.yml --profile app up -d --build
+```
+
+The command returns once the API is healthy and nine weeks of simulated
+history are in: about 12,000 reports, posted in two and a half minutes on the
+laptop described under [Measured pipeline](#measured-pipeline). The detector
+checks as soon as the history is in, so the demo's alerts are on the dashboards
+at once. Open **<http://localhost:8088>**: the public dashboard needs no
+account, and the sign-in page offers the demo accounts. Starting it again keeps
+the history rather than posting a second copy.
+
+| Command | What it does |
+|---|---|
+| `python scripts/smoke-test/smoke_test.py` | Checks the running stack from outside, as CI does: the site, the API through the proxy, the alert socket, district scope and the detector's alerts |
+| `docker compose --env-file .env -f infra/docker-compose.yml --profile app logs -f api` | Follows one service's log: `api`, `web`, `detector`, `simulator`, `simulator-backfill`, `postgres`, `kafka` or `redis` |
+| `docker compose --env-file .env -f infra/docker-compose.yml --profile app down` | Stops everything and keeps the data; `down -v` deletes it too. Without `--profile app`, the application's containers are left running |
+
+Once running, the stack used about 1.2 GB of memory, half of it the API and
+most of the rest Kafka. Only the site is published, on `127.0.0.1:8088`
+(`SENTINEL_WEB_PORT` changes it); PostgreSQL, Kafka and Redis stay on their
+loopback ports for tools. On an ARM machine, set `SENTINEL_POSTGIS_IMAGE` as
+`infra/.env.example` says. How each part runs on its own, for development, is
+under [Running the frontend](#running-the-frontend) and
+[Running the backend](#running-the-backend).
+
+## Architecture
+
+![Sentinel's architecture: browsers reach one nginx container, which serves the React app and passes the API and the alert socket to the Spring Boot API; ingestion removes identity and publishes to Kafka; the stream processor stores reports in PostgreSQL with PostGIS and counts them in Redis; the hourly Python detector writes alerts, which a database trigger announces to the API, which pushes them over WebSocket to inspectors.](docs/architecture/sentinel-architecture.svg)
+
+The same, in words:
+
+1. **One origin.** Browsers reach one container, `web` (nginx), which serves
+   the React build and passes `/api` and the alert socket at `/api/ws` to the
+   API.
+2. **Identity stops at the front door.** A report reaches ingestion from a data
+   provider's `/submit` page, or from the simulator through the trusted report
+   feed. Ingestion validates it, drops every identity field, bands the age and
+   rounds the location, publishes it to Kafka keyed by its district, and
+   answers `202` once Kafka holds it.
+3. **Stored once, counted live.** The stream processor, in the same API,
+   stores each report once in PostgreSQL with PostGIS and adds it to its
+   district's seven-day window in Redis.
+4. **Checked every hour.** The Python detector compares each district and
+   symptom group's last seven days with the eight weeks before and, for each
+   series it flags, looks for reports bunched within 2 km across several
+   facilities. It writes alerts and their clusters to PostgreSQL.
+5. **Pushed as it commits.** A database trigger announces each alert raised or
+   changed; the API pushes it over STOMP to the inspectors whose districts
+   cover it, and to nobody else.
+6. **Coarse for the public.** The public API answers with district figures,
+   trends and published alerts, never a report's position, a facility or an
+   officer's note.
+
+Map tiles come from OpenStreetMap straight to the browser. In the full stack
+each box tagged with a name is its own container; see
+[ADR 0021](docs/adr/0021-full-stack-in-docker-compose.md). A PNG of the
+diagram, for slides, is beside it in `docs/architecture/`.
+
 ## Why it exists
 
 An outbreak rarely announces itself at a single clinic. It appears as a handful of
