@@ -769,10 +769,15 @@ sentinel/
 │                          district list, Leaflet map with cluster rings, weekly chart,
 │                          and the alert socket
 ├── infra/
-│   ├── docker-compose.yml Local PostgreSQL with PostGIS, Kafka and Redis
-│   └── .env.example       Local settings, dummy values; copy to .env at the root
+│   ├── docker-compose.yml PostgreSQL with PostGIS, Kafka and Redis; with
+│   │                      --profile app, the whole stack
+│   ├── docker/            One Dockerfile per image (api, web, detector, simulator),
+│   │                      each with its .dockerignore, and the site's nginx config
+│   └── .env.example       Settings, dummy values; copy to .env at the root
+├── .github/workflows/     CI: tests, image builds and the full-stack smoke test
 ├── docs/
 │   ├── adr/               Architecture decision records
+│   ├── architecture/      The architecture diagram, SVG and PNG
 │   └── design/
 │       ├── PRODUCT.md     Product record
 │       ├── DESIGN.md      Design system, written from the built page
@@ -782,6 +787,7 @@ sentinel/
 │   ├── district-boundaries/ Builds the public map's district outlines from geoBoundaries
 │   ├── facility-registry/ Builds the registry seed from the Ministry of Health list
 │   ├── measure-pipeline/  Measures the pipeline's throughput and latency
+│   ├── smoke-test/        Checks a running full stack through its site
 │   └── git-hooks/         commit-msg hook
 └── README.md
 ```
