@@ -723,6 +723,23 @@ The submission page at `/submit` never asks for any identity field at all.
 | `python -m sentinel_detector evaluate-geography` | `backend/detector` | Measure the geographic check against point and wave outbreaks, as in [Measured geography](#measured-geography); a few minutes |
 | `python measure_pipeline.py` | `scripts/measure-pipeline` | Measure throughput and latency against a running stack, as in [Measured pipeline](#measured-pipeline); it adds reports, so use a throwaway one. See [its README](scripts/measure-pipeline/README.md) |
 | `pytest` · `ruff check .` · `black .` | `scripts/measure-pipeline` | Test, lint and format the measurement |
+| `python smoke_test.py` | `scripts/smoke-test` | Check a running full stack through its site; `--base-url` for another port, `--alert-timeout 0` to skip waiting for alerts |
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request and every push to `main`.
+A red build is never merged.
+
+| Job | What it checks |
+|---|---|
+| Frontend | Typecheck, lint, formatting, tests and the production build |
+| API | `./mvnw verify`: Spotless, unit tests, and integration tests against real PostgreSQL with PostGIS, Kafka and Redis started by Testcontainers |
+| Python | Ruff, Black and pytest for the simulator, the facility registry build and the pipeline measurement; Ruff and Black for the smoke test |
+| Detector | Ruff, Black and pytest, with Testcontainers |
+| Images and full stack | Builds the four images, with layers cached between runs, starts the whole stack from them on the example settings, and runs `scripts/smoke-test` against it: the site and a deep link, the public API through the proxy, the alert socket's origin check both ways, district scope both ways, and the detector's first alerts from the simulated history |
+
+The images are built from `infra/docker/`, one Dockerfile each, from the
+repository root. They are not pushed to a registry.
 
 ## Repository layout
 
