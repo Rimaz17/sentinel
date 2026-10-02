@@ -62,8 +62,10 @@ final class RateLimitFilter extends OncePerRequestFilter {
     }
     String path = request.getRequestURI();
     if (GUESSABLE.contains(path)) {
-      // The address the connection came from. Headers such as X-Forwarded-For are not trusted,
-      // because anyone can set them; behind a proxy this is the proxy's address.
+      // The address the connection came from. X-Forwarded-For is not read here, because anyone
+      // can set it. Behind the full stack's web proxy, Tomcat itself replaces the proxy's address
+      // with the visitor's from that header, trusting it only from a private network address
+      // (server.forward-headers-strategy=native in infra/docker-compose.yml).
       return limiter.acquire("auth:" + request.getRemoteAddr(), authPerMinute);
     }
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
