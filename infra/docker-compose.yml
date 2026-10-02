@@ -77,6 +77,54 @@ services:
       timeout: 3s
       retries: 10
 
+  # The application itself, started only with --profile app, so the command
+  # above for the three services alone is unchanged. Each container reaches the
+  # others by service name; settings come from the same .env, with the
+  # in-network addresses set here in place of its localhost ones.
+
+  # The Spring Boot API. It publishes no port: browsers reach it through web.
+  api:
+    profiles: [app]
+    build:
+      context: ..
+      dockerfile: infra/docker/api.Dockerfile
+    image: sentinel-api:local
+    environment:
+      SENTINEL_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SENTINEL_DB_USERNAME: ${POSTGRES_USER}
+      SENTINEL_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SENTINEL_KAFKA_BOOTSTRAP_SERVERS: kafka:19092
+      SENTINEL_REDIS_URL: redis://redis:6379
+      SENTINEL_JWT_SECRET: ${SENTINEL_JWT_SECRET:?set SENTINEL_JWT_SECRET in .env}
+      SENTINEL_FEED_KEY: ${SENTINEL_FEED_KEY:?set SENTINEL_FEED_KEY in .env}
+      SENTINEL_COOKIE_SECURE: ${SENTINEL_COOKIE_SECURE:-true}
+      SENTINEL_ADMIN_EMAIL: ${SENTINEL_ADMIN_EMAIL:-}
+      SENTINEL_ADMIN_PASSWORD: ${SENTINEL_ADMIN_PASSWORD:-}
+      SENTINEL_DEMO_MODE: ${SENTINEL_DEMO_MODE:-true}
+      SENTINEL_DEMO_PASSWORD: ${SENTINEL_DEMO_PASSWORD:-sentinel-demo}
+      SENTINEL_DEMO_INVITE_CODE: ${SENTINEL_DEMO_INVITE_CODE:-CMB-DEM-7Q4X}
+      # Every request arrives through web, so the address it came from is web's.
+      # This lets Tomcat take the visitor's from X-Forwarded-For, trusting that
+      # header only from a private network address such as web's; the sign-in
+      # rate limit then counts each visitor, not the proxy (docs/adr/0021).
+      SERVER_FORWARD_HEADERS_STRATEGY: native
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      # A public endpoint that reads the database, and needs no account.
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8080/api/public/alerts"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      # The first start applies every migration and seeds the facility registry.
+      start_period: 120s
+    restart: unless-stopped
+
 volumes:
   postgres-data:
   kafka-data:
