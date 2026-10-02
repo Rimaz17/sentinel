@@ -113,6 +113,13 @@ jobs:
           black --check .
           pytest
 
+      # Run against the whole stack in the Images and full stack job; linted here.
+      - name: Smoke test
+        working-directory: scripts/smoke-test
+        run: |
+          ruff check .
+          black --check .
+
   detector:
     name: Detector
     runs-on: ubuntu-latest
