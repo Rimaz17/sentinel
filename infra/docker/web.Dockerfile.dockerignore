@@ -1,0 +1,10 @@
+# The build context is the repository root; the web image is built from the
+# frontend and its nginx configuration only. The image installs its own
+# node_modules and writes its own dist.
+*
+!frontend
+frontend/node_modules
+frontend/dist
+frontend/coverage
+frontend/.impeccable
+!infra/docker/web.nginx.conf
