@@ -381,7 +381,8 @@ pushed over WebSocket as the detector commits it.
 | Realtime | WebSocket (STOMP) for alert push |
 | Frontend | React + TypeScript + Vite, Tailwind CSS, TanStack Query |
 | Maps | Leaflet with OpenStreetMap tiles |
-| Local stack | Docker Compose |
+| Web server | nginx, serving the frontend's build and passing `/api` to the API |
+| Full and local stack | Docker Compose |
 | CI | GitHub Actions |
 
 Google Maps is not used anywhere. Its terms forbid using its tiles outside its own
