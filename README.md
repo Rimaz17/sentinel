@@ -448,6 +448,8 @@ Every other internal panel polls every 30 seconds while the tab is visible, and
 
 ## Running the backend
 
+This is the development setup, each part run on the host from its own
+terminal; to start everything in containers instead, see [Run it](#run-it).
 Requires **Docker**, **Java 17** and, for the simulator, **Python 3.12 or later**.
 Maven is not needed; the Maven wrapper fetches it.
 
@@ -466,6 +468,7 @@ cp infra/.env.example .env
 docker compose --env-file .env -f infra/docker-compose.yml up -d
 ```
 
+Without `--profile app`, this starts those three only, as before Phase 7.
 PostgreSQL listens on `localhost:5433`, Kafka on `localhost:9094` and Redis on
 `localhost:6380`, each one above its usual port, so none collides with one
 already installed. The database is PostgreSQL 17 with PostGIS
