@@ -915,6 +915,19 @@ These are documented on purpose and are not defects.
   See [ADR 0017](docs/adr/0017-public-demo-mode.md).
 - **The demo administrator sees every account's name and email** until the
   nightly reset, so the demo's pages ask visitors for made-up details.
+- **The full stack serves plain HTTP.** The refresh cookie is `Secure`, which
+  browsers accept over HTTP from `localhost` only, so a demo reached any other
+  way needs HTTPS in front of the site's port, or every visitor is signed out
+  when their 15-minute access token ends.
+- **A stack stopped for days keeps a gap in its reports.** On a restart the
+  simulator posts from that moment, and the backfill sees recent history and
+  skips, so the baseline holds too few reports until the gap leaves the
+  nine-week window. Start afresh with `down -v` after a long stop.
+- **The official PostGIS image is built for x86-64 only.** On an ARM machine,
+  `SENTINEL_POSTGIS_IMAGE` swaps in a build for both from one of its
+  maintainers; every other image is published for both.
+- **Images are built in CI, not published.** Nothing pulls them yet, so a
+  deployment builds them from the repository.
 - **Detection assumes a stable baseline.** A prior year containing a real epidemic
   inflates "normal" and reduces future sensitivity. Periodic recalibration would be
   needed.
