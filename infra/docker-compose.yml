@@ -1,8 +1,15 @@
-# Local development services: the database, the event stream and the live
-# counters. The API, the simulator and the detector run on the host.
+# Sentinel in containers. Run from the repository root.
 #
-# Run from the repository root:
+# The database, the event stream and the live counters alone, for development
+# with the API, the simulator and the detector run on the host:
 #   docker compose --env-file .env -f infra/docker-compose.yml up -d
+#
+# The whole stack, built from this checkout, the site on http://localhost:8088:
+#   docker compose --env-file .env -f infra/docker-compose.yml --profile app up -d --build
+#
+# Stop either with `down`, adding `--profile app` for the whole stack: without
+# it, the application's containers are left running. `down -v` also deletes
+# the data. See docs/adr/0021-full-stack-in-docker-compose.md.
 
 name: sentinel
 
@@ -10,8 +17,11 @@ services:
   # PostgreSQL 17 with PostGIS, for report locations and distance queries
   # (docs/adr/0019). The same server as the plain image, so a volume written by
   # postgres:17-alpine opens unchanged; the extension is created by migration.
+  # The official image is built for x86-64 only; on an ARM machine, set
+  # SENTINEL_POSTGIS_IMAGE to imresamu/postgis:17-3.5-alpine, the same build for
+  # both, from one of the official image's maintainers.
   postgres:
-    image: postgis/postgis:17-3.5-alpine
+    image: ${SENTINEL_POSTGIS_IMAGE:-postgis/postgis:17-3.5-alpine}
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
       POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
@@ -34,11 +44,14 @@ services:
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      # What clients on the host are told to connect to: the published port below.
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:${SENTINEL_KAFKA_PORT:?set SENTINEL_KAFKA_PORT in .env}
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,INTERNAL://:19092
+      # What clients are told to connect to: on the host, the published port
+      # below; in another container, such as the API in the full stack, this one
+      # by its service name. The brokers' own traffic stays on PLAINTEXT.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:${SENTINEL_KAFKA_PORT:?set SENTINEL_KAFKA_PORT in .env},INTERNAL://kafka:19092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
       # A single node can keep only one copy of anything.
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -73,6 +86,125 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  # The application itself, started only with --profile app, so the command
+  # above for the three services alone is unchanged. Each container reaches the
+  # others by service name; settings come from the same .env, with the
+  # in-network addresses set here in place of its localhost ones.
+
+  # The Spring Boot API. It publishes no port: browsers reach it through web.
+  api:
+    profiles: [app]
+    build:
+      context: ..
+      dockerfile: infra/docker/api.Dockerfile
+    image: sentinel-api:local
+    environment:
+      SENTINEL_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SENTINEL_DB_USERNAME: ${POSTGRES_USER}
+      SENTINEL_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SENTINEL_KAFKA_BOOTSTRAP_SERVERS: kafka:19092
+      SENTINEL_REDIS_URL: redis://redis:6379
+      SENTINEL_JWT_SECRET: ${SENTINEL_JWT_SECRET:?set SENTINEL_JWT_SECRET in .env}
+      SENTINEL_FEED_KEY: ${SENTINEL_FEED_KEY:?set SENTINEL_FEED_KEY in .env}
+      SENTINEL_COOKIE_SECURE: ${SENTINEL_COOKIE_SECURE:-true}
+      SENTINEL_ADMIN_EMAIL: ${SENTINEL_ADMIN_EMAIL:-}
+      SENTINEL_ADMIN_PASSWORD: ${SENTINEL_ADMIN_PASSWORD:-}
+      SENTINEL_DEMO_MODE: ${SENTINEL_DEMO_MODE:-true}
+      SENTINEL_DEMO_PASSWORD: ${SENTINEL_DEMO_PASSWORD:-sentinel-demo}
+      SENTINEL_DEMO_INVITE_CODE: ${SENTINEL_DEMO_INVITE_CODE:-CMB-DEM-7Q4X}
+      # Every request arrives through web, so the address it came from is web's.
+      # This lets Tomcat take the visitor's from X-Forwarded-For, trusting that
+      # header only from a private network address such as web's; the sign-in
+      # rate limit then counts each visitor, not the proxy (docs/adr/0021).
+      SERVER_FORWARD_HEADERS_STRATEGY: native
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      # A public endpoint that reads the database, and needs no account.
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8080/api/public/alerts"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      # The first start applies every migration and seeds the facility registry.
+      start_period: 120s
+    restart: unless-stopped
+
+  # The site: the frontend's build, with /api and the alert socket passed to the
+  # API. The one port the full stack publishes, on loopback; a deployed demo
+  # puts a TLS proxy or tunnel in front of it.
+  web:
+    profiles: [app]
+    build:
+      context: ..
+      dockerfile: infra/docker/web.Dockerfile
+    image: sentinel-web:local
+    ports:
+      - "127.0.0.1:${SENTINEL_WEB_PORT:-8088}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Nine weeks of history, which detection compares against, posted once and
+  # then exits. Skipped when the API already holds reports from those weeks, so
+  # starting the stack again never posts a second copy.
+  simulator-backfill:
+    profiles: [app]
+    build:
+      context: ..
+      dockerfile: infra/docker/simulator.Dockerfile
+    image: sentinel-simulator:local
+    command: ["backfill", "--days", "63", "--if-empty"]
+    environment: &simulator-environment
+      SENTINEL_API_URL: http://api:8080
+      SENTINEL_FEED_KEY: ${SENTINEL_FEED_KEY:?set SENTINEL_FEED_KEY in .env}
+    depends_on:
+      api:
+        condition: service_healthy
+    # Not restarted: a backfill stopped part way would then find reports and
+    # skip, leaving part of the history. A failure stops the stack's start
+    # instead, and says so.
+    restart: "no"
+
+  # Reports as they happen, with the demo's outbreaks, once the history is in.
+  simulator:
+    profiles: [app]
+    image: sentinel-simulator:local
+    command: ["live"]
+    environment: *simulator-environment
+    depends_on:
+      simulator-backfill:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # The hourly check, the first as soon as the history is in, so alerts show
+  # within minutes of a first start rather than at the next hour.
+  detector:
+    profiles: [app]
+    build:
+      context: ..
+      dockerfile: infra/docker/detector.Dockerfile
+    image: sentinel-detector:local
+    command: ["watch"]
+    environment:
+      SENTINEL_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SENTINEL_DB_USERNAME: ${POSTGRES_USER}
+      SENTINEL_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      simulator-backfill:
+        condition: service_completed_successfully
+    restart: unless-stopped
 
 volumes:
   postgres-data:

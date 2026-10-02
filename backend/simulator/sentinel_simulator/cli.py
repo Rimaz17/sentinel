@@ -1,12 +1,15 @@
 """Command line: fill in history, or keep reports flowing in real time.
 
     python -m sentinel_simulator backfill --days 63
+    python -m sentinel_simulator backfill --if-empty
     python -m sentinel_simulator live
     python -m sentinel_simulator --outbreak SETTINGS backfill
     python -m sentinel_simulator --quiet backfill
 
 Detection compares the last 7 days with the 8 weeks before them, so a 63-day
-backfill gives it a full window on first run. Unless `--quiet` is given, the
+backfill gives it a full window on first run; `--if-empty` skips it when the API
+already holds reports from that window, so a stack started again keeps its
+history rather than gaining a second copy of it. Unless `--quiet` is given, the
 demo's rolling outbreaks run on top of the baseline, so the dashboards always
 have alerts to show; see sentinel_simulator.scenario. `--outbreak` injects an
 outbreak of your own, timed relative to now, with SETTINGS such as
@@ -76,6 +79,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
     backfill = commands.add_parser("backfill", help="post reports for the past N days, then stop")
     backfill.add_argument("--days", type=int, default=63, help="days of history (default: 63)")
+    backfill.add_argument(
+        "--if-empty",
+        action="store_true",
+        help="skip the backfill if the API already holds reports from the last nine weeks",
+    )
 
     live = commands.add_parser("live", help="post reports as they happen, until interrupted")
     live.add_argument(
@@ -109,6 +117,14 @@ def backfill(client, generator: Generator, days: int, now: datetime) -> int:
         f" in {elapsed:.1f} s ({rate:.0f}/s)"
     )
     return posted
+
+
+def holds_history(client) -> bool:
+    """Whether the API already holds reports from the window a backfill would fill."""
+    held = client.recent_report_count()
+    if held:
+        print(f"The API already holds {held:,} reports from the last nine weeks; no backfill.")
+    return held > 0
 
 
 def live(
@@ -157,6 +173,8 @@ def main(argv: list[str] | None = None) -> int:
     demo = planned_demo(args, now)
     try:
         with SentinelClient(args.api_url, key) as client:
+            if args.command == "backfill" and args.if_empty and holds_history(client):
+                return 0
             facilities = client.facilities()
             generator = Generator(
                 facilities, rng, spread_km=args.spread_km, outbreaks=outbreaks + demo

@@ -1,0 +1,8 @@
+# The build context is the repository root; the API image is built from these
+# files only. Everything else, .env and build output included, never leaves the
+# machine.
+*
+!backend/api/mvnw
+!backend/api/pom.xml
+!backend/api/.mvn
+!backend/api/src

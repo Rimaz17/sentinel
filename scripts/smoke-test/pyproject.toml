@@ -1,0 +1,18 @@
+[project]
+name = "sentinel-smoke-test"
+version = "0.1.0"
+description = "Checks a running full stack through its web container, from the site to the detector's alerts"
+requires-python = ">=3.12"
+# Standard library only.
+dependencies = []
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]

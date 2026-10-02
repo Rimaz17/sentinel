@@ -9,6 +9,88 @@ that range.
 
 ---
 
+## Run it
+
+The whole system, every service in its own container, starts with one command.
+It needs only **Docker with Compose** (Docker Desktop on Windows and macOS);
+Java, Node and Python are needed only to work on the code. From the repository
+root, copy the example settings:
+
+```bash
+cp infra/.env.example .env
+```
+
+They run as they are, which is how CI runs them, but for anything beyond a look
+on your own machine change the database password (`POSTGRES_PASSWORD` and
+`SENTINEL_DB_PASSWORD` alike), set `SENTINEL_JWT_SECRET` and `SENTINEL_FEED_KEY`
+each to the output of `openssl rand -base64 48`, and give the administrator a
+real address and a password of 12 characters or more. Then build and start:
+
+```bash
+docker compose --env-file .env -f infra/docker-compose.yml --profile app up -d --build
+```
+
+The command returns once the API is healthy and nine weeks of simulated
+history are in: about 12,000 reports, posted in two and a half minutes on the
+laptop described under [Measured pipeline](#measured-pipeline). The detector
+checks as soon as the history is in, so the demo's alerts are on the dashboards
+at once. Open **<http://localhost:8088>**: the public dashboard needs no
+account, and the sign-in page offers the demo accounts. Starting it again keeps
+the history rather than posting a second copy.
+
+| Command | What it does |
+|---|---|
+| `python scripts/smoke-test/smoke_test.py` | Checks the running stack from outside, as CI does: the site, the API through the proxy, the alert socket, district scope and the detector's alerts |
+| `docker compose --env-file .env -f infra/docker-compose.yml --profile app logs -f api` | Follows one service's log: `api`, `web`, `detector`, `simulator`, `simulator-backfill`, `postgres`, `kafka` or `redis` |
+| `docker compose --env-file .env -f infra/docker-compose.yml --profile app down` | Stops everything and keeps the data; `down -v` deletes it too. Without `--profile app`, the application's containers are left running |
+
+Once running, the stack used about 1.2 GB of memory, half of it the API and
+most of the rest Kafka. Only the site is published, on `127.0.0.1:8088`
+(`SENTINEL_WEB_PORT` changes it); PostgreSQL, Kafka and Redis stay on their
+loopback ports for tools. On an ARM machine, set `SENTINEL_POSTGIS_IMAGE` as
+`infra/.env.example` says. How each part runs on its own, for development, is
+under [Running the frontend](#running-the-frontend) and
+[Running the backend](#running-the-backend).
+
+## Architecture
+
+![Sentinel's architecture in seven layers: users (the public, data providers, health inspectors and the administrator, in a React and Leaflet app); the nginx web gateway; the Spring Boot API with its auth, ingestion, facility registry, alerts, live push, public API and admin parts; Apache Kafka and the stream processor; PostgreSQL with PostGIS, Redis and Flyway; the Python detector and report simulator; and Docker, Docker Compose and GitHub Actions. A red arrow shows alerts pushed live to inspectors.](docs/architecture/sentinel-architecture-overview.png)
+
+The overview groups the system into layers.
+[The detailed diagram](docs/architecture/sentinel-architecture.svg) shows
+every flow between the parts exactly, including where an alert starts: the
+detector writes it to PostgreSQL, and a database trigger announces it to the
+API, which pushes it to inspectors.
+
+The same, in words:
+
+1. **One origin.** Browsers reach one container, `web` (nginx), which serves
+   the React build and passes `/api` and the alert socket at `/api/ws` to the
+   API.
+2. **Identity stops at the front door.** A report reaches ingestion from a data
+   provider's `/submit` page, or from the simulator through the trusted report
+   feed. Ingestion validates it, drops every identity field, bands the age and
+   rounds the location, publishes it to Kafka keyed by its district, and
+   answers `202` once Kafka holds it.
+3. **Stored once, counted live.** The stream processor, in the same API,
+   stores each report once in PostgreSQL with PostGIS and adds it to its
+   district's seven-day window in Redis.
+4. **Checked every hour.** The Python detector compares each district and
+   symptom group's last seven days with the eight weeks before and, for each
+   series it flags, looks for reports bunched within 2 km across several
+   facilities. It writes alerts and their clusters to PostgreSQL.
+5. **Pushed as it commits.** A database trigger announces each alert raised or
+   changed; the API pushes it over STOMP to the inspectors whose districts
+   cover it, and to nobody else.
+6. **Coarse for the public.** The public API answers with district figures,
+   trends and published alerts, never a report's position, a facility or an
+   officer's note.
+
+Map tiles come from OpenStreetMap straight to the browser. In the full stack,
+each box in the detailed diagram tagged with a name is its own container; see
+[ADR 0021](docs/adr/0021-full-stack-in-docker-compose.md). A PNG of the
+detailed diagram, for slides, is beside it in `docs/architecture/`.
+
 ## Why it exists
 
 An outbreak rarely announces itself at a single clinic. It appears as a handful of
@@ -61,7 +143,7 @@ Inspectors see each cluster as a ring on the map. See
 | 4 | Accounts and roles, invite codes, PHI accounts, public dashboard | **Built** |
 | 5 | Real-time, Kafka, Redis windows, WebSocket alerts | **Built** |
 | 6 | Geography, PostGIS, DBSCAN, cluster rings | **Built** |
-| 7 | Ship it, Docker Compose, CI, deployed demo | Not started |
+| 7 | Ship it, Docker Compose, CI, deployed demo | **Built**, except the deployed demo and screen recording |
 | n/a | **Landing page**, the public entry point at `/` | **Built** |
 
 Phase 1 is the backend's walking skeleton: the facility registry seeded from
@@ -148,6 +230,22 @@ all of administration but may change only what visitors made, so nothing it can
 do leaves the demo broken for the next visitor, and every night at 03:00 Sri
 Lanka time what visitors made is removed. See
 [ADR 0017](docs/adr/0017-public-demo-mode.md).
+
+Phase 7 ships it:
+
+- **The whole stack in Docker Compose.** One command builds and starts the API,
+  the site, the simulator and the detector beside PostgreSQL, Kafka and Redis
+  (see [Run it](#run-it)). nginx serves the frontend and passes the API and the
+  alert socket through on one origin; the API counts each visitor, not the
+  proxy, for its sign-in rate limit; nine weeks of history are posted once, and
+  the detector checks as soon as they are in.
+- **Images built in CI.** Every pull request builds the four images, starts the
+  whole stack from them and runs a smoke test against it, as far as the
+  detector's first alerts (see [Continuous integration](#continuous-integration)).
+- **An architecture diagram,** above.
+
+See [ADR 0021](docs/adr/0021-full-stack-in-docker-compose.md). A deployed demo
+and a screen recording are still to come.
 
 ## Measured detection
 
@@ -289,7 +387,8 @@ pushed over WebSocket as the detector commits it.
 | Realtime | WebSocket (STOMP) for alert push |
 | Frontend | React + TypeScript + Vite, Tailwind CSS, TanStack Query |
 | Maps | Leaflet with OpenStreetMap tiles |
-| Local stack | Docker Compose |
+| Web server | nginx, serving the frontend's build and passing `/api` to the API |
+| Full and local stack | Docker Compose |
 | CI | GitHub Actions |
 
 Google Maps is not used anywhere. Its terms forbid using its tiles outside its own
@@ -355,6 +454,8 @@ Every other internal panel polls every 30 seconds while the tab is visible, and
 
 ## Running the backend
 
+This is the development setup, each part run on the host from its own
+terminal; to start everything in containers instead, see [Run it](#run-it).
 Requires **Docker**, **Java 17** and, for the simulator, **Python 3.12 or later**.
 Maven is not needed; the Maven wrapper fetches it.
 
@@ -373,6 +474,7 @@ cp infra/.env.example .env
 docker compose --env-file .env -f infra/docker-compose.yml up -d
 ```
 
+Without `--profile app`, this starts those three only, as before Phase 7.
 PostgreSQL listens on `localhost:5433`, Kafka on `localhost:9094` and Redis on
 `localhost:6380`, each one above its usual port, so none collides with one
 already installed. The database is PostgreSQL 17 with PostGIS
@@ -627,6 +729,23 @@ The submission page at `/submit` never asks for any identity field at all.
 | `python -m sentinel_detector evaluate-geography` | `backend/detector` | Measure the geographic check against point and wave outbreaks, as in [Measured geography](#measured-geography); a few minutes |
 | `python measure_pipeline.py` | `scripts/measure-pipeline` | Measure throughput and latency against a running stack, as in [Measured pipeline](#measured-pipeline); it adds reports, so use a throwaway one. See [its README](scripts/measure-pipeline/README.md) |
 | `pytest` · `ruff check .` · `black .` | `scripts/measure-pipeline` | Test, lint and format the measurement |
+| `python smoke_test.py` | `scripts/smoke-test` | Check a running full stack through its site; `--base-url` for another port, `--alert-timeout 0` to skip waiting for alerts |
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request and every push to `main`.
+A red build is never merged.
+
+| Job | What it checks |
+|---|---|
+| Frontend | Typecheck, lint, formatting, tests and the production build |
+| API | `./mvnw verify`: Spotless, unit tests, and integration tests against real PostgreSQL with PostGIS, Kafka and Redis started by Testcontainers |
+| Python | Ruff, Black and pytest for the simulator, the facility registry build and the pipeline measurement; Ruff and Black for the smoke test |
+| Detector | Ruff, Black and pytest, with Testcontainers |
+| Images and full stack | Builds the four images, with layers cached between runs, starts the whole stack from them on the example settings, and runs `scripts/smoke-test` against it: the site and a deep link, the public API through the proxy, the alert socket's origin check both ways, district scope both ways, and the detector's first alerts from the simulated history |
+
+The images are built from `infra/docker/`, one Dockerfile each, from the
+repository root. They are not pushed to a registry.
 
 ## Repository layout
 
@@ -656,10 +775,16 @@ sentinel/
 │                          district list, Leaflet map with cluster rings, weekly chart,
 │                          and the alert socket
 ├── infra/
-│   ├── docker-compose.yml Local PostgreSQL with PostGIS, Kafka and Redis
-│   └── .env.example       Local settings, dummy values; copy to .env at the root
+│   ├── docker-compose.yml PostgreSQL with PostGIS, Kafka and Redis; with
+│   │                      --profile app, the whole stack
+│   ├── docker/            One Dockerfile per image (api, web, detector, simulator),
+│   │                      each with its .dockerignore, and the site's nginx config
+│   └── .env.example       Settings, dummy values; copy to .env at the root
+├── .github/workflows/     CI: tests, image builds and the full-stack smoke test
 ├── docs/
 │   ├── adr/               Architecture decision records
+│   ├── architecture/      The architecture: an illustrated overview, and a
+│   │                      detailed diagram as SVG and PNG
 │   └── design/
 │       ├── PRODUCT.md     Product record
 │       ├── DESIGN.md      Design system, written from the built page
@@ -669,6 +794,7 @@ sentinel/
 │   ├── district-boundaries/ Builds the public map's district outlines from geoBoundaries
 │   ├── facility-registry/ Builds the registry seed from the Ministry of Health list
 │   ├── measure-pipeline/  Measures the pipeline's throughput and latency
+│   ├── smoke-test/        Checks a running full stack through its site
 │   └── git-hooks/         commit-msg hook
 └── README.md
 ```
@@ -732,7 +858,11 @@ These are documented on purpose and are not defects.
   inspector's districts takes effect at the next session renewal, at most 15
   minutes later.
 - **Rate limits are counted in memory, per client address.** A restart forgets
-  them, and behind a reverse proxy every visitor shares the proxy's address.
+  them. Behind the full stack's web container, each visitor is counted by the
+  address in `X-Forwarded-For`, which the API trusts from a private network
+  address only; a TLS proxy in front of a deployed demo must put the visitor's
+  real address last in that header, as Caddy and Cloudflare do. See
+  [ADR 0021](docs/adr/0021-full-stack-in-docker-compose.md).
 - **Invite codes are stored as SHA-256 hashes.** Registration has to find the
   facility by its code, so they cannot use BCrypt; a copy of the table would let
   codes of about 35 bits be recovered offline.
@@ -792,6 +922,19 @@ These are documented on purpose and are not defects.
   See [ADR 0017](docs/adr/0017-public-demo-mode.md).
 - **The demo administrator sees every account's name and email** until the
   nightly reset, so the demo's pages ask visitors for made-up details.
+- **The full stack serves plain HTTP.** The refresh cookie is `Secure`, which
+  browsers accept over HTTP from `localhost` only, so a demo reached any other
+  way needs HTTPS in front of the site's port, or every visitor is signed out
+  when their 15-minute access token ends.
+- **A stack stopped for days keeps a gap in its reports.** On a restart the
+  simulator posts from that moment, and the backfill sees recent history and
+  skips, so the baseline holds too few reports until the gap leaves the
+  nine-week window. Start afresh with `down -v` after a long stop.
+- **The official PostGIS image is built for x86-64 only.** On an ARM machine,
+  `SENTINEL_POSTGIS_IMAGE` swaps in a build for both from one of its
+  maintainers; every other image is published for both.
+- **Images are built in CI, not published.** Nothing pulls them yet, so a
+  deployment builds them from the repository.
 - **Detection assumes a stable baseline.** A prior year containing a real epidemic
   inflates "normal" and reduces future sensitivity. Periodic recalibration would be
   needed.
