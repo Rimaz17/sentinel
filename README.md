@@ -851,7 +851,11 @@ These are documented on purpose and are not defects.
   inspector's districts takes effect at the next session renewal, at most 15
   minutes later.
 - **Rate limits are counted in memory, per client address.** A restart forgets
-  them, and behind a reverse proxy every visitor shares the proxy's address.
+  them. Behind the full stack's web container, each visitor is counted by the
+  address in `X-Forwarded-For`, which the API trusts from a private network
+  address only; a TLS proxy in front of a deployed demo must put the visitor's
+  real address last in that header, as Caddy and Cloudflare do. See
+  [ADR 0021](docs/adr/0021-full-stack-in-docker-compose.md).
 - **Invite codes are stored as SHA-256 hashes.** Registration has to find the
   facility by its code, so they cannot use BCrypt; a copy of the table would let
   codes of about 35 bits be recovered offline.
