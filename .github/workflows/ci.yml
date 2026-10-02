@@ -152,3 +152,92 @@ jobs:
       # evaluation tests use the simulator from ../simulator.
       - name: Test
         run: pytest
+
+  stack:
+    name: Images and full stack
+    runs-on: ubuntu-latest
+    # The first build fills the cache; later ones take a few minutes, and the
+    # backfill about three more.
+    timeout-minutes: 40
+    env:
+      COMPOSE: docker compose --env-file .env -f infra/docker-compose.yml --profile app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Each image is built as compose builds it, from the repository root, and
+      # loaded under the name compose runs it by. Layers are cached between runs.
+      # Nothing is pushed anywhere.
+      - name: Build the API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/docker/api.Dockerfile
+          tags: sentinel-api:local
+          load: true
+          provenance: false
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,scope=api,mode=max
+
+      - name: Build the web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/docker/web.Dockerfile
+          tags: sentinel-web:local
+          load: true
+          provenance: false
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,scope=web,mode=max
+
+      - name: Build the detector image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/docker/detector.Dockerfile
+          tags: sentinel-detector:local
+          load: true
+          provenance: false
+          cache-from: type=gha,scope=detector
+          cache-to: type=gha,scope=detector,mode=max
+
+      - name: Build the simulator image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/docker/simulator.Dockerfile
+          tags: sentinel-simulator:local
+          load: true
+          provenance: false
+          cache-from: type=gha,scope=simulator
+          cache-to: type=gha,scope=simulator,mode=max
+
+      # The example settings, as they are: a stack on a throwaway runner, with
+      # every port on loopback.
+      - name: Settings
+        run: cp infra/.env.example .env
+
+      # Returns once the API is healthy and the backfill has finished, or fails
+      # if either does not.
+      - name: Start the full stack
+        run: $COMPOSE up -d --no-build
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # The site, the API through the proxy, the alert socket's origin check,
+      # district scope, and the detector's first alerts from the simulated
+      # history.
+      - name: Smoke test
+        run: python scripts/smoke-test/smoke_test.py --alert-timeout 600
+
+      - name: Logs
+        if: failure()
+        run: $COMPOSE logs --no-color --tail 200
+
+      - name: Stop
+        if: always()
+        run: $COMPOSE down -v
