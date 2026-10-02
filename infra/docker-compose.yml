@@ -10,8 +10,11 @@ services:
   # PostgreSQL 17 with PostGIS, for report locations and distance queries
   # (docs/adr/0019). The same server as the plain image, so a volume written by
   # postgres:17-alpine opens unchanged; the extension is created by migration.
+  # The official image is built for x86-64 only; on an ARM machine, set
+  # SENTINEL_POSTGIS_IMAGE to imresamu/postgis:17-3.5-alpine, the same build for
+  # both, from one of the official image's maintainers.
   postgres:
-    image: postgis/postgis:17-3.5-alpine
+    image: ${SENTINEL_POSTGIS_IMAGE:-postgis/postgis:17-3.5-alpine}
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
       POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
