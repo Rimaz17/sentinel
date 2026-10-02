@@ -1,8 +1,15 @@
-# Local development services: the database, the event stream and the live
-# counters. The API, the simulator and the detector run on the host.
+# Sentinel in containers. Run from the repository root.
 #
-# Run from the repository root:
+# The database, the event stream and the live counters alone, for development
+# with the API, the simulator and the detector run on the host:
 #   docker compose --env-file .env -f infra/docker-compose.yml up -d
+#
+# The whole stack, built from this checkout, the site on http://localhost:8088:
+#   docker compose --env-file .env -f infra/docker-compose.yml --profile app up -d --build
+#
+# Stop either with `down`, adding `--profile app` for the whole stack: without
+# it, the application's containers are left running. `down -v` also deletes
+# the data. See docs/adr/0021-full-stack-in-docker-compose.md.
 
 name: sentinel
 
