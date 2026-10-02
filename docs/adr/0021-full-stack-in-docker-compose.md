@@ -95,8 +95,10 @@ Running them in containers raises questions the host setup never did:
 - The rate limit counts each visitor behind nginx. The header is trusted from
   any private address, and the published port is loopback only, so only a
   process on the same machine can claim another address: in a deployed demo,
-  the TLS proxy or tunnel in front, which must set `X-Forwarded-For` itself
-  rather than pass on a visitor's. Caddy and Cloudflare Tunnel both do.
+  the TLS proxy or tunnel in front. Tomcat reads the header from the right,
+  skipping private addresses, so that proxy must put the visitor's real
+  address last, whatever the visitor sent: Caddy replaces the header with it,
+  and Cloudflare appends it.
 - A stack stopped for days and started again has a gap in its reports: the
   simulator posts from the moment it starts, and the backfill sees recent
   history and skips. The baseline then holds too few reports until the gap
