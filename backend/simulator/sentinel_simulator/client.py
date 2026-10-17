@@ -11,6 +11,7 @@ from __future__ import annotations
 import http.client
 import json
 import time
+from datetime import UTC, datetime
 from urllib.parse import urlsplit
 
 from sentinel_simulator.generator import Facility, SimulatedReport
@@ -66,6 +67,14 @@ class SentinelClient:
         if status != 200:
             raise ApiError(status, _detail(body))
         return sum(sum(week["counts"].values()) for week in json.loads(body)["weeks"])
+
+    def latest_reported_at(self) -> datetime | None:
+        """When the latest report the API holds presented, or None if it holds none."""
+        status, body = self._request("GET", "/api/ingestion/reports/latest")
+        if status != 200:
+            raise ApiError(status, _detail(body))
+        value = json.loads(body)["reportedAt"]
+        return None if value is None else datetime.fromisoformat(value).astimezone(UTC)
 
     def submit(self, report: SimulatedReport) -> dict:
         status, body = self._request(
