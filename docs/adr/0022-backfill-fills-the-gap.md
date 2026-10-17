@@ -56,14 +56,19 @@ The backfill fills whatever is missing, from the API's latest report up to now.
 
 - The dashboards look current after any stop, with no command to run. The stack
   still never posts a second copy: what it posts is only what is missing.
-- A start after a long stop takes longer. A two-week gap is about 3,000
-  reports, about a minute at the 50 a second one sequential backfill runs at
-  ([measurements](../measurements.md)), before the live simulator and the
-  detector start.
-- The gap is measured from the latest report of any kind. A data provider's
+- A start after a long stop takes longer, before the live simulator and the
+  detector start. Filling the 16 days from 2 to 17 October 2026 on the
+  author's machine posted 3,246 reports in 81 seconds, 40 a second, a little
+  below the 50 a second of [measurements](../measurements.md).
+- The gap is measured from the latest report of any kind, so only a gap at the
+  end is found; a hole behind the latest report is not. A data provider's
   report submitted while the simulator was stopped, with the API running on its
   own, makes the gap before it look filled. In the compose stack the API and
   the simulator start and stop together, so this needs a stack run in pieces.
+  A stack started on the old `--if-empty` backfill has its hole behind the live
+  reports posted since, so this change does not fill it; it leaves the
+  nine-week window nine weeks later. The author's own was filled once by hand,
+  posting just its days with the simulator's generator.
 - A backfill stopped part way leaves its history up to the latest report it
   stored. Starting the stack again carries on from about there, rather than
   skipping, as `--if-empty` would have. The service is still not restarted on
