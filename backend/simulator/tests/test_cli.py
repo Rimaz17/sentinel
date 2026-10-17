@@ -74,6 +74,25 @@ def test_an_api_holding_no_report_gets_the_full_history(capsys):
     assert "holds no reports; posting 63 days of history" in capsys.readouterr().out
 
 
+def test_a_latest_report_older_than_the_window_gets_the_full_history(capsys):
+    latest = NOW - timedelta(days=90)
+
+    assert gap_start(LatestClient(latest), NOW, days=63) == NOW - timedelta(days=63)
+    assert "before the 63 days a backfill covers; posting all of them" in capsys.readouterr().out
+
+
+def test_a_stack_started_again_at_once_fills_only_the_minutes_since(capsys):
+    latest = NOW - timedelta(minutes=3)
+
+    assert gap_start(LatestClient(latest), NOW, days=63) == latest
+    assert "filling the 3 minutes since" in capsys.readouterr().out
+
+
+def test_nothing_is_missing_when_the_latest_report_is_from_now(capsys):
+    assert gap_start(LatestClient(NOW), NOW, days=63) == NOW
+    assert "nothing is missing" in capsys.readouterr().out
+
+
 class HoldingClient:
     def __init__(self, held):
         self.held = held
