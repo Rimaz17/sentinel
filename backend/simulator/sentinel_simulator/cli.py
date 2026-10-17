@@ -101,6 +101,19 @@ def planned_demo(args: argparse.Namespace, now: datetime) -> list[Outbreak]:
     return demo_outbreaks(now, now + LIVE_HORIZON)
 
 
+def describe_span(span: timedelta) -> str:
+    """A length of time in the largest unit that reads naturally: days, hours or minutes."""
+    minutes = round(span.total_seconds() / 60)
+    if minutes < 1:
+        return "less than a minute"
+    if minutes < 120:
+        return f"{minutes} minute{'' if minutes == 1 else 's'}"
+    hours = round(minutes / 60)
+    if hours < 48:
+        return f"{hours} hours"
+    return f"{round(hours / 24)} days"
+
+
 def backfill(client, generator: Generator, days: int, now: datetime) -> int:
     start = now - timedelta(days=days)
     posted = 0
