@@ -96,8 +96,9 @@ These are documented on purpose and are not defects.
   ([ADR 0022](adr/0022-backfill-fills-the-gap.md)). A data provider's report
   submitted while the simulator alone was stopped makes the gap before it look
   filled; the compose stack starts and stops them together, so this needs a
-  stack run in pieces. A start after a long stop also takes about a minute more
-  for each two weeks missing.
+  stack run in pieces. Only a gap at the end is found, so a hole left by a
+  stack that ran before this change stays until it leaves the nine-week window.
+  A start after a long stop also takes longer: 16 missing days took 81 seconds.
 - **The official PostGIS image is built for x86-64 only.** On an ARM machine,
   `SENTINEL_POSTGIS_IMAGE` swaps in a build for both from one of its
   maintainers; every other image is published for both.
