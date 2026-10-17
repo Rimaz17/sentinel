@@ -168,6 +168,15 @@ def test_a_backfill_plans_the_demo_outbreaks_of_its_own_days():
     assert any(o.start <= NOW < o.end for o in planned)
 
 
+def test_a_backfill_from_a_given_start_plans_only_the_outbreaks_since():
+    start = NOW - timedelta(days=16)
+    planned = planned_demo(parse_args(["backfill", "--days", "63"]), NOW, start)
+
+    assert planned
+    assert all(o.end > start and o.start < NOW for o in planned)
+    assert len(planned) < len(planned_demo(parse_args(["backfill", "--days", "63"]), NOW))
+
+
 def test_a_live_run_plans_the_demo_outbreaks_years_ahead():
     planned = planned_demo(parse_args(["live"]), NOW)
 
