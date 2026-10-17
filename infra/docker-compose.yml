@@ -156,25 +156,27 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # Nine weeks of history, which detection compares against, posted once and
-  # then exits. Skipped when the API already holds reports from those weeks, so
-  # starting the stack again never posts a second copy.
+  # Whatever the reports are missing, posted each time the stack starts, and
+  # then exits: nine weeks of history, which detection compares against, on a
+  # first start, and after a stop, the days since the latest report, so the
+  # dashboards never show a hole however long the stack was off. Started again
+  # at once, it finds almost nothing missing and posts almost nothing, never a
+  # second copy (docs/adr/0022).
   simulator-backfill:
     profiles: [app]
     build:
       context: ..
       dockerfile: infra/docker/simulator.Dockerfile
     image: sentinel-simulator:local
-    command: ["backfill", "--days", "63", "--if-empty"]
+    command: ["backfill", "--days", "63", "--fill-gap"]
     environment: &simulator-environment
       SENTINEL_API_URL: http://api:8080
       SENTINEL_FEED_KEY: ${SENTINEL_FEED_KEY:?set SENTINEL_FEED_KEY in .env}
     depends_on:
       api:
         condition: service_healthy
-    # Not restarted: a backfill stopped part way would then find reports and
-    # skip, leaving part of the history. A failure stops the stack's start
-    # instead, and says so.
+    # Not restarted: a failure stops the stack's start instead, and says so.
+    # Starting the stack again carries on from about where it stopped.
     restart: "no"
 
   # Reports as they happen, with the demo's outbreaks, once the history is in.

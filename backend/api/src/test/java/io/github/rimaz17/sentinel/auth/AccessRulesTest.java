@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.github.rimaz17.sentinel.IntegrationTest;
 import io.github.rimaz17.sentinel.TestAccounts;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,18 @@ class AccessRulesTest {
       })
   void theFeedReadsNothingButTheRegistry(String path) throws Exception {
     mvc.perform(get(path).with(TestAccounts.asFeed())).andExpect(status().isForbidden());
+  }
+
+  @Test
+  void theLatestReportTimeIsTheFeedsAlone() throws Exception {
+    String path = "/api/ingestion/reports/latest";
+    mvc.perform(get(path))
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.detail").value(SecurityProblems.SIGN_IN));
+    mvc.perform(get(path).with(accounts.as(provider))).andExpect(status().isForbidden());
+    mvc.perform(get(path).with(accounts.as(admin))).andExpect(status().isForbidden());
+    mvc.perform(get(path).with(accounts.asInspector("*"))).andExpect(status().isForbidden());
+    mvc.perform(get(path).with(TestAccounts.asFeed())).andExpect(status().isOk());
   }
 
   @ParameterizedTest

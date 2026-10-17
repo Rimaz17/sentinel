@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -69,6 +70,13 @@ interface ReportRepository extends JpaRepository<Report, UUID> {
       """)
   List<Report> findLocatedIn(
       Instant from, Instant to, Collection<String> districtCodes, Limit limit);
+
+  /**
+   * When the most recent report up to {@code now} presented, or empty if none had. A report dated
+   * ahead of {@code now}, as ingestion's clock-skew allowance lets through, is not counted.
+   */
+  @Query("select max(r.reportedAt) from Report r where r.reportedAt <= :now")
+  Optional<Instant> findLatestReportedAtUpTo(Instant now);
 
   /** Every report that presented at or after {@code since}, as the seven-day windows hold it. */
   @Query(

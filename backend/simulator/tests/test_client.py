@@ -33,39 +33,22 @@ FACILITIES = [
 ]
 
 
-# Two of the nine weeks /api/public/trends returns, as the API words them.
-TRENDS = {
-    "districtCode": None,
-    "asOf": "2026-09-27T05:00:00Z",
-    "weeks": [
-        {
-            "start": "2026-09-13T05:00:00Z",
-            "end": "2026-09-20T05:00:00Z",
-            "counts": {"DENGUE_LIKE": 40, "INFLUENZA_LIKE": 2},
-        },
-        {
-            "start": "2026-09-20T05:00:00Z",
-            "end": "2026-09-27T05:00:00Z",
-            "counts": {"DENGUE_LIKE": 0, "GASTROINTESTINAL": 5},
-        },
-    ],
-}
-
-
 class FakeApi(BaseHTTPRequestHandler):
     """Answers as the Sentinel API does, and remembers what it was sent."""
 
     protocol_version = "HTTP/1.1"
     received: list = []
     connections: set = set()
+    # When the latest stored report presented, as the API words it; None when it holds none.
+    latest: str | None = None
 
     def do_GET(self):
         FakeApi.connections.add(self.client_address)
         if self.headers.get("X-Feed-Key") != KEY:
             self._reply(401, {"detail": "The feed key is not recognised."})
             return
-        if self.path == "/api/public/trends":
-            self._reply(200, TRENDS)
+        if self.path == "/api/ingestion/reports/latest":
+            self._reply(200, {"reportedAt": FakeApi.latest})
             return
         self._reply(200, FACILITIES)
 
@@ -105,6 +88,7 @@ class FakeApi(BaseHTTPRequestHandler):
 def api():
     FakeApi.received = []
     FakeApi.connections = set()
+    FakeApi.latest = None
     server = ThreadingHTTPServer(("127.0.0.1", 0), FakeApi)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -137,9 +121,17 @@ def test_reads_the_facility_registry(api):
     assert facilities[1].latitude is None
 
 
-def test_counts_the_reports_held_from_the_last_nine_weeks(api):
+def test_reads_when_the_latest_report_presented(api):
+    FakeApi.latest = "2026-10-02T15:04:26.512Z"
     with SentinelClient(api, KEY) as client:
-        assert client.recent_report_count() == 47
+        latest = client.latest_reported_at()
+    assert latest == datetime(2026, 10, 2, 15, 4, 26, 512000, tzinfo=UTC)
+    assert latest.utcoffset().total_seconds() == 0
+
+
+def test_reads_that_the_api_holds_no_report(api):
+    with SentinelClient(api, KEY) as client:
+        assert client.latest_reported_at() is None
 
 
 def test_submits_a_report_as_its_facility(api):

@@ -124,6 +124,17 @@ about twenty an hour at a weekday's morning peak and about one an hour
 overnight. `--seed N` makes a run repeatable; `--api-url`, or `SENTINEL_API_URL`,
 points it at another API.
 
+Live mode posts only while it runs, so a break leaves a gap. After one, fill it
+rather than backfilling again:
+
+```bash
+python -m sentinel_simulator backfill --fill-gap
+```
+
+It asks the API when its latest report presented and posts from then to now,
+or all `--days` when the API holds none since then; the compose stack runs it
+on every start ([ADR 0022](adr/0022-backfill-fills-the-gap.md)).
+
 **The demo's outbreaks run by default**, so the dashboards always have alerts to
 show ([ADR 0018](adr/0018-demo-outbreaks-by-default.md)). On top of the
 baseline, a new outbreak starts every three and a half days and lasts ten, each

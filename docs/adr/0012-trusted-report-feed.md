@@ -1,6 +1,6 @@
 # 0012, The simulator submits through a trusted report feed
 
-Status: accepted · 2026-09-28
+Status: accepted · 2026-09-28 · amended 2026-10-18: the feed reads the latest report time
 
 ## Context
 
@@ -36,7 +36,9 @@ each report in `X-Facility-Code`. The simulator is the feed.
   authority, `FEED`, outside the role enum, and holds no account. It may submit
   reports and read the facility registry, which the simulator needs to know
   which facilities exist, and nothing else: no reports, alerts, districts or
-  administration.
+  administration. Since 2026-10-18 it also reads one time, when the latest
+  stored report presented, so the backfill posts only what is missing
+  ([ADR 0022](0022-backfill-fills-the-gap.md)); still no report itself.
 - **Data providers are unchanged by it.** For a signed-in data provider the
   facility comes from their token. An `X-Facility-Code` header or a facility
   field in the body is ignored, and a test proves a Kandy provider naming Colombo

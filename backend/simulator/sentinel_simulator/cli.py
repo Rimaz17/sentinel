@@ -1,15 +1,16 @@
 """Command line: fill in history, or keep reports flowing in real time.
 
     python -m sentinel_simulator backfill --days 63
-    python -m sentinel_simulator backfill --if-empty
+    python -m sentinel_simulator backfill --fill-gap
     python -m sentinel_simulator live
     python -m sentinel_simulator --outbreak SETTINGS backfill
     python -m sentinel_simulator --quiet backfill
 
 Detection compares the last 7 days with the 8 weeks before them, so a 63-day
-backfill gives it a full window on first run; `--if-empty` skips it when the API
-already holds reports from that window, so a stack started again keeps its
-history rather than gaining a second copy of it. Unless `--quiet` is given, the
+backfill gives it a full window on first run; `--fill-gap` posts only what the
+API is missing, from its latest report up to now, so a stack started again after
+days or weeks off has no hole in its history, and one started again at once
+gains almost nothing, never a second copy. Unless `--quiet` is given, the
 demo's rolling outbreaks run on top of the baseline, so the dashboards always
 have alerts to show; see sentinel_simulator.scenario. `--outbreak` injects an
 outbreak of your own, timed relative to now, with SETTINGS such as
@@ -80,9 +81,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     backfill = commands.add_parser("backfill", help="post reports for the past N days, then stop")
     backfill.add_argument("--days", type=int, default=63, help="days of history (default: 63)")
     backfill.add_argument(
-        "--if-empty",
+        "--fill-gap",
         action="store_true",
-        help="skip the backfill if the API already holds reports from the last nine weeks",
+        help=(
+            "post only what the API is missing: from its latest report up to now, or all"
+            " --days when it holds none since then"
+        ),
     )
 
     live = commands.add_parser("live", help="post reports as they happen, until interrupted")
@@ -92,17 +96,33 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def planned_demo(args: argparse.Namespace, now: datetime) -> list[Outbreak]:
-    """The demo's outbreaks this run will post, or none with --quiet."""
+def planned_demo(
+    args: argparse.Namespace, now: datetime, start: datetime | None = None
+) -> list[Outbreak]:
+    """The demo's outbreaks this run will post, or none with --quiet. A backfill posts from
+    `start`, or from --days back when it is not given."""
     if args.quiet:
         return []
     if args.command == "backfill":
-        return demo_outbreaks(now - timedelta(days=args.days), now)
+        return demo_outbreaks(start or now - timedelta(days=args.days), now)
     return demo_outbreaks(now, now + LIVE_HORIZON)
 
 
-def backfill(client, generator: Generator, days: int, now: datetime) -> int:
-    start = now - timedelta(days=days)
+def describe_span(span: timedelta) -> str:
+    """A length of time in the largest unit that reads naturally: days, hours or minutes."""
+    minutes = round(span.total_seconds() / 60)
+    if minutes < 1:
+        return "less than a minute"
+    if minutes < 120:
+        return f"{minutes} minute{'' if minutes == 1 else 's'}"
+    hours = round(minutes / 60)
+    if hours < 48:
+        return f"{hours} hours"
+    return f"{round(hours / 24)} days"
+
+
+def backfill(client, generator: Generator, start: datetime, now: datetime) -> int:
+    """Post every report presenting in [start, now)."""
     posted = 0
     began = time.monotonic()
     for report in generator.reports(start, now):
@@ -113,18 +133,34 @@ def backfill(client, generator: Generator, days: int, now: datetime) -> int:
     elapsed = time.monotonic() - began
     rate = posted / elapsed if elapsed > 0 else 0.0
     print(
-        f"Backfill complete: {posted:,} reports over {days} days"
+        f"Backfill complete: {posted:,} reports over {describe_span(now - start)}"
         f" in {elapsed:.1f} s ({rate:.0f}/s)"
     )
     return posted
 
 
-def holds_history(client) -> bool:
-    """Whether the API already holds reports from the window a backfill would fill."""
-    held = client.recent_report_count()
-    if held:
-        print(f"The API already holds {held:,} reports from the last nine weeks; no backfill.")
-    return held > 0
+def gap_start(client, now: datetime, days: int) -> datetime:
+    """Where a backfill that fills the gap starts: at the API's latest report, or `days` back
+    when it holds none since then. `now` itself when nothing is missing."""
+    window = now - timedelta(days=days)
+    latest = client.latest_reported_at()
+    if latest is None:
+        print(f"The API holds no reports; posting {describe_span(now - window)} of history.")
+        return window
+    if latest <= window:
+        print(
+            f"The API's latest report is from {latest:%Y-%m-%d %H:%M} UTC, before the"
+            f" {describe_span(now - window)} a backfill covers; posting all of them."
+        )
+        return window
+    if latest >= now:
+        print("The API's latest report is from now; nothing is missing.")
+        return now
+    print(
+        f"The API's latest report is from {latest:%Y-%m-%d %H:%M} UTC;"
+        f" filling the {describe_span(now - latest)} since."
+    )
+    return latest
 
 
 def live(
@@ -170,11 +206,16 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
-    demo = planned_demo(args, now)
     try:
         with SentinelClient(args.api_url, key) as client:
-            if args.command == "backfill" and args.if_empty and holds_history(client):
-                return 0
+            start = None
+            if args.command == "backfill":
+                start = now - timedelta(days=args.days)
+                if args.fill_gap:
+                    start = gap_start(client, now, args.days)
+                    if start >= now:
+                        return 0
+            demo = planned_demo(args, now, start)
             facilities = client.facilities()
             generator = Generator(
                 facilities, rng, spread_km=args.spread_km, outbreaks=outbreaks + demo
@@ -195,7 +236,7 @@ def main(argv: list[str] | None = None) -> int:
                         "  It starts after the backfill ends, so the backfill will not include it."
                     )
             if args.command == "backfill":
-                backfill(client, generator, args.days, now)
+                backfill(client, generator, start, now)
             else:
                 print(f"Posting live every {args.interval:g} s; Ctrl+C to stop", flush=True)
                 live(client, generator, args.interval)

@@ -1,6 +1,6 @@
 # 0021, the full stack in Docker Compose, and images built in CI
 
-Status: accepted · 2026-10-02
+Status: accepted · 2026-10-02 · amended 2026-10-18: the backfill fills the gap
 
 ## Context
 
@@ -67,6 +67,10 @@ Running them in containers raises questions the host setup never did:
   instead. The live `simulator` and the `detector` both wait for it to
   complete, so the detector's first check, made as it starts, finds the
   history and raises the demo's alerts within minutes of a first start.
+  Amended 2026-10-18 ([ADR 0022](0022-backfill-fills-the-gap.md)): skipping
+  left a stack started after days off with a hole in its reports, so the
+  service now runs `backfill --days 63 --fill-gap`, which posts whatever is
+  missing since the API's latest report, and on a fresh volume all nine weeks.
 - **Images built from the repository root,** one Dockerfile each in
   `infra/docker/`, each with its own `.dockerignore` listing the few paths it
   is built from, so `.env`, build output and `node_modules` never enter a
