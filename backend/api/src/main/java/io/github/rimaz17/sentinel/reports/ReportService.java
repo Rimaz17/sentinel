@@ -102,6 +102,16 @@ public class ReportService {
     }
   }
 
+  /**
+   * When the most recent stored report presented, or empty if none is stored. A report dated ahead
+   * of now is passed over, so it cannot hide reports missing before it. The report feed asks, to
+   * post only what is missing since (docs/adr/0022).
+   */
+  @Transactional(readOnly = true)
+  public Optional<Instant> latestReportedAt() {
+    return reports.findLatestReportedAtUpTo(clock.instant());
+  }
+
   /*
    * The queries below take the districts they may look at: a list of codes, or null for the whole
    * country. An empty list is a caller who may see no district at all, and finds nothing.
