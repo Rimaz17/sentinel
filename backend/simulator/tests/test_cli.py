@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from sentinel_simulator.baselines import WEEKLY_BASELINES
 from sentinel_simulator.cli import (
     backfill,
+    describe_span,
     holds_history,
     live,
     main,
@@ -37,6 +38,17 @@ def test_backfill_posts_every_report_in_the_window(capsys):
     assert posted == len(client.submitted) > 0
     assert all(NOW - timedelta(days=7) <= r.reported_at < NOW for r in client.submitted)
     assert "Backfill complete" in capsys.readouterr().out
+
+
+def test_a_span_is_described_in_the_largest_unit_that_reads_naturally():
+    assert describe_span(timedelta(seconds=20)) == "less than a minute"
+    assert describe_span(timedelta(minutes=1)) == "1 minute"
+    assert describe_span(timedelta(minutes=12)) == "12 minutes"
+    assert describe_span(timedelta(minutes=119)) == "119 minutes"
+    assert describe_span(timedelta(hours=5, minutes=10)) == "5 hours"
+    assert describe_span(timedelta(hours=47)) == "47 hours"
+    assert describe_span(timedelta(days=15, hours=23)) == "16 days"
+    assert describe_span(timedelta(days=63)) == "63 days"
 
 
 class HoldingClient:
