@@ -5,6 +5,7 @@ from sentinel_simulator.baselines import WEEKLY_BASELINES
 from sentinel_simulator.cli import (
     backfill,
     describe_span,
+    gap_start,
     holds_history,
     live,
     main,
@@ -49,6 +50,28 @@ def test_a_span_is_described_in_the_largest_unit_that_reads_naturally():
     assert describe_span(timedelta(hours=47)) == "47 hours"
     assert describe_span(timedelta(days=15, hours=23)) == "16 days"
     assert describe_span(timedelta(days=63)) == "63 days"
+
+
+class LatestClient:
+    """Answers when the API's latest report presented, as SentinelClient does."""
+
+    def __init__(self, latest):
+        self.latest = latest
+
+    def latest_reported_at(self):
+        return self.latest
+
+
+def test_a_gap_is_filled_from_the_apis_latest_report(capsys):
+    latest = datetime(2026, 9, 11, 5, 30, tzinfo=UTC)
+
+    assert gap_start(LatestClient(latest), NOW, days=63) == latest
+    assert "from 2026-09-11 05:30 UTC; filling the 16 days since" in capsys.readouterr().out
+
+
+def test_an_api_holding_no_report_gets_the_full_history(capsys):
+    assert gap_start(LatestClient(None), NOW, days=63) == NOW - timedelta(days=63)
+    assert "holds no reports; posting 63 days of history" in capsys.readouterr().out
 
 
 class HoldingClient:
