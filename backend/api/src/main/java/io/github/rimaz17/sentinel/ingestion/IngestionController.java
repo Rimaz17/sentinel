@@ -2,9 +2,11 @@ package io.github.rimaz17.sentinel.ingestion;
 
 import io.github.rimaz17.sentinel.accounts.Role;
 import io.github.rimaz17.sentinel.auth.Caller;
+import io.github.rimaz17.sentinel.reports.ReportService;
 import io.github.rimaz17.sentinel.web.ApiProblem;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,9 +29,11 @@ class IngestionController {
       "A report from the feed must name its facility in the X-Facility-Code header.";
 
   private final IngestionService ingestion;
+  private final ReportService reports;
 
-  IngestionController(IngestionService ingestion) {
+  IngestionController(IngestionService ingestion, ReportService reports) {
     this.ingestion = ingestion;
+    this.reports = reports;
   }
 
   /** Accepted rather than created: the report is on the stream, and is stored after the reply. */
@@ -40,6 +44,16 @@ class IngestionController {
       @RequestHeader(name = FACILITY_HEADER, required = false) String facilityHeader,
       @Valid @RequestBody ReportSubmission submission) {
     return ingestion.submit(facilityCode(caller, facilityHeader), submission);
+  }
+
+  /**
+   * When the most recent stored report presented, so the report feed, starting again after a stop,
+   * posts only what is missing since. A time and nothing else: no report, district or facility. See
+   * docs/adr/0022-backfill-fills-the-gap.md.
+   */
+  @GetMapping("/latest")
+  LatestReport latest() {
+    return new LatestReport(reports.latestReportedAt().orElse(null));
   }
 
   /**
