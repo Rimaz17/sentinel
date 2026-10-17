@@ -1,6 +1,7 @@
 import random
 from datetime import UTC, datetime, timedelta
 
+from sentinel_simulator import cli
 from sentinel_simulator.baselines import WEEKLY_BASELINES
 from sentinel_simulator.cli import (
     backfill,
@@ -90,6 +91,56 @@ def test_a_stack_started_again_at_once_fills_only_the_minutes_since(capsys):
 
 def test_nothing_is_missing_when_the_latest_report_is_from_now(capsys):
     assert gap_start(LatestClient(NOW), NOW, days=63) == NOW
+    assert "nothing is missing" in capsys.readouterr().out
+
+
+class GapApi(RecordingClient):
+    """The API to a whole run of main: a registry, a latest report and somewhere to post.
+    It stands in for the SentinelClient class, so calling it opens it."""
+
+    def __init__(self, latest):
+        super().__init__()
+        self.latest = latest
+
+    def __call__(self, api_url, feed_key):
+        return self
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        pass
+
+    def facilities(self):
+        return [Facility(f"P{d}0000001", d, "Teaching", 7.0, 80.5) for d in WEEKLY_BASELINES]
+
+    def latest_reported_at(self):
+        return self.latest
+
+
+def run_with(api, monkeypatch, *argv):
+    monkeypatch.setenv("SENTINEL_FEED_KEY", "a-feed-key-for-tests-only-0123456789")
+    monkeypatch.setattr(cli, "SentinelClient", api)
+    return main(list(argv))
+
+
+def test_a_fill_gap_backfill_posts_from_the_latest_report_to_now(monkeypatch, capsys):
+    latest = datetime.now(UTC) - timedelta(days=2)
+    api = GapApi(latest)
+
+    assert run_with(api, monkeypatch, "--seed", "3", "backfill", "--fill-gap") == 0
+
+    assert api.submitted
+    assert all(latest <= r.reported_at < datetime.now(UTC) for r in api.submitted)
+    assert "filling the 2 days since" in capsys.readouterr().out
+
+
+def test_a_fill_gap_backfill_with_nothing_missing_posts_nothing(monkeypatch, capsys):
+    api = GapApi(datetime.now(UTC) + timedelta(minutes=1))
+
+    assert run_with(api, monkeypatch, "backfill", "--fill-gap") == 0
+
+    assert api.submitted == []
     assert "nothing is missing" in capsys.readouterr().out
 
 
