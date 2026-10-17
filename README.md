@@ -91,6 +91,11 @@ and the detector checks at once, so alerts are on the dashboards straight away.
 Open **<http://localhost:8088>**. The public dashboard needs no account; the
 sign-in page offers demo accounts for each staff role.
 
+Stopped and started again, even weeks later, the stack fills in the reports it
+missed while it was off before the live simulator and the detector start, so
+the dashboards are current with no command to run: the start button in Docker
+Desktop is enough ([ADR 0022](docs/adr/0022-backfill-fills-the-gap.md)).
+
 | Command | What it does |
 |---|---|
 | `python scripts/smoke-test/smoke_test.py` | Checks the running stack end to end, as CI does |
