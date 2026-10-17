@@ -58,6 +58,17 @@ class LatestReportTest {
                 .json("{\"reportedAt\": \"" + NOW.minus(10, ChronoUnit.MINUTES) + "\"}", true));
   }
 
+  @Test
+  void passesOverAReportDatedAheadOfNow() throws Exception {
+    store(10);
+    store(-60);
+
+    mvc.perform(get("/api/ingestion/reports/latest").with(TestAccounts.asFeed()))
+        .andExpect(
+            content()
+                .json("{\"reportedAt\": \"" + NOW.minus(10, ChronoUnit.MINUTES) + "\"}", true));
+  }
+
   /** A Kandy report that presented {@code minutesAgo} minutes before the test began. */
   private void store(int minutesAgo) {
     long facilityId =
