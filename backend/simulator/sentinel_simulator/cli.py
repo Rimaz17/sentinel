@@ -135,6 +135,30 @@ def backfill(client, generator: Generator, start: datetime, now: datetime) -> in
     return posted
 
 
+def gap_start(client, now: datetime, days: int) -> datetime:
+    """Where a backfill that fills the gap starts: at the API's latest report, or `days` back
+    when it holds none since then. `now` itself when nothing is missing."""
+    window = now - timedelta(days=days)
+    latest = client.latest_reported_at()
+    if latest is None:
+        print(f"The API holds no reports; posting {describe_span(now - window)} of history.")
+        return window
+    if latest <= window:
+        print(
+            f"The API's latest report is from {latest:%Y-%m-%d %H:%M} UTC, before the"
+            f" {describe_span(now - window)} a backfill covers; posting all of them."
+        )
+        return window
+    if latest >= now:
+        print("The API's latest report is from now; nothing is missing.")
+        return now
+    print(
+        f"The API's latest report is from {latest:%Y-%m-%d %H:%M} UTC;"
+        f" filling the {describe_span(now - latest)} since."
+    )
+    return latest
+
+
 def holds_history(client) -> bool:
     """Whether the API already holds reports from the window a backfill would fill."""
     held = client.recent_report_count()
