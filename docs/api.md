@@ -35,6 +35,7 @@ activation are limited to 10 requests a minute from one address.
 |---|---|
 | `POST /api/ingestion/reports` | Submits a report. A data provider's facility is the one in their token; the feed names it in `X-Facility-Code`. Answers `202 Accepted` with the report's id once Kafka has it, and `503` if Kafka cannot take it; the report is stored a moment later. Limited to 120 a minute per data provider. |
 | `GET /api/facilities` | The registry, for the feed and for inspectors' maps. |
+| `GET /api/ingestion/reports/latest` | The feed only: when the latest stored report presented, as `{"reportedAt": "2026-10-17T20:56:26Z"}`, or `null` with none stored. A report dated ahead of now is passed over. The backfill posts from here to now ([ADR 0022](adr/0022-backfill-fills-the-gap.md)). |
 
 **Inspectors**, within their districts; anything outside them is 403:
 
