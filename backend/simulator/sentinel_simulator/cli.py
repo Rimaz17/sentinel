@@ -92,12 +92,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def planned_demo(args: argparse.Namespace, now: datetime) -> list[Outbreak]:
-    """The demo's outbreaks this run will post, or none with --quiet."""
+def planned_demo(
+    args: argparse.Namespace, now: datetime, start: datetime | None = None
+) -> list[Outbreak]:
+    """The demo's outbreaks this run will post, or none with --quiet. A backfill posts from
+    `start`, or from --days back when it is not given."""
     if args.quiet:
         return []
     if args.command == "backfill":
-        return demo_outbreaks(now - timedelta(days=args.days), now)
+        return demo_outbreaks(start or now - timedelta(days=args.days), now)
     return demo_outbreaks(now, now + LIVE_HORIZON)
 
 
