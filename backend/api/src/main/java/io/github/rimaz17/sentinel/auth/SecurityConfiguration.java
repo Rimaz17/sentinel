@@ -77,6 +77,10 @@ class SecurityConfiguration {
                     .authenticated()
                     .requestMatchers(HttpMethod.POST, "/api/ingestion/reports")
                     .hasAnyAuthority("ROLE_DATA_PROVIDER", FeedAuthentication.AUTHORITY)
+                    // When the latest stored report presented, so the feed posts only what is
+                    // missing. The feed alone needs it (docs/adr/0022).
+                    .requestMatchers(HttpMethod.GET, "/api/ingestion/reports/latest")
+                    .hasAuthority(FeedAuthentication.AUTHORITY)
                     // The registry is public Ministry of Health data, but it is read only by the
                     // two callers that need it: the map's facility rings and the simulator.
                     .requestMatchers(HttpMethod.GET, "/api/facilities")
