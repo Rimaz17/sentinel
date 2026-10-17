@@ -84,6 +84,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="skip the backfill if the API already holds reports from the last nine weeks",
     )
+    backfill.add_argument(
+        "--fill-gap",
+        action="store_true",
+        help=(
+            "post only what the API is missing: from its latest report up to now, or all"
+            " --days when it holds none since then"
+        ),
+    )
 
     live = commands.add_parser("live", help="post reports as they happen, until interrupted")
     live.add_argument(
@@ -210,11 +218,18 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
-    demo = planned_demo(args, now)
     try:
         with SentinelClient(args.api_url, key) as client:
             if args.command == "backfill" and args.if_empty and holds_history(client):
                 return 0
+            start = None
+            if args.command == "backfill":
+                start = now - timedelta(days=args.days)
+                if args.fill_gap:
+                    start = gap_start(client, now, args.days)
+                    if start >= now:
+                        return 0
+            demo = planned_demo(args, now, start)
             facilities = client.facilities()
             generator = Generator(
                 facilities, rng, spread_km=args.spread_km, outbreaks=outbreaks + demo
@@ -235,7 +250,7 @@ def main(argv: list[str] | None = None) -> int:
                         "  It starts after the backfill ends, so the backfill will not include it."
                     )
             if args.command == "backfill":
-                backfill(client, generator, now - timedelta(days=args.days), now)
+                backfill(client, generator, start, now)
             else:
                 print(f"Posting live every {args.interval:g} s; Ctrl+C to stop", flush=True)
                 live(client, generator, args.interval)
