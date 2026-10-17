@@ -1,15 +1,16 @@
 """Command line: fill in history, or keep reports flowing in real time.
 
     python -m sentinel_simulator backfill --days 63
-    python -m sentinel_simulator backfill --if-empty
+    python -m sentinel_simulator backfill --fill-gap
     python -m sentinel_simulator live
     python -m sentinel_simulator --outbreak SETTINGS backfill
     python -m sentinel_simulator --quiet backfill
 
 Detection compares the last 7 days with the 8 weeks before them, so a 63-day
-backfill gives it a full window on first run; `--if-empty` skips it when the API
-already holds reports from that window, so a stack started again keeps its
-history rather than gaining a second copy of it. Unless `--quiet` is given, the
+backfill gives it a full window on first run; `--fill-gap` posts only what the
+API is missing, from its latest report up to now, so a stack started again after
+days or weeks off has no hole in its history, and one started again at once
+gains almost nothing, never a second copy. Unless `--quiet` is given, the
 demo's rolling outbreaks run on top of the baseline, so the dashboards always
 have alerts to show; see sentinel_simulator.scenario. `--outbreak` injects an
 outbreak of your own, timed relative to now, with SETTINGS such as
