@@ -58,6 +58,8 @@ class FakeApi(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     received: list = []
     connections: set = set()
+    # When the latest stored report presented, as the API words it; None when it holds none.
+    latest: str | None = None
 
     def do_GET(self):
         FakeApi.connections.add(self.client_address)
@@ -66,6 +68,9 @@ class FakeApi(BaseHTTPRequestHandler):
             return
         if self.path == "/api/public/trends":
             self._reply(200, TRENDS)
+            return
+        if self.path == "/api/ingestion/reports/latest":
+            self._reply(200, {"reportedAt": FakeApi.latest})
             return
         self._reply(200, FACILITIES)
 
@@ -105,6 +110,7 @@ class FakeApi(BaseHTTPRequestHandler):
 def api():
     FakeApi.received = []
     FakeApi.connections = set()
+    FakeApi.latest = None
     server = ThreadingHTTPServer(("127.0.0.1", 0), FakeApi)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -140,6 +146,19 @@ def test_reads_the_facility_registry(api):
 def test_counts_the_reports_held_from_the_last_nine_weeks(api):
     with SentinelClient(api, KEY) as client:
         assert client.recent_report_count() == 47
+
+
+def test_reads_when_the_latest_report_presented(api):
+    FakeApi.latest = "2026-10-02T15:04:26.512Z"
+    with SentinelClient(api, KEY) as client:
+        latest = client.latest_reported_at()
+    assert latest == datetime(2026, 10, 2, 15, 4, 26, 512000, tzinfo=UTC)
+    assert latest.utcoffset().total_seconds() == 0
+
+
+def test_reads_that_the_api_holds_no_report(api):
+    with SentinelClient(api, KEY) as client:
+        assert client.latest_reported_at() is None
 
 
 def test_submits_a_report_as_its_facility(api):
