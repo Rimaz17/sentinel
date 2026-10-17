@@ -61,13 +61,6 @@ class SentinelClient:
             for item in json.loads(body)
         ]
 
-    def recent_report_count(self) -> int:
-        """Reports the API holds from the last nine weeks, the window detection reads."""
-        status, body = self._request("GET", "/api/public/trends")
-        if status != 200:
-            raise ApiError(status, _detail(body))
-        return sum(sum(week["counts"].values()) for week in json.loads(body)["weeks"])
-
     def latest_reported_at(self) -> datetime | None:
         """When the latest report the API holds presented, or None if it holds none."""
         status, body = self._request("GET", "/api/ingestion/reports/latest")
