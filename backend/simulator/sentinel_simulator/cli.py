@@ -114,8 +114,8 @@ def describe_span(span: timedelta) -> str:
     return f"{round(hours / 24)} days"
 
 
-def backfill(client, generator: Generator, days: int, now: datetime) -> int:
-    start = now - timedelta(days=days)
+def backfill(client, generator: Generator, start: datetime, now: datetime) -> int:
+    """Post every report presenting in [start, now)."""
     posted = 0
     began = time.monotonic()
     for report in generator.reports(start, now):
@@ -126,7 +126,7 @@ def backfill(client, generator: Generator, days: int, now: datetime) -> int:
     elapsed = time.monotonic() - began
     rate = posted / elapsed if elapsed > 0 else 0.0
     print(
-        f"Backfill complete: {posted:,} reports over {days} days"
+        f"Backfill complete: {posted:,} reports over {describe_span(now - start)}"
         f" in {elapsed:.1f} s ({rate:.0f}/s)"
     )
     return posted
@@ -208,7 +208,7 @@ def main(argv: list[str] | None = None) -> int:
                         "  It starts after the backfill ends, so the backfill will not include it."
                     )
             if args.command == "backfill":
-                backfill(client, generator, args.days, now)
+                backfill(client, generator, now - timedelta(days=args.days), now)
             else:
                 print(f"Posting live every {args.interval:g} s; Ctrl+C to stop", flush=True)
                 live(client, generator, args.interval)

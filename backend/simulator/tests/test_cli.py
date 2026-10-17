@@ -33,7 +33,7 @@ def generator(seed=5):
 def test_backfill_posts_every_report_in_the_window(capsys):
     client = RecordingClient()
 
-    posted = backfill(client, generator(), days=7, now=NOW)
+    posted = backfill(client, generator(), start=NOW - timedelta(days=7), now=NOW)
 
     assert posted == len(client.submitted) > 0
     assert all(NOW - timedelta(days=7) <= r.reported_at < NOW for r in client.submitted)
@@ -137,7 +137,12 @@ def test_backfill_includes_an_injected_outbreak(capsys):
     facilities = [Facility(f"P{d}0000001", d, "Teaching", 7.0, 80.5) for d in WEEKLY_BASELINES]
     client = RecordingClient()
 
-    backfill(client, Generator(facilities, random.Random(5), outbreaks=[outbreak]), days=7, now=NOW)
+    backfill(
+        client,
+        Generator(facilities, random.Random(5), outbreaks=[outbreak]),
+        start=NOW - timedelta(days=7),
+        now=NOW,
+    )
 
     kandy_dengue = [
         r
