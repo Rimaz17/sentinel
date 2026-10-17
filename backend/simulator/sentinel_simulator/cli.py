@@ -80,11 +80,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     backfill = commands.add_parser("backfill", help="post reports for the past N days, then stop")
     backfill.add_argument("--days", type=int, default=63, help="days of history (default: 63)")
     backfill.add_argument(
-        "--if-empty",
-        action="store_true",
-        help="skip the backfill if the API already holds reports from the last nine weeks",
-    )
-    backfill.add_argument(
         "--fill-gap",
         action="store_true",
         help=(
@@ -167,14 +162,6 @@ def gap_start(client, now: datetime, days: int) -> datetime:
     return latest
 
 
-def holds_history(client) -> bool:
-    """Whether the API already holds reports from the window a backfill would fill."""
-    held = client.recent_report_count()
-    if held:
-        print(f"The API already holds {held:,} reports from the last nine weeks; no backfill.")
-    return held > 0
-
-
 def live(
     client,
     generator: Generator,
@@ -220,8 +207,6 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     try:
         with SentinelClient(args.api_url, key) as client:
-            if args.command == "backfill" and args.if_empty and holds_history(client):
-                return 0
             start = None
             if args.command == "backfill":
                 start = now - timedelta(days=args.days)

@@ -7,7 +7,6 @@ from sentinel_simulator.cli import (
     backfill,
     describe_span,
     gap_start,
-    holds_history,
     live,
     main,
     parse_args,
@@ -144,27 +143,9 @@ def test_a_fill_gap_backfill_with_nothing_missing_posts_nothing(monkeypatch, cap
     assert "nothing is missing" in capsys.readouterr().out
 
 
-class HoldingClient:
-    def __init__(self, held):
-        self.held = held
-
-    def recent_report_count(self):
-        return self.held
-
-
-def test_a_backfill_if_empty_is_skipped_when_the_api_holds_recent_reports(capsys):
-    assert holds_history(HoldingClient(11_934))
-    assert "already holds 11,934 reports" in capsys.readouterr().out
-
-
-def test_a_backfill_if_empty_goes_ahead_when_the_api_holds_none(capsys):
-    assert not holds_history(HoldingClient(0))
-    assert capsys.readouterr().out == ""
-
-
-def test_if_empty_is_off_unless_asked_for():
-    assert not parse_args(["backfill"]).if_empty
-    assert parse_args(["backfill", "--if-empty"]).if_empty
+def test_fill_gap_is_off_unless_asked_for():
+    assert not parse_args(["backfill"]).fill_gap
+    assert parse_args(["backfill", "--fill-gap"]).fill_gap
 
 
 def test_live_posts_each_interval_as_it_ends(capsys):
