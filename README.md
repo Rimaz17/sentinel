@@ -37,15 +37,16 @@ Taken from the full stack running locally on its simulated data.
 </p>
 <p align="center"><b>Landing page</b> · the public entry point: what Sentinel is in one sentence, and one click to the public dashboard</p>
 
-<p align="center">
-  <img src="docs/screenshots/landing-how-it-works.webp" width="100%" alt="The landing page's How it works section: an illustration of one week drawn twice, above as patients and hospitals scattered across a grey hillside annotated 'isolated cases' and 'rainy season?', below as one connected network with a red cluster annotated 'Sentinel alert', 'DBSCAN cluster' and 'hidden outbreak'; beside it, the heading 'An outbreak rarely announces itself at one clinic.' and the two checks, against its own history and against its own map.">
-</p>
-<p align="center"><b>How it works</b> · on the landing page, the two checks in plain words: each area against its own history, and against its own map</p>
-
-<p align="center">
-  <img src="docs/screenshots/landing-public-route.webp" width="100%" alt="The landing page's route to the public dashboard: the heading 'See what is happening in your district.', a line promising district-level status with no account, and a button to open the public dashboard, beside an illustration of Sri Lanka stippled with small red marks, densest around the cities and along the coast.">
-</p>
-<p align="center"><b>The public route</b> · one click to the public dashboard, with no account or sign-up; the map beside it is an illustration, not live data</p>
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/landing-how-it-works.webp" width="100%" alt="The landing page's How it works section: an illustration of one week drawn twice, above as patients and hospitals scattered across a grey hillside annotated 'isolated cases' and 'rainy season?', below as one connected network with a red cluster annotated 'Sentinel alert', 'DBSCAN cluster' and 'hidden outbreak'; beside it, the heading 'An outbreak rarely announces itself at one clinic.' and the two checks, against its own history and against its own map."></td>
+    <td width="50%"><img src="docs/screenshots/landing-public-route.webp" width="100%" alt="The landing page's route to the public dashboard: the heading 'See what is happening in your district.', a line promising district-level status with no account, and a button to open the public dashboard, beside an illustration of Sri Lanka stippled with small red marks, densest around the cities and along the coast."></td>
+  </tr>
+  <tr>
+    <td><b>How it works</b> · the two checks in plain words: each area against its own history, and against its own map</td>
+    <td><b>The public route</b> · one click to the public dashboard, no account; the map is an illustration, not live data</td>
+  </tr>
+</table>
 
 **Same data, two audiences.** The public sees the pattern; inspectors see the detail.
 
