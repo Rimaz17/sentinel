@@ -91,6 +91,23 @@ and the detector checks at once, so alerts are on the dashboards straight away.
 Open **<http://localhost:8088>**. The public dashboard needs no account; the
 sign-in page offers demo accounts for each staff role.
 
+### Demo accounts
+
+Every demo account signs in with the password `sentinel-demo`. The accounts and
+the password are shown to every visitor on the sign-in page, on purpose
+([ADR 0017](docs/adr/0017-public-demo-mode.md)), and a click on an account fills
+the form.
+
+| Account | Email | Reaches |
+|---|---|---|
+| Administrator | `admin@demo.sentinel.test` | All of administration, held back from what would break the demo |
+| Inspector, every district | `inspector.national@demo.sentinel.test` | The internal dashboard for all 25 districts |
+| Inspector, Colombo | `inspector.colombo@demo.sentinel.test` | Colombo only; Kandy answers 403 |
+| Data provider | `records.idh@demo.sentinel.test` | Report submission for the Infectious Diseases Hospital, Angoda |
+
+To register as a new data provider, use the demo invite code `CMB-DEM-7Q4X` at
+`/register`. What visitors change is put back every night at 03:00 Sri Lanka time.
+
 Stopped and started again, even weeks later, the stack fills in the reports it
 missed while it was off before the live simulator and the detector start, so
 the dashboards are current with no command to run: the start button in Docker
