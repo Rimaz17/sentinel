@@ -10,7 +10,7 @@
 
 Docker only · a few minutes to start · all case data simulated · [Demo accounts](#demo-accounts) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Results](#results) · [API](docs/api.md)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/Rimaz17/sentinel/ci.yml?branch=main&label=CI&logo=github)](https://github.com/Rimaz17/sentinel/actions/workflows/ci.yml) [![Java 17](https://img.shields.io/badge/Java-17-E76F00?logo=openjdk&logoColor=white)](backend/api) [![Spring Boot 4.1](https://img.shields.io/badge/Spring_Boot-4.1-6DB33F?logo=springboot&logoColor=white)](backend/api) [![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](frontend) [![TypeScript 6.0](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](frontend) [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](backend/detector)
+[![CI](https://img.shields.io/github/actions/workflow/status/Rimaz17/sentinel/ci.yml?branch=main&label=CI&logo=github)](https://github.com/Rimaz17/sentinel/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-D63AFF)](LICENSE) [![Java 17](https://img.shields.io/badge/Java-17-E76F00?logo=openjdk&logoColor=white)](backend/api) [![Spring Boot 4.1](https://img.shields.io/badge/Spring_Boot-4.1-6DB33F?logo=springboot&logoColor=white)](backend/api) [![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](frontend) [![TypeScript 6.0](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](frontend) [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](backend/detector)
 <br>
 [![PostgreSQL 17 with PostGIS](https://img.shields.io/badge/PostgreSQL-17_%C2%B7_PostGIS-4169E1?logo=postgresql&logoColor=white)](docs/adr/0019-postgis.md) [![Apache Kafka 4.2](https://img.shields.io/badge/Kafka-4.2-231F20?logo=apachekafka&logoColor=white)](docs/adr/0014-kafka-between-ingestion-and-storage.md) [![Redis 7.4](https://img.shields.io/badge/Redis-7.4-DC382D?logo=redis&logoColor=white)](docs/adr/0015-seven-day-windows-in-redis.md) [![Leaflet with OpenStreetMap](https://img.shields.io/badge/Leaflet-OpenStreetMap-199900?logo=leaflet&logoColor=white)](docs/adr/0010-openstreetmap-tiles.md) [![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](infra/docker-compose.yml)
 
@@ -265,6 +265,16 @@ Documented on purpose; [the full list](docs/limitations.md) has 30.
 | [Known limitations](docs/limitations.md) | Every known limitation and trade-off |
 | [Decision records](docs/adr/) | Why each significant choice was made |
 | [Design](docs/design/) | The product and design system records |
+
+## License
+
+The code is released under the [MIT License](LICENSE). The data and fonts it
+bundles keep their own licences: the facility registry is derived from Team
+Watchdog's "Ministry of Health Institutions" dataset (Apache License 2.0); the
+district outlines are OpenStreetMap data via geoBoundaries (Open Data Commons
+Open Database License 1.0, © OpenStreetMap contributors); map tiles are ©
+OpenStreetMap contributors; and the fonts, Schibsted Grotesk and Geist Mono, are
+under the SIL Open Font License 1.1.
 
 ## Credits
 
