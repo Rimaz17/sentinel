@@ -1,11 +1,32 @@
-# Sentinel
+<div align="center">
 
-A public-health outbreak early-warning system for Sri Lanka. It gathers anonymised
-symptom reports from hospitals, clinics and pharmacies, learns what a normal week
-looks like for each district, and raises an alert when an area moves well outside
-that range.
+<img src="docs/brand/sentinel-logo.svg" alt="Sentinel" width="440">
 
-**All case data in this project is simulated. No real patient data is used.**
+<hr>
+
+### Outbreak early warning for Sri Lanka, district by district.
+
+[![Run it with one Docker Compose command](https://img.shields.io/badge/run_it-one_docker_compose_command-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#run-it)
+
+Docker only · a few minutes to start · all case data simulated · [Demo accounts](#demo-accounts) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Results](#results) · [API](docs/api.md)
+
+[![CI](https://img.shields.io/github/actions/workflow/status/Rimaz17/sentinel/ci.yml?branch=main&label=CI&logo=github)](https://github.com/Rimaz17/sentinel/actions/workflows/ci.yml) [![Java 17](https://img.shields.io/badge/Java-17-E76F00?logo=openjdk&logoColor=white)](backend/api) [![Spring Boot 4.1](https://img.shields.io/badge/Spring_Boot-4.1-6DB33F?logo=springboot&logoColor=white)](backend/api) [![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](frontend) [![TypeScript 6.0](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](frontend) [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](backend/detector)
+<br>
+[![PostgreSQL 17 with PostGIS](https://img.shields.io/badge/PostgreSQL-17_%C2%B7_PostGIS-4169E1?logo=postgresql&logoColor=white)](docs/adr/0019-postgis.md) [![Apache Kafka 4.2](https://img.shields.io/badge/Kafka-4.2-231F20?logo=apachekafka&logoColor=white)](docs/adr/0014-kafka-between-ingestion-and-storage.md) [![Redis 7.4](https://img.shields.io/badge/Redis-7.4-DC382D?logo=redis&logoColor=white)](docs/adr/0015-seven-day-windows-in-redis.md) [![Leaflet with OpenStreetMap](https://img.shields.io/badge/Leaflet-OpenStreetMap-199900?logo=leaflet&logoColor=white)](docs/adr/0010-openstreetmap-tiles.md) [![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](infra/docker-compose.yml)
+
+</div>
+
+Sentinel gathers anonymised symptom reports from hospitals, clinics and
+pharmacies across Sri Lanka, learns what a normal week looks like for each
+district, and raises an alert when an area moves well outside that range: on
+day three of an outbreak, not day ten. Public health inspectors see each alert
+the moment it is raised, with where its reports are bunched on the map; the
+public sees calm, district-level status and nothing that could identify anyone.
+
+> **Status:** all seven build phases are built, and every pull request starts
+> the whole stack in CI and checks it as far as the detector's first alerts. A
+> public deployment is not up yet, so the demo runs locally with one command.
+> **All case data is simulated; no real patient data is used.**
 
 ## Screenshots
 
