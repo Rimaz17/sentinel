@@ -304,10 +304,12 @@ sentinel/
 │   ├── adr/               Architecture decision records
 │   ├── architecture/      The architecture: an illustrated overview, and a
 │   │                      detailed diagram as SVG and PNG
-│   └── design/
-│       ├── PRODUCT.md     Product record
-│       ├── DESIGN.md      Design system, written from the built page
-│       └── source-images/ Full-resolution originals (archived, not shipped)
+│   ├── brand/             The logo tile at the top of the README
+│   ├── design/
+│   │   ├── PRODUCT.md     Product record
+│   │   ├── DESIGN.md      Design system, written from the built page
+│   │   └── source-images/ Full-resolution originals (archived, not shipped)
+│   └── screenshots/       README screenshots, taken from the full stack on simulated data
 ├── scripts/
 │   ├── build-images.py    Regenerates frontend/src/assets from the originals
 │   ├── district-boundaries/ Builds the public map's district outlines from geoBoundaries
