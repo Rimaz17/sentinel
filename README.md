@@ -8,7 +8,7 @@
 
 [![Run it with one Docker Compose command](https://img.shields.io/badge/run_it-one_docker_compose_command-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#run-it)
 
-Docker only · a few minutes to start · all case data simulated · [Demo accounts](#demo-accounts) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Results](#results) · [API](docs/api.md)
+Docker only · a few minutes to start · all case data simulated · [Video walkthrough](#video-walkthrough) · [Demo accounts](#demo-accounts) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Results](#results) · [API](docs/api.md)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/Rimaz17/sentinel/ci.yml?branch=main&label=CI&logo=github)](https://github.com/Rimaz17/sentinel/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-D63AFF)](LICENSE) [![Java 17](https://img.shields.io/badge/Java-17-E76F00?logo=openjdk&logoColor=white)](backend/api) [![Spring Boot 4.1](https://img.shields.io/badge/Spring_Boot-4.1-6DB33F?logo=springboot&logoColor=white)](backend/api) [![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](frontend) [![TypeScript 6.0](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](frontend) [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](backend/detector)
 <br>
