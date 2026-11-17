@@ -28,6 +28,16 @@ public sees calm, district-level status and nothing that could identify anyone.
 > public deployment is not up yet, so the demo runs locally with one command.
 > **All case data is simulated; no real patient data is used.**
 
+## Video walkthrough
+
+Four minutes, narrated, with English captions, filmed on the full stack running
+locally on its simulated data: why Sentinel exists and how it decides, the
+public dashboard, a hospital registering and submitting a report, an inspector
+confirming an outbreak with its 2 km ring, access refused outside an inspector's
+district, administration, and the architecture.
+
+https://github.com/user-attachments/assets/11814ede-2552-4384-a715-ee3d7fbd1536
+
 ## Screenshots
 
 Taken from the full stack running locally on its simulated data.
