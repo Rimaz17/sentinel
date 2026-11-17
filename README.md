@@ -25,7 +25,8 @@ public sees calm, district-level status and nothing that could identify anyone.
 
 > **Status:** all seven build phases are built, and every pull request starts
 > the whole stack in CI and checks it as far as the detector's first alerts. A
-> public deployment is not up yet, so the demo runs locally with one command.
+> public deployment is not up yet, so the demo runs locally with one command,
+> and the [video walkthrough](#video-walkthrough) shows it running.
 > **All case data is simulated; no real patient data is used.**
 
 ## Video walkthrough
