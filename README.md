@@ -285,7 +285,9 @@ Watchdog's "Ministry of Health Institutions" dataset (Apache License 2.0); the
 district outlines are OpenStreetMap data via geoBoundaries (Open Data Commons
 Open Database License 1.0, © OpenStreetMap contributors); map tiles are ©
 OpenStreetMap contributors; and the fonts, Schibsted Grotesk and Geist Mono, are
-under the SIL Open Font License 1.1.
+under the SIL Open Font License 1.1. The music in the video walkthrough is
+"Inspired" by Kevin MacLeod (incompetech.com), licensed under Creative Commons
+Attribution 4.0.
 
 ## Credits
 
