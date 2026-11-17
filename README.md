@@ -247,7 +247,7 @@ stack from them and smoke-tests it, as far as the detector's first alerts.
 | 4 | Accounts and roles: invite codes, inspector accounts, public dashboard | **Built** |
 | 5 | Real-time: Kafka, Redis windows, WebSocket alerts | **Built** |
 | 6 | Geography: PostGIS, DBSCAN, cluster rings | **Built** |
-| 7 | Ship it: Docker Compose, CI, deployed demo | **Built**, except the deployed demo and screen recording |
+| 7 | Ship it: Docker Compose, CI, deployed demo | **Built**, except the deployed demo |
 | n/a | Landing page, the public entry point at `/` | **Built** |
 
 ## Known limitations
