@@ -8,7 +8,7 @@
 
 [![Run it with one Docker Compose command](https://img.shields.io/badge/run_it-one_docker_compose_command-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#run-it)
 
-Docker only · a few minutes to start · all case data simulated · [Demo accounts](#demo-accounts) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Results](#results) · [API](docs/api.md)
+Docker only · a few minutes to start · all case data simulated · [Video walkthrough](#video-walkthrough) · [Demo accounts](#demo-accounts) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Results](#results) · [API](docs/api.md)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/Rimaz17/sentinel/ci.yml?branch=main&label=CI&logo=github)](https://github.com/Rimaz17/sentinel/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-D63AFF)](LICENSE) [![Java 17](https://img.shields.io/badge/Java-17-E76F00?logo=openjdk&logoColor=white)](backend/api) [![Spring Boot 4.1](https://img.shields.io/badge/Spring_Boot-4.1-6DB33F?logo=springboot&logoColor=white)](backend/api) [![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](frontend) [![TypeScript 6.0](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](frontend) [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](backend/detector)
 <br>
@@ -25,8 +25,19 @@ public sees calm, district-level status and nothing that could identify anyone.
 
 > **Status:** all seven build phases are built, and every pull request starts
 > the whole stack in CI and checks it as far as the detector's first alerts. A
-> public deployment is not up yet, so the demo runs locally with one command.
+> public deployment is not up yet, so the demo runs locally with one command,
+> and the [video walkthrough](#video-walkthrough) shows it running.
 > **All case data is simulated; no real patient data is used.**
+
+## Video walkthrough
+
+Four minutes, narrated, with English captions, filmed on the full stack running
+locally on its simulated data: why Sentinel exists and how it decides, the
+public dashboard, a hospital registering and submitting a report, an inspector
+confirming an outbreak with its 2 km ring, access refused outside an inspector's
+district, administration, and the architecture.
+
+https://github.com/user-attachments/assets/11814ede-2552-4384-a715-ee3d7fbd1536
 
 ## Screenshots
 
@@ -247,7 +258,7 @@ stack from them and smoke-tests it, as far as the detector's first alerts.
 | 4 | Accounts and roles: invite codes, inspector accounts, public dashboard | **Built** |
 | 5 | Real-time: Kafka, Redis windows, WebSocket alerts | **Built** |
 | 6 | Geography: PostGIS, DBSCAN, cluster rings | **Built** |
-| 7 | Ship it: Docker Compose, CI, deployed demo | **Built**, except the deployed demo and screen recording |
+| 7 | Ship it: Docker Compose, CI, deployed demo | **Built**, except the deployed demo |
 | n/a | Landing page, the public entry point at `/` | **Built** |
 
 ## Known limitations
@@ -285,7 +296,9 @@ Watchdog's "Ministry of Health Institutions" dataset (Apache License 2.0); the
 district outlines are OpenStreetMap data via geoBoundaries (Open Data Commons
 Open Database License 1.0, © OpenStreetMap contributors); map tiles are ©
 OpenStreetMap contributors; and the fonts, Schibsted Grotesk and Geist Mono, are
-under the SIL Open Font License 1.1.
+under the SIL Open Font License 1.1. The music in the video walkthrough is
+"Inspired" by Kevin MacLeod (incompetech.com), licensed under Creative Commons
+Attribution 4.0.
 
 ## Credits
 
